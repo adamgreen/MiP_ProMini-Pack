@@ -1,4 +1,8 @@
-## Bill of Materials 
+## Overview
+In progress project based on [Sparkfun's MiP ProMini-Pack](https://www.sparkfun.com/products/retired/13058).
+
+
+## Bill of Materials
 Description | Quantity | Part Number(s) 
 ------------|----------|---------------
 [10uF Capacitor - 1206](https://www.digikey.com/products/en?keywords=478-8235-1-ND) | 2 | C13, C19
