@@ -7246,7 +7246,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="U3" library="SparkFun-AnalogIC" deviceset="TS3USB221A" device="" value="TS3USB221A"/>
 <part name="GND9" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="GND10" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
-<part name="D4" library="SparkFun-LED" deviceset="LED-GREEN" device="0603" value="GREEN"/>
+<part name="D4" library="SparkFun-LED" deviceset="LED-GREEN" device="0603" value="Green"/>
 <part name="R7" library="SparkFun-Resistors" deviceset="1KOHM1/10W1%(0603)" device="" value="1K"/>
 <part name="SUPPLY3" library="SparkFun-Aesthetics" deviceset="VIN" device=""/>
 <part name="R4" library="SparkFun-Resistors" deviceset="10KOHM1/10W1%(0603)" device="0603" value="10K"/>
@@ -7295,6 +7295,8 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="GND18" library="SparkFun" deviceset="GND" device=""/>
 <part name="P+13" library="SparkFun-Aesthetics" deviceset="5V" device="" value="5V"/>
 <part name="R10" library="SparkFun-Resistors" deviceset="1KOHM1/10W1%(0603)" device="" value="1K"/>
+<part name="P+14" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
+<part name="P+16" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
 </parts>
 <sheets>
 <sheet>
@@ -7305,7 +7307,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <wire x1="223.52" y1="140.208" x2="223.52" y2="175.26" width="0.2032" layer="97" style="shortdash"/>
 <text x="243.84" y="141.478" size="1.778" layer="97" rot="R90">Optional Pullups for I2C lines</text>
 <text x="166.37" y="11.43" size="2.54" layer="94">Adam Green (http://github.com/adamgreen)</text>
-<text x="238.76" y="7.62" size="2.54" layer="94">v1</text>
+<text x="238.76" y="7.62" size="2.54" layer="94">v2</text>
 <text x="86.36" y="154.94" size="1.778" layer="97">Note: Cut jumper to move
 SEL to another pin</text>
 <text x="6.35" y="115.57" size="1.778" layer="97" rot="R90" align="bottom-center">MiP UART</text>
@@ -7382,8 +7384,8 @@ board from FTDI.</text>
 <instance part="JP9" gate="G$1" x="35.56" y="45.72"/>
 <instance part="SJ2" gate="G$1" x="101.6" y="66.04" rot="R90"/>
 <instance part="SJ4" gate="G$1" x="101.6" y="27.94" rot="MR270"/>
-<instance part="P+4" gate="G$1" x="27.94" y="68.58"/>
-<instance part="P+5" gate="G$1" x="111.76" y="68.58"/>
+<instance part="P+4" gate="G$1" x="33.02" y="68.58"/>
+<instance part="P+5" gate="G$1" x="106.68" y="68.58"/>
 <instance part="SUPPLY1" gate="G$1" x="93.98" y="68.58"/>
 <instance part="SUPPLY2" gate="G$1" x="45.72" y="68.58"/>
 <instance part="U3" gate="G$1" x="50.8" y="132.08" rot="MR0"/>
@@ -7458,6 +7460,12 @@ board from FTDI.</text>
 <instance part="R10" gate="G$1" x="27.94" y="139.7" smashed="yes" rot="R180">
 <attribute name="NAME" x="26.67" y="143.2814" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="31.75" y="143.002" size="1.778" layer="96" rot="R180"/>
+</instance>
+<instance part="P+14" gate="G$1" x="27.94" y="68.58" smashed="yes">
+<attribute name="VALUE" x="24.384" y="72.136" size="1.778" layer="96"/>
+</instance>
+<instance part="P+16" gate="G$1" x="111.76" y="68.58" smashed="yes">
+<attribute name="VALUE" x="110.744" y="72.136" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -8339,26 +8347,6 @@ board from FTDI.</text>
 <pinref part="R3" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<wire x1="33.02" y1="27.94" x2="27.94" y2="27.94" width="0.1524" layer="91"/>
-<wire x1="27.94" y1="27.94" x2="27.94" y2="66.04" width="0.1524" layer="91"/>
-<wire x1="27.94" y1="66.04" x2="33.02" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="P+4" gate="G$1" pin="5V"/>
-<wire x1="27.94" y1="68.58" x2="27.94" y2="66.04" width="0.1524" layer="91"/>
-<junction x="27.94" y="66.04"/>
-<pinref part="SJ1" gate="G$1" pin="3"/>
-<pinref part="SJ3" gate="G$1" pin="3"/>
-</segment>
-<segment>
-<pinref part="SJ4" gate="G$1" pin="3"/>
-<wire x1="106.68" y1="27.94" x2="111.76" y2="27.94" width="0.1524" layer="91"/>
-<wire x1="111.76" y1="27.94" x2="111.76" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="SJ2" gate="G$1" pin="3"/>
-<wire x1="111.76" y1="66.04" x2="106.68" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="P+5" gate="G$1" pin="5V"/>
-<wire x1="111.76" y1="68.58" x2="111.76" y2="66.04" width="0.1524" layer="91"/>
-<junction x="111.76" y="66.04"/>
-</segment>
-<segment>
 <pinref part="P+8" gate="G$1" pin="5V"/>
 <wire x1="203.2" y1="86.36" x2="203.2" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="203.2" y1="83.82" x2="200.66" y2="83.82" width="0.1524" layer="91"/>
@@ -8383,6 +8371,16 @@ board from FTDI.</text>
 <pinref part="P+13" gate="G$1" pin="5V"/>
 <wire x1="210.82" y1="175.26" x2="215.9" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="215.9" y1="175.26" x2="215.9" y2="177.8" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="P+4" gate="G$1" pin="5V"/>
+<pinref part="SJ1" gate="G$1" pin="3"/>
+<wire x1="33.02" y1="68.58" x2="33.02" y2="66.04" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="SJ2" gate="G$1" pin="3"/>
+<pinref part="P+5" gate="G$1" pin="5V"/>
+<wire x1="106.68" y1="66.04" x2="106.68" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -8415,6 +8413,18 @@ board from FTDI.</text>
 <pinref part="D1" gate="G$1" pin="C"/>
 <pinref part="P+12" gate="G$1" pin="3.3V"/>
 <wire x1="60.96" y1="170.18" x2="60.96" y2="172.72" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="P+14" gate="G$1" pin="3.3V"/>
+<pinref part="SJ3" gate="G$1" pin="3"/>
+<wire x1="27.94" y1="68.58" x2="27.94" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="27.94" x2="33.02" y2="27.94" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="SJ4" gate="G$1" pin="3"/>
+<pinref part="P+16" gate="G$1" pin="3.3V"/>
+<wire x1="106.68" y1="27.94" x2="111.76" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="111.76" y1="27.94" x2="111.76" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$15" class="0">
