@@ -2264,10 +2264,10 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <attribute name="NAME" x="9.7028" y="23.0632" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
 </element>
 <element name="C3" library="rcl" package="C0805" value="0.1uF" x="18.288" y="47.117" smashed="yes" rot="R270">
-<attribute name="NAME" x="16.51" y="47.879" size="0.6096" layer="25" font="vector" rot="R270"/>
+<attribute name="NAME" x="17.907" y="48.895" size="0.6096" layer="25" font="vector"/>
 </element>
 <element name="C1" library="rcl" package="C0805" value="0.1uF" x="21.336" y="46.101" smashed="yes">
-<attribute name="NAME" x="23.495" y="45.847" size="0.6096" layer="25" font="vector"/>
+<attribute name="NAME" x="23.495" y="46.609" size="0.6096" layer="25" font="vector"/>
 </element>
 <element name="R6" library="rcl" package="R0805" value="330" x="21.336" y="48.26" smashed="yes">
 <attribute name="NAME" x="23.495" y="48.006" size="0.6096" layer="25" font="vector"/>
@@ -2289,11 +2289,11 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="U1" library="SparkFun-DigitalIC" package="TQFP32-08" value="ATMEGA328" x="21.336" y="39.37" smashed="yes" rot="R135">
 <attribute name="PROD_ID" value="IC-09069" x="21.336" y="39.37" size="1.778" layer="27" rot="R135" display="off"/>
 <attribute name="VALUE" value="ATMEGA328P" x="21.336" y="39.37" size="1.778" layer="27" rot="R135" display="off"/>
-<attribute name="NAME" x="20.95016875" y="33.323959375" size="0.6096" layer="25" font="vector"/>
+<attribute name="NAME" x="20.95016875" y="33.704959375" size="0.6096" layer="25" font="vector"/>
 </element>
 <element name="JP1" library="SparkFun" package="1X06" value="FTDI Basic" x="14.986" y="4.826" smashed="yes"/>
 <element name="C2" library="rcl" package="C0805" value="0.1uF" x="17.018" y="23.749" smashed="yes" rot="R270">
-<attribute name="NAME" x="18.415" y="23.749" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="16.764" y="21.082" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="R1" library="rcl" package="R0805" value="DNP" x="20.066" y="29.591" smashed="yes" rot="MR180">
 <attribute name="NAME" x="22.098" y="29.972" size="0.6096" layer="26" font="vector" rot="MR180"/>
@@ -2309,7 +2309,7 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <attribute name="VALUE" x="19.812" y="36.068" size="1.27" layer="28" rot="MR270"/>
 </element>
 <element name="Q1" library="adam_custom" package="RESONATOR-SMD-CUSTOM" value="16MHZ" x="25.019" y="32.258" smashed="yes" rot="R270">
-<attribute name="NAME" x="23.114" y="32.258" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="22.86" y="31.75" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="FRAME1" library="SparkFun-Aesthetics" package="CREATIVE_COMMONS" value="FRAME-LETTER" x="5.0546" y="-9.525"/>
 <element name="JP4" library="SparkFun-Connectors" package="1X08" value="" x="34.036" y="46.228" locked="yes" smashed="yes" rot="MR270">
@@ -2324,40 +2324,52 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="JP9" library="SparkFun-Connectors" package="1X08" value="" x="11.176" y="46.228" locked="yes" smashed="yes" rot="MR270">
 <attribute name="VALUE" x="14.351" y="47.498" size="1.27" layer="28" rot="MR270"/>
 </element>
-<element name="SJ2" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="32.131" y="25.908" rot="R180"/>
-<element name="SJ4" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="31.496" y="49.784" rot="R180"/>
+<element name="SJ2" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="32.131" y="25.908" smashed="yes" rot="R180">
+<attribute name="VALUE" x="32.2311" y="25.908" size="0.02" layer="27" rot="R180"/>
+<attribute name="VALUE" x="33.401" y="27.813" size="0.4064" layer="27" rot="R180"/>
+</element>
+<element name="SJ4" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="31.496" y="49.784" smashed="yes" rot="R180">
+<attribute name="VALUE" x="31.5961" y="49.784" size="0.02" layer="27" rot="R180"/>
+<attribute name="VALUE" x="32.766" y="51.689" size="0.4064" layer="27" rot="R180"/>
+</element>
 <element name="U3" library="adam_custom" package="QFN-10-RSE-CUSTOM" value="TS3USB221A" x="22.479" y="22.86" smashed="yes" rot="R90">
-<attribute name="NAME" x="20.652" y="22.845" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
+<attribute name="NAME" x="25.034" y="24.081" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
 </element>
 <element name="D4" library="SparkFun-LED" package="LED-0603" value="Green" x="30.734" y="13.208" smashed="yes" rot="R180">
 <attribute name="PROD_ID" value="DIO-00821" x="39.116" y="16.002" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="31.8135" y="13.208" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="30.861" y="15.4305" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="R7" library="rcl" package="R0805" value="1K" x="32.385" y="13.716" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.385" y="16.256" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="32.385" y="16.129" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="R4" library="rcl" package="R0805" value="10K" x="23.876" y="26.797" smashed="yes" rot="R270">
-<attribute name="NAME" x="23.876" y="29.337" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="23.749" y="29.21" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="R5" library="rcl" package="R0805" value="10K" x="28.829" y="14.351" smashed="yes" rot="R90">
-<attribute name="NAME" x="30.353" y="14.351" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
+<attribute name="NAME" x="28.829" y="16.51" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
 </element>
 <element name="R8" library="rcl" package="R0805" value="1K" x="21.844" y="18.542" smashed="yes" rot="R270">
-<attribute name="NAME" x="23.368" y="18.542" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="20.447" y="18.542" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
 </element>
 <element name="C4" library="rcl" package="C0805" value="0.1uF" x="19.558" y="22.352" smashed="yes" rot="R90">
-<attribute name="NAME" x="18.034" y="22.352" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
+<attribute name="NAME" x="19.685" y="20.066" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
 </element>
 <element name="JP10" library="SparkFun-Connectors" package="1X01" value="M01PTH" x="31.496" y="18.288" smashed="yes"/>
-<element name="SJ5" library="SparkFun-Passives" package="PAD-JUMPER-2-NC_BY_TRACE_YES_SILK" value="D2 Jumper" x="31.242" y="21.844" rot="R90"/>
+<element name="SJ5" library="SparkFun-Passives" package="PAD-JUMPER-2-NC_BY_TRACE_YES_SILK" value="D2 Jumper" x="31.242" y="21.844" smashed="yes" rot="R90"/>
 <element name="F1" library="adam_custom" package="PTC-1206-CUSTOM" value="PTCCUSTOM" x="2.54" y="23.495" smashed="yes" rot="R90">
 <attribute name="NAME" x="4.064" y="23.495" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
 </element>
 <element name="JP11" library="SparkFun-Connectors" package="1X04-1.5MM_JST" value="" x="4.064" y="27.686" rot="MR90"/>
-<element name="SJ1" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="10.922" y="25.908"/>
-<element name="SJ3" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="11.176" y="49.784"/>
+<element name="SJ1" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="10.922" y="25.908" smashed="yes">
+<attribute name="VALUE" x="10.8219" y="25.908" size="0.02" layer="27"/>
+<attribute name="VALUE" x="9.652" y="24.003" size="0.4064" layer="27"/>
+</element>
+<element name="SJ3" library="SparkFun-Passives" package="PAD-JUMPER-3-2OF3_NC_BY_PASTE_YES_SILK_FULL_BOX" value="" x="11.176" y="49.784" smashed="yes">
+<attribute name="VALUE" x="11.0759" y="49.784" size="0.02" layer="27"/>
+<attribute name="VALUE" x="9.906" y="47.879" size="0.4064" layer="27"/>
+</element>
 <element name="C10" library="rcl" package="C0805" value="0.1uF" x="20.447" y="14.097" smashed="yes" rot="R270">
-<attribute name="NAME" x="21.971" y="14.097" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="21.717" y="15.113" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
 </element>
 <element name="C13" library="SparkFun" package="EIA3216" value="10uF" x="17.907" y="14.097" smashed="yes" rot="R90">
 <attribute name="NAME" x="17.907" y="17.161" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
@@ -2367,38 +2379,38 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <attribute name="NAME" x="13.843" y="16.256" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="C19" library="SparkFun" package="EIA3216" value="10uF" x="9.652" y="16.764" smashed="yes" rot="R90">
-<attribute name="NAME" x="7.763" y="16.764" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
+<attribute name="NAME" x="7.763" y="16.002" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
 </element>
 <element name="FID1" library="SparkFun-Aesthetics" package="FIDUCIAL-1X2" value="FIDUCIAL1X2" x="10.16" y="5.08"/>
 <element name="FID2" library="SparkFun-Aesthetics" package="FIDUCIAL-1X2" value="FIDUCIAL1X2" x="33.02" y="55.88" smashed="yes"/>
 <element name="C5" library="rcl" package="C0805" value="0.1uF" x="28.956" y="10.287" smashed="yes" rot="R270">
-<attribute name="NAME" x="27.432" y="10.287" size="0.6096" layer="25" font="vector" rot="R270" align="center"/>
+<attribute name="NAME" x="27.686" y="10.287" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
 </element>
 <element name="C6" library="SparkFun" package="EIA3216" value="10uF" x="25.654" y="10.922" smashed="yes" rot="R90">
-<attribute name="NAME" x="23.765" y="8.763" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
+<attribute name="NAME" x="24.146" y="10.922" size="0.6096" layer="25" font="vector" rot="R90" align="center"/>
 </element>
 <element name="U4" library="SparkFun-PowerIC" package="SOT23-5" value="MIC5205-3.3" x="21.717" y="9.779" smashed="yes" rot="R270">
 <attribute name="PROD_ID" value="VREG-00822" x="20.193" y="12.954" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="21.717" y="12.065" size="0.6096" layer="25" font="vector" align="center"/>
+<attribute name="NAME" x="21.463" y="11.938" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="C7" library="SparkFun" package="EIA3216" value="10uF" x="16.129" y="9.652" smashed="yes">
-<attribute name="NAME" x="16.129" y="11.414" size="0.6096" layer="25" font="vector" align="center"/>
+<attribute name="NAME" x="15.748" y="11.414" size="0.6096" layer="25" font="vector" align="center"/>
 </element>
 <element name="J1" library="SparkFun-Connectors" package="1X02" value="" x="9.906" y="9.398" smashed="yes" rot="R305">
 <attribute name="NAME" x="11.52091875" y="10.0257" size="0.8128" layer="21" font="vector" ratio="15" rot="R305"/>
 <attribute name="VALUE" x="6.576753125" y="8.61721875" size="1.27" layer="27" rot="R305"/>
 </element>
 <element name="R12" library="rcl" package="R0805" value="1K" x="25.781" y="14.986" smashed="yes" rot="R180">
-<attribute name="NAME" x="26.416" y="13.716" size="0.6096" layer="25" font="vector" rot="R180"/>
+<attribute name="NAME" x="26.543" y="16.637" size="0.6096" layer="25" font="vector" rot="R180"/>
 </element>
 <element name="D1" library="adafruit" package="SOD-323F" value="ZLLS410TA" x="19.685" y="27.178" smashed="yes" rot="R180">
-<attribute name="NAME" x="19.58" y="25.897" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
+<attribute name="NAME" x="19.707" y="25.643" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
 </element>
 <element name="R13" library="rcl" package="R0805" value="1K" x="20.701" y="30.099" smashed="yes" rot="R270">
-<attribute name="NAME" x="21.971" y="30.734" size="0.6096" layer="25" font="vector" rot="R270"/>
+<attribute name="NAME" x="19.431" y="32.258" size="0.6096" layer="25" font="vector"/>
 </element>
 <element name="R10" library="rcl" package="R0805" value="1K" x="23.876" y="18.542" smashed="yes" rot="R270">
-<attribute name="NAME" x="25.146" y="19.177" size="0.6096" layer="25" font="vector" rot="R270"/>
+<attribute name="NAME" x="25.146" y="19.812" size="0.6096" layer="25" font="vector" rot="R270"/>
 </element>
 </elements>
 <signals>
