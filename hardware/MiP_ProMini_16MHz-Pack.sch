@@ -12151,7 +12151,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="223.52" y1="140.208" x2="223.52" y2="175.26" width="0.2032" layer="97" style="shortdash"/>
 <text x="243.84" y="141.478" size="1.778" layer="97" rot="R90">Optional Pullups for I2C lines</text>
 <text x="166.37" y="11.43" size="2.54" layer="94">Adam Green (http://github.com/adamgreen)</text>
-<text x="238.76" y="7.62" size="2.54" layer="94">v2</text>
+<text x="238.76" y="7.62" size="2.54" layer="94">v3</text>
 <text x="86.36" y="154.94" size="1.778" layer="97">Note: Cut jumper to move
 SEL to another pin</text>
 <text x="6.35" y="115.57" size="1.778" layer="97" rot="R90" align="bottom-center">MiP UART</text>
