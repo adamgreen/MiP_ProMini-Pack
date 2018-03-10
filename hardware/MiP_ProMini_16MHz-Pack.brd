@@ -2388,13 +2388,13 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <attribute name="NAME" x="11.52091875" y="10.0257" size="0.8128" layer="21" font="vector" ratio="15" rot="R305"/>
 <attribute name="VALUE" x="6.576753125" y="8.61721875" size="1.27" layer="27" rot="R305"/>
 </element>
-<element name="R12" library="rcl" package="R0805" value="1k" x="25.781" y="14.986" smashed="yes" rot="R180">
+<element name="R12" library="rcl" package="R0805" value="1K" x="25.781" y="14.986" smashed="yes" rot="R180">
 <attribute name="NAME" x="26.416" y="13.716" size="0.6096" layer="25" font="vector" rot="R180"/>
 </element>
 <element name="D1" library="adafruit" package="SOD-323F" value="ZLLS410TA" x="19.685" y="27.178" smashed="yes" rot="R180">
 <attribute name="NAME" x="19.58" y="25.897" size="0.6096" layer="25" font="vector" rot="R180" align="center"/>
 </element>
-<element name="R13" library="rcl" package="R0805" value="1k" x="20.701" y="30.099" smashed="yes" rot="R270">
+<element name="R13" library="rcl" package="R0805" value="1K" x="20.701" y="30.099" smashed="yes" rot="R270">
 <attribute name="NAME" x="21.971" y="30.734" size="0.6096" layer="25" font="vector" rot="R270"/>
 </element>
 <element name="R10" library="rcl" package="R0805" value="1K" x="23.876" y="18.542" smashed="yes" rot="R270">

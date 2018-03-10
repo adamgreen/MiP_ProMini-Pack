@@ -12132,10 +12132,10 @@ Source: AVX .. aphvc.pdf</description>
 <part name="P+9" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
 <part name="J1" library="SparkFun-Connectors" deviceset="M02" device="PTH"/>
 <part name="P+10" library="SparkFun-Aesthetics" deviceset="5V" device="" value="5V"/>
-<part name="R12" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R12" library="rcl" deviceset="R-US_" device="R0805" value="1K"/>
 <part name="D1" library="adafruit" deviceset="DIODE" device="SOD-323F" value="ZLLS410TA"/>
 <part name="P+12" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
-<part name="R13" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R13" library="rcl" deviceset="R-US_" device="R0805" value="1K"/>
 <part name="R10" library="rcl" deviceset="R-US_" device="R0805" value="1K"/>
 <part name="P+4" library="SparkFun-Aesthetics" deviceset="5V" device="" value="5V"/>
 <part name="P+14" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
