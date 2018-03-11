@@ -5300,6 +5300,10 @@ QFN is non-stock</description>
 <text x="-1.056" y="1.52" size="0.4064" layer="25">&gt;Name</text>
 <text x="-1.0325" y="-1.9275" size="0.4064" layer="27">&gt;Value</text>
 <rectangle x1="-1.6" y1="-0.65" x2="1.6" y2="0.65" layer="29"/>
+<rectangle x1="-1.6" y1="-0.65" x2="-1.2" y2="0.65" layer="41"/>
+<rectangle x1="-0.7" y1="-0.65" x2="-0.25" y2="0.65" layer="41"/>
+<rectangle x1="0.25" y1="-0.65" x2="0.7" y2="0.65" layer="41"/>
+<rectangle x1="1.2" y1="-0.65" x2="1.6" y2="0.65" layer="41"/>
 </package>
 <package name="RESONATOR-PTH">
 <wire x1="-2.286" y1="1.778" x2="-2.286" y2="-1.778" width="0.2032" layer="21" curve="162.403081"/>
