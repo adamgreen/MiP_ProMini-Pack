@@ -12177,12 +12177,11 @@ board from FTDI.</text>
 <instances>
 <instance part="R2" gate="G$1" x="142.24" y="165.1" rot="R90"/>
 <instance part="GND3" gate="1" x="139.7" y="139.7"/>
-<instance part="C3" gate="G$1" x="152.4" y="106.68" smashed="yes" rot="R180">
-<attribute name="NAME" x="153.416" y="106.807" size="1.778" layer="95"/>
-</instance>
+<instance part="C3" gate="G$1" x="152.4" y="106.68" rot="R180"/>
 <instance part="GND2" gate="1" x="152.4" y="96.52"/>
 <instance part="C1" gate="G$1" x="147.32" y="137.16" smashed="yes" rot="R180">
-<attribute name="NAME" x="148.336" y="137.287" size="1.778" layer="95"/>
+<attribute name="NAME" x="153.924" y="140.335" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="154.686" y="135.763" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="GND7" gate="1" x="147.32" y="127"/>
 <instance part="R6" gate="G$1" x="215.9" y="91.44" rot="R270"/>
@@ -12206,9 +12205,7 @@ board from FTDI.</text>
 <instance part="P+1" gate="G$1" x="162.56" y="172.72"/>
 <instance part="GND5" gate="1" x="162.56" y="96.52"/>
 <instance part="JP1" gate="G$1" x="17.78" y="165.1"/>
-<instance part="C2" gate="G$1" x="129.54" y="157.48" smashed="yes" rot="R270">
-<attribute name="NAME" x="129.413" y="158.496" size="1.778" layer="95" rot="R90"/>
-</instance>
+<instance part="C2" gate="G$1" x="129.54" y="157.48" rot="R270"/>
 <instance part="R1" gate="G$1" x="228.6" y="154.94" rot="R90"/>
 <instance part="R3" gate="G$1" x="236.22" y="154.94" rot="R90"/>
 <instance part="P+2" gate="G$1" x="228.6" y="162.56"/>
@@ -12216,7 +12213,8 @@ board from FTDI.</text>
 <instance part="S1" gate="G$1" x="139.7" y="149.86" rot="R90"/>
 <instance part="JP3" gate="G$1" x="88.9" y="22.86" rot="R180"/>
 <instance part="Q1" gate="G$1" x="162.56" y="129.54" smashed="yes" rot="R270">
-<attribute name="NAME" x="159.004" y="133.35" size="1.778" layer="95"/>
+<attribute name="NAME" x="161.29" y="134.366" size="1.778" layer="95"/>
+<attribute name="VALUE" x="159.258" y="123.444" size="1.778" layer="96"/>
 </instance>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
 <instance part="FRAME1" gate="V" x="147.32" y="0"/>
@@ -12243,14 +12241,13 @@ board from FTDI.</text>
 <instance part="GND11" gate="1" x="66.04" y="127"/>
 <instance part="R5" gate="G$1" x="83.82" y="134.62" rot="R90"/>
 <instance part="R8" gate="G$1" x="27.94" y="144.78" smashed="yes" rot="R180">
-<attribute name="NAME" x="26.67" y="148.3614" size="1.778" layer="95" rot="R180"/>
+<attribute name="NAME" x="24.13" y="148.3614" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="31.75" y="148.082" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="P+6" gate="G$1" x="33.02" y="152.4" smashed="yes">
 <attribute name="VALUE" x="29.464" y="155.956" size="1.778" layer="96"/>
 </instance>
-<instance part="C4" gate="G$1" x="78.74" y="167.64" smashed="yes" rot="R180">
-<attribute name="NAME" x="79.756" y="167.767" size="1.778" layer="95"/>
-</instance>
+<instance part="C4" gate="G$1" x="78.74" y="167.64" rot="R180"/>
 <instance part="GND12" gate="1" x="78.74" y="157.48"/>
 <instance part="P+7" gate="G$1" x="78.74" y="172.72" smashed="yes">
 <attribute name="VALUE" x="75.184" y="176.276" size="1.778" layer="96"/>
@@ -12294,7 +12291,8 @@ board from FTDI.</text>
 </instance>
 <instance part="R13" gate="G$1" x="68.58" y="109.22" rot="R180"/>
 <instance part="R10" gate="G$1" x="27.94" y="139.7" smashed="yes" rot="R180">
-<attribute name="NAME" x="26.67" y="143.2814" size="1.778" layer="95" rot="R180"/>
+<attribute name="NAME" x="25.146" y="142.7734" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="31.75" y="143.002" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="P+4" gate="G$1" x="27.94" y="68.58"/>
 <instance part="P+14" gate="G$1" x="33.02" y="68.58" smashed="yes">
