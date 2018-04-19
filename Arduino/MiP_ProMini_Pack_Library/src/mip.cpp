@@ -65,6 +65,8 @@
 #define MIP_FLAG_RELEASE_SERIAL (1 << 6)
 
 
+MiP* MiP::s_pInstance = NULL;
+
 
 MiP::MiP(int8_t serialSelectPin /* = MIP_UART_SELECT_PIN*/ , bool releaseSerialToPc /* = true */)
 {
@@ -85,11 +87,14 @@ MiP::MiP(int8_t serialSelectPin /* = MIP_UART_SELECT_PIN*/ , bool releaseSerialT
 
     // UNDONE: Doesn't really do much anyway.
     m_pTransport = mipTransportInit(NULL);
+
+    s_pInstance = this;
 }
 
 MiP::~MiP()
 {
     mipTransportUninit(m_pTransport);
+    s_pInstance = NULL;
 }
 
 

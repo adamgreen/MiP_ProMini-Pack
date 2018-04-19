@@ -32,20 +32,18 @@
 // Macro which will release the TS3USB221A switch to connect the AVR UART to PC and then print data out to it.
 #define PRINT(...) \
     do { \
-        Serial.flush(); \
-        digitalWrite(MIP_UART_SELECT_PIN, LOW); \
+        bool needToRestore = MiP::isInstanceSerialGoingToMiP(); \
+        MiP::switchInstanceSerialToPC(); \
         Serial.print(__VA_ARGS__); \
-        Serial.flush(); \
-        digitalWrite(MIP_UART_SELECT_PIN, HIGH); \
+        if (needToRestore) MiP::switchInstanceSerialToMiP(); \
     } while(0);
 
 #define PRINTLN(...) \
     do { \
-        Serial.flush(); \
-        digitalWrite(MIP_UART_SELECT_PIN, LOW); \
+        bool needToRestore = MiP::isInstanceSerialGoingToMiP(); \
+        MiP::switchInstanceSerialToPC(); \
         Serial.println(__VA_ARGS__); \
-        Serial.flush(); \
-        digitalWrite(MIP_UART_SELECT_PIN, HIGH); \
+        if (needToRestore) MiP::switchInstanceSerialToMiP(); \
     } while(0);
 
 // Integer error codes that can be returned from most of these MiP API functions.
@@ -360,6 +358,31 @@ public:
     {
         return digitalRead(m_serialSelectPin) == HIGH;
     }
+    static void switchInstanceSerialToMiP()
+    {
+        if (s_pInstance)
+        {
+            s_pInstance->switchSerialToMiP();
+        }
+    }
+    static void switchInstanceSerialToPC()
+    {
+        if (s_pInstance)
+        {
+            s_pInstance->switchSerialToPC();
+        }
+    }
+    static bool isInstanceSerialGoingToMiP()
+    {
+        if (s_pInstance)
+        {
+            return s_pInstance->isSerialGoingToMiP();
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     int setGestureRadarMode(MiPGestureRadarMode mode);
     int getGestureRadarMode(MiPGestureRadarMode* pMode);
@@ -417,14 +440,16 @@ protected:
     int  parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
     void readNotifications();
 
-    MiPTransport*             m_pTransport;
-    MiPRadarNotification      m_lastRadar;
-    MiPGestureNotification    m_lastGesture;
-    MiPStatus                 m_lastStatus;
-    MiPWeight                 m_lastWeight;
-    MiPClap                   m_lastClap;
-    uint8_t                   m_flags;
-    int8_t                    m_serialSelectPin;
+    MiPTransport*           m_pTransport;
+    MiPRadarNotification    m_lastRadar;
+    MiPGestureNotification  m_lastGesture;
+    MiPStatus               m_lastStatus;
+    MiPWeight               m_lastWeight;
+    MiPClap                 m_lastClap;
+    uint8_t                 m_flags;
+    int8_t                  m_serialSelectPin;
+
+    static MiP*             s_pInstance;
 };
 
 #endif // MIP_H_
