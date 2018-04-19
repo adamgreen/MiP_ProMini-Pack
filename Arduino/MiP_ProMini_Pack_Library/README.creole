@@ -1,0 +1,2681 @@
+=MiP API
+This library provides an interface for the various operations supported by the
+[[https://github.com/WowWeeLabs/MiP-BLE-Protocol | WowWee MiP Mobile self-balancing Inverted Pendulum  robot protocol]] when the [[https://github.com/adamgreen/MiP_ProMini-Pack | Arduino based MiP ProMini Pack]] is connected directly to the MiP mainboard.
+
+
+
+==Reference
+===Error Codes
+|= Error                    |= Value    |= Description                              |
+| MIP_ERROR_NONE            | 0         | Success                                   |
+| MIP_ERROR_CONNECT         | 1         | Connection to MiP failed                  |
+| MIP_ERROR_PARAM           | 2         | Invalid parameter passed to API           |
+| MIP_ERROR_MEMORY          | 3         | Out of memory                             |
+| MIP_ERROR_NOT_CONNECTED   | 4         | No MiP robot connected                    |
+| MIP_ERROR_NO_REQUEST      | 5         | Not waiting for a response from a request |
+| MIP_ERROR_TIMEOUT         | 6         | Timed out waiting for response            |
+| MIP_ERROR_EMPTY           | 7         | The queue was empty                       |
+| MIP_ERROR_BAD_RESPONSE    | 8         | Unexpected response from MiP              |
+
+
+===API by Function
+|= Function         |= API                                                                                                                                  |
+| Initialization    | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipinit | mipInit]]                                                  |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipuninit | mipUninit]]                                              |
+| Connection        | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipconnecttorobot | mipConnectToRobot]]                              |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdisconnectfromrobot | mipDisconnectFromRobot]]                    |
+| Modes             | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetgestureradarmode | mipSetGestureRadarMode]]                    |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetgestureradarmode | mipGetGestureRadarMode]]                    |
+| LEDs              | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetchestled | mipSetChestLED]]                                    |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipflashchestled | mipFlashChestLED]]                                |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetchestled | mipGetChestLED]]                                    |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetheadleds | mipSetHeadLEDs]]                                    |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetheadleds | mipGetHeadLEDs]]                                    |
+| Motion            | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipcontinuousdrive | mipContinuousDrive]]                            |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdistancedrive | mipDistanceDrive]]                                |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipturnleft | mipTurnLeft]]                                          |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipturnright | mipTurnRight]]                                        |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdriveforward | mipDriveForward]]                                  |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdrivebackward | mipDriveBackward]]                                |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipstop | mipStop]]                                                  |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipfalldown | mipFallDown]]                                          |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetup | mipGetUp]]                                                |
+| Sound             | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipplaysound | mipPlaySound]]                                        |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetvolume | mipGetVolume]]                                        |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetvolume | mipSetVolume]]                                        |
+| Odometer          | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipreadodometer | mipReadOdometer]]                                  |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipresetodometer | mipResetOdometer]]                                |
+| Status            | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetstatus | mipGetStatus]]                                        |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlateststatusnotification | mipGetLatestStatusNotification]]    |
+| Radar             | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestradarnotification | mipGetLatestRadarNotification]]      |
+| Gesture           | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestgesturenotification | mipGetLatestGestureNotification]]  |
+| Shake             | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestshakenotification | mipGetLatestShakeNotification]]      |
+| Weight            | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetweight | mipGetWeight]]                                        |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestweightnotification | mipGetLatestWeightNotification]]    |
+| Clap              | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetclapsettings | mipGetClapSettings]]                            |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipenableclap | mipEnableClap]]                                      |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetclapdelay | mipSetClapDelay]]                                  |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestclapnotification | mipGetLatestClapNotification]]        |
+| Version Info      | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetsoftwareversion | mipGetSoftwareVersion]]                      |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgethardwareinfo | mipGetHardwareInfo]]                            |
+| Raw               | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#miprawsend | mipRawSend]]                                            |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#miprawreceive | mipRawReceive]]                                      |
+|                   | [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#miprawreceivenotification | mipRawReceiveNotification]]              |
+
+
+===API by Name
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipconnecttorobot | mipConnectToRobot]]                              |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipcontinuousdrive | mipContinuousDrive]]                            |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdisconnectfromrobot | mipDisconnectFromRobot]]                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdistancedrive | mipDistanceDrive]]                                |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdrivebackward | mipDriveBackward]]                                |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipdriveforward | mipDriveForward]]                                  |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipenableclap | mipEnableClap]]                                      |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipfalldown | mipFallDown]]                                          |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipflashchestled | mipFlashChestLED]]                                |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetchestled | mipGetChestLED]]                                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetclapsettings | mipGetClapSettings]]                            |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetgestureradarmode | mipGetGestureRadarMode]]                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgethardwareinfo | mipGetHardwareInfo]]                            |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetheadleds | mipGetHeadLEDs]]                                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestclapnotification | mipGetLatestClapNotification]]        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestgesturenotification | mipGetLatestGestureNotification]]  |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestradarnotification | mipGetLatestRadarNotification]]      |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestshakenotification | mipGetLatestShakeNotification]]      |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlateststatusnotification | mipGetLatestStatusNotification]]    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetlatestweightnotification | mipGetLatestWeightNotification]]    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetsoftwareversion | mipGetSoftwareVersion]]                      |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetstatus | mipGetStatus]]                                        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetup | mipGetUp]]                                                |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetvolume | mipGetVolume]]                                        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipgetweight | mipGetWeight]]                                        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipinit | mipInit]]                                                  |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipplaysound | mipPlaySound]]                                        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#miprawreceive | mipRawReceive]]                                      |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#miprawreceivenotification | mipRawReceiveNotification]]              |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#miprawsend | mipRawSend]]                                            |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipreadodometer | mipReadOdometer]]                                  |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipresetodometer | mipResetOdometer]]                                |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetchestled | mipSetChestLED]]                                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetclapdelay | mipSetClapDelay]]                                  |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetgestureradarmode | mipSetGestureRadarMode]]                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetheadleds | mipSetHeadLEDs]]                                    |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipsetvolume | mipSetVolume]]                                        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipstop | mipStop]]                                                  |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipturnleft | mipTurnLeft]]                                          |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipturnright | mipTurnRight]]                                        |
+| [[https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/README.creole#mipuninit | mipUninit]]                                              |
+
+
+===mipInit
+{{{MiP* mipInit(const char* pInitOptions);}}}\\
+Is the first mip*() function that should be called by the developer.  It allocates and returns the MiP* pointer used as
+the first parameter in all subsequent mip*() function calls.
+
+**Parameters:**
+* pInitOptions: A character string which originates with the user.  It is transport specific.  At this point all
+  supported transports ignore the parameter so it can be set to NULL.
+
+**Returns:**
+* NULL on error.
+* A valid pointer to a MiP object otherwise.  This pointer is used as the first parameter in all subsequent mip*()
+  function calls.
+
+
+===mipUninit
+{{{void mipUninit(MiP* pMiP);}}}\\
+Is the last mip*() function that should be called by the developer.  It is used to cleanly shutdown the transport and
+any other resources used by the MiP API.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+
+
+===mipConnectToRobot
+{{{int mipConnectToRobot(MiP* pMiP, const char* pRobotName);}}}\\
+Called to connect to the MiP robot.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pRobotName: The name of the robot to which a connection should be made.  This parameter should be NULL.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Connect.ino - Connect and disconnect from default MiP.\n"
+                "Should see chest LED turn green on successful connection and\n"
+                "then go to sleep shortly after once disconnected.\n");
+    Serial.end();
+
+    // Connect to MiP robot.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Do stuff with the MiP robot.
+
+    // Disconnect from MiP.
+    result = mipDisconnectFromRobot(g_pMiP);
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipDisconnectFromRobot
+{{{int mipDisconnectFromRobot(MiP* pMiP);}}}\\
+Called to disconnect from the current MiP robot and put it to sleep. The Arduino processor on the MiP ProMini Pack is still left running. Only the MiP itself is put to sleep until the next power cycle.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Connect.ino - Connect and disconnect from default MiP.\n"
+                "Should see chest LED turn green on successful connection and\n"
+                "then go to sleep shortly after once disconnected.\n");
+    Serial.end();
+
+    // Connect to MiP robot.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Do stuff with the MiP robot.
+
+    // Disconnect from MiP.
+    result = mipDisconnectFromRobot(g_pMiP);
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipSetGestureRadarMode
+{{{int mipSetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode mode);}}}\\
+Used to enable gesture or radar mode.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* mode: Which mode should be enabled: **MIP_GESTURE_RADAR_DISABLED** (disables both gesture and radar
+  modes), **MIP_GESTURE** (enables gesture mode), or **MIP_RADAR** (enables radar mode).
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* When the mode is set to **MIP_GESTURE**, the MiP will start sending gesture notifications.  These notifications can be
+  queried via mipGetLatestGestureNotification().
+* When the mode is set to **MIP_RADAR**, the MiP will start sending radar notifications.  These notifications can be
+  queried via mipGetLatestRadarNotification().
+* These gesture/radar notifications will be suppressed while the MiP is executing long running commands.  Shorter
+  commands like mipContinuousDrive() do allow the MiP to send the notifications in a timely fashion.
+* These gesture/radar notifications will only be sent when the MiP is actively balancing.  They will be suppressed if
+  the MiP is laying back on its kickstand for example.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                 result = -1;
+    MiPGestureRadarMode mode = MIP_GESTURE_RADAR_DISABLED;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("GestureRadarMode.ino - Use mipSet/GetGestureRadarMode() functions.\n"
+                 "Should switch into radar mode.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    Serial.println("Enable radar mode");
+    do
+    {
+        // Keep trying until it goes through.
+        result = mipGetGestureRadarMode(g_pMiP, &mode);
+        result = mipSetGestureRadarMode(g_pMiP, MIP_RADAR);
+    } while (mode != MIP_RADAR);
+    Serial.println("Radar mode enabled");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetGestureRadarMode
+{{{int mipGetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode* pMode);}}}\\
+Requests the current gesture or radar mode setting from the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pMode: A pointer into which the current MiP gesture/radar mode should be placed.  The returned mode setting will be
+  one of: **MIP_GESTURE_RADAR_DISABLED** (both gesture and radar modes are disabled), **MIP_GESTURE** (gesture mode is
+  enabled), or **MIP_RADAR** (radar mode is enabled).
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if MiP doesn't return a valid mode.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                 result = -1;
+    MiPGestureRadarMode mode = MIP_GESTURE_RADAR_DISABLED;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("GestureRadarMode.ino - Use mipSet/GetGestureRadarMode() functions.\n"
+                 "Should switch into radar mode.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    Serial.println("Enable radar mode");
+    do
+    {
+        // Keep trying until it goes through.
+        result = mipGetGestureRadarMode(g_pMiP, &mode);
+        result = mipSetGestureRadarMode(g_pMiP, MIP_RADAR);
+    } while (mode != MIP_RADAR);
+    Serial.println("Radar mode enabled");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipSetChestLED
+{{{int mipSetChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue);}}}\\
+Sets the colour of the RGB LED in the MiP's chest.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* red: The intensity of the red colour channel (0 - 255).
+* green: The intensity of the green colour channel (0 - 255).
+* blue: The intensity of the blue colour channel (0 - 255).
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int           result = -1;
+    const uint8_t red = 0xff;
+    const uint8_t green = 0x00;
+    const uint8_t blue = 0xff;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("SetChestLED.ino - Use mipSetChestLED() function.\n"
+                 "Should switch chest LED to magenta.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetChestLED(g_pMiP, red, green, blue);
+
+    delay(3000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipFlashChestLED
+{{{int mipFlashChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);}}}\\
+Sets the colour and flashing period of the RGB LED in the MiP's chest.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* red: The intensity of the red colour channel (0 - 255).
+* green: The intensity of the green colour channel (0 - 255).
+* blue: The intensity of the blue colour channel (0 - 255).
+* onTime: Is the time in milliseconds that the LED should remain on with the specified colour.  This parameter can be
+  set to a value between 0 and 5100 milliseconds.
+* offTime: Is the time in milliseconds that the LED should remain off before turning on again with the specified colour.
+  This parameter can be set to a value between 0 and 5100 milliseconds.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiP only supports a granularity of 20 milliseconds for the onTime and offTime parameters.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int            result = -1;
+    const uint8_t  red = 0xff;
+    const uint8_t  green = 0x00;
+    const uint8_t  blue = 0x00;
+    const uint16_t onTime = 1000;    // 1000 msecs / sec
+    const uint16_t offTime = 1000;   // 1000 msecs / sec
+    MiPChestLED    chestLED;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("FlashChestLED.ino - Use mipFlashChestLED() and mipGetChestLED() functions.\n"
+                 "Should flash chest LED red.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipFlashChestLED(g_pMiP, red, green, blue, onTime, offTime);
+
+    delay(4000);
+
+    result = mipGetChestLED(g_pMiP, &chestLED);
+    Serial.println("chestLED");
+    Serial.print("red: ");
+        Serial.println(chestLED.red);
+    Serial.print("green: ");
+        Serial.println(chestLED.green);
+    Serial.print("blue: ");
+        Serial.println(chestLED.blue);
+    Serial.print("on time: ");
+        Serial.print(chestLED.onTime);
+        Serial.println(" milliseconds");
+    Serial.print("off time: ");
+        Serial.print(chestLED.offTime);
+        Serial.println(" milliseconds");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetChestLED
+{{{int mipGetChestLED(MiP* pMiP, MiPChestLED* pChestLED);}}}\\
+Requests the current setting for the colour and flashing period of the RGB LED in the MiP's chest.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pChestLED: Points to the MiPChestLED structure to be filled in by this call.  This structure
+  contains **red**, **green**, and **blue** fields indicating the intensity (0 - 255) of each colour channel when the
+  chest LED is on.  The structure also contains **onTime** and **offTime** fields indicating the time in milliseconds
+  the LED should be turned on and off for the flashing pattern.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if MiP doesn't return a valid mode.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiP only supports a granularity of 20 milliseconds for the onTime and offTime fields in the MiPChestLED structure.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int            result = -1;
+    const uint8_t  red = 0xff;
+    const uint8_t  green = 0x00;
+    const uint8_t  blue = 0x00;
+    const uint16_t onTime = 1000;    // 1000 msecs / sec
+    const uint16_t offTime = 1000;   // 1000 msecs / sec
+    MiPChestLED    chestLED;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("FlashChestLED.ino - Use mipFlashChestLED() and mipGetChestLED() functions.\n"
+                 "Should flash chest LED red.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipFlashChestLED(g_pMiP, red, green, blue, onTime, offTime);
+
+    delay(4000);
+
+    result = mipGetChestLED(g_pMiP, &chestLED);
+    Serial.println("chestLED");
+    Serial.print("red: ");
+        Serial.println(chestLED.red);
+    Serial.print("green: ");
+        Serial.println(chestLED.green);
+    Serial.print("blue: ");
+        Serial.println(chestLED.blue);
+    Serial.print("on time: ");
+        Serial.print(chestLED.onTime);
+        Serial.println(" milliseconds");
+    Serial.print("off time: ");
+        Serial.print(chestLED.offTime);
+        Serial.println(" milliseconds");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipSetHeadLEDs
+{{{int mipSetHeadLEDs(MiP* pMiP, MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);}}}\\
+Sets the state of the four LEDs on the MiP's head.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* led1: The state of led1 on the MiP's head.  Valid states
+  are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* led2: The state of led2 on the MiP's head.  Valid states
+  are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* led3: The state of led3 on the MiP's head.  Valid states
+  are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* led4: The state of led4 on the MiP's head.  Valid states
+  are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The 4 head LEDs are numbered from left to right, with led1 being the leftmost and led4 being the rightmost.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int         result = -1;
+    MiPHeadLEDs headLEDs;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("HeadLEDs.ino - Use head LED functions.\n"
+                 "Should set each head LED to different state.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetHeadLEDs(g_pMiP, MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+
+    delay(4000);
+
+    result = mipGetHeadLEDs(g_pMiP, &headLEDs);
+    Serial.println("Head LEDs");
+    Serial.print("led1: ");
+        printLEDString(headLEDs.led1);
+    Serial.print("led2: ");
+        printLEDString(headLEDs.led2);
+    Serial.print("led3: ");
+        printLEDString(headLEDs.led3);
+    Serial.print("led4: ");
+        printLEDString(headLEDs.led4);
+
+    mipUninit(g_pMiP);
+}
+
+static void printLEDString(MiPHeadLED led)
+{
+    switch (led)
+    {
+    case MIP_HEAD_LED_OFF:
+        Serial.println("Off");
+        break;
+    case MIP_HEAD_LED_ON:
+        Serial.println("On");
+        break;
+    case MIP_HEAD_LED_BLINK_SLOW:
+        Serial.println("Blink Slow");
+        break;
+    case MIP_HEAD_LED_BLINK_FAST:
+        Serial.println("Blink Fast");
+        break;
+    default:
+        Serial.println("");
+        break;
+    }
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetHeadLEDs
+{{{int mipGetHeadLEDs(MiP* pMiP, MiPHeadLEDs* pHeadLEDs);}}}\\
+Requests the current setting for the MiP's four head LEDs.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pHeadLEDs: Points to the MiPHeadLEDs structure to be filled in by this call.  This structure
+  contains **led1**, **led2**, **led3**, and **led4** fields indicating the state of each head LED.  Supported states
+  are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if MiP doesn't return a valid state.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The 4 head LEDs are numbered from left to right, with led1 being the leftmost and led4 being the rightmost.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int         result = -1;
+    MiPHeadLEDs headLEDs;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("HeadLEDs.ino - Use head LED functions.\n"
+                 "Should set each head LED to different state.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetHeadLEDs(g_pMiP, MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+
+    delay(4000);
+
+    result = mipGetHeadLEDs(g_pMiP, &headLEDs);
+    Serial.println("Head LEDs");
+    Serial.print("led1: ");
+        printLEDString(headLEDs.led1);
+    Serial.print("led2: ");
+        printLEDString(headLEDs.led2);
+    Serial.print("led3: ");
+        printLEDString(headLEDs.led3);
+    Serial.print("led4: ");
+        printLEDString(headLEDs.led4);
+
+    mipUninit(g_pMiP);
+}
+
+static void printLEDString(MiPHeadLED led)
+{
+    switch (led)
+    {
+    case MIP_HEAD_LED_OFF:
+        Serial.println("Off");
+        break;
+    case MIP_HEAD_LED_ON:
+        Serial.println("On");
+        break;
+    case MIP_HEAD_LED_BLINK_SLOW:
+        Serial.println("Blink Slow");
+        break;
+    case MIP_HEAD_LED_BLINK_FAST:
+        Serial.println("Blink Fast");
+        break;
+    default:
+        Serial.println("");
+        break;
+    }
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipContinuousDrive
+{{{int mipContinuousDrive(MiP* pMiP, int8_t velocity, int8_t turnRate);}}}\\
+Instruct the MiP to drive in a particular direction.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* velocity: The forward/reverse velocity.  This parameter can have a value between -32 and 32, where -32 is maximum
+  reverse velocity and 32 is maximum forward velocity.  A velocity of 0 indicates that no forward/reverse motion is
+  desired at this time.
+* turnRate: The amount of left/right turn rate.  This parameter can have a value between -32 and 32, where -32 is
+  maximum left turn rate and 32 is maximum right turn velocity.  A turn rate of 0 indicates that no left/right turning
+  is desired at this time.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* This command must be sent at regular intervals to keep the MiP robot moving in the desired direction.  This interval
+  should be ~50 milliseconds.
+* When sent at longer intervals the MiP's motion will become more jerky as it thinks that there will not be another
+  motion command coming so it starts to stop all motion and then starts moving again once the next command does finally
+  arrive.
+* If your robot code is constantly sensing it's environment and using those ongoing sensor readings to make decisions on
+  which direction the robot should be currently headed, then this command will be the most useful for updating the MiP's
+  motion vector in real time.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                 result = -1;
+    MiPGestureRadarMode mode = MIP_GESTURE_RADAR_DISABLED;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("ContinuousDrive.c - Use mipContinuousDrive() function.\n"
+                 "\tDrive forward with right turn and then backward with left turn.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    for (int i = 0 ; i < 40 ; i++)
+    {
+        // Drive forward at half-speed and turn right at quarter rate.
+        result = mipContinuousDrive(g_pMiP, 16, 8);
+        // Pace out the continuous drive commands by 50 msec.
+        delay(50);
+    }
+    for (int i = 0 ; i < 40 ; i++)
+    {
+        // Drive backward at half-speed and turn left at quarter rate.
+        result = mipContinuousDrive(g_pMiP, -16, -8);
+        // Pace out the continuous drive commands by 50 msec.
+        delay(50);
+    }
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipDistanceDrive
+{{{int mipDistanceDrive(MiP* pMiP, MiPDriveDirection driveDirection, uint8_t cm, MiPTurnDirection turnDirection, uint16_t degrees);}}}\\
+Used to queue up a drive/turn command to the MiP robot.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* driveDirection: Specifies the direction the robot should drive: **MIP_DRIVE_FORWARD** or **MIP_DRIVE_BACKWARD**.
+* cm: Specifies the number of cm (centimeters) the robot should proceed in driveDirection.  This parameter can have a
+  value between 0 and 255 cm.  Can be set to 0 if only a turn is desired.
+* turnDirection: Specifies the direction the robot should turn: **MIP_TURN_LEFT** or **MIP_TURN_RIGHT**.
+* degrees: The number of degrees the robot should turn.  This parameter can have a value between 0 and 360 degrees.  Can
+  be set to 0 if only a forward/reverse drive is desired.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* It is possible to queue up to 20 of these distance drive commands in the MiP's memory.
+* I have found that there should be at least 0.5 seconds between queueing calls or the MiP may drop the command rather
+  than queueing it up.
+* There is no way to specify the speed to be used for driving and/or turning.
+* The distance travelled isn't super accurate.  Usually it travels further than commanded.
+* Queued up commands will continue to be executed by the MiP even after calling mipDisconnectFromRobot() and/or
+  mipUninit().
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("DistanceDrive.ino - Use mipDistanceDrive function.\n"
+                 "Drive forward, turn 360 degrees in each direction and backward.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Queue up multiple commands to run in sequence.
+    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+    // Don't queue up multiple commands too fast.
+    delay(500);
+    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
+    delay(500);
+    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
+    delay(500);
+    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
+    delay(500);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipTurnLeft
+{{{int mipTurnLeft(MiP* pMiP, uint16_t degrees, uint8_t speed);}}}\\
+Commands the MiP robot to turn left the desired number of degrees at the desired speed.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* degrees: The number of degrees the robot should turn.  This parameter can have a value between 0 and 1275 degrees.
+* speed: The speed at which the turn should take place.  The speed can have a value between 0 and 24 with 0 being the
+  slowest rate and 24 the fastest.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("TurnLeftRight.ino - Use mipTurnLeft & mipTurnRight() functions.\n"
+                 "Turn 180 degrees to left and then 180 degrees to right.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipTurnLeft(g_pMiP, 180, 12);
+    delay(2000);
+    result = mipTurnRight(g_pMiP, 180, 12);
+    delay(2000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipTurnRight
+{{{int mipTurnRight(MiP* pMiP, uint16_t degrees, uint8_t speed);}}}\\
+Commands the MiP robot to turn right the desired number of degrees at the desired speed.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* degrees: The number of degrees the robot should turn.  This parameter can have a value between 0 and 1275 degrees.
+* speed: The speed at which the turn should take place.  The speed can have a value between 0 and 24 with 0 being the
+  slowest rate and 24 the fastest.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("TurnLeftRight.ino - Use mipTurnLeft & mipTurnRight() functions.\n"
+                 "Turn 180 degrees to left and then 180 degrees to right.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipTurnLeft(g_pMiP, 180, 12);
+    delay(2000);
+    result = mipTurnRight(g_pMiP, 180, 12);
+    delay(2000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipDriveForward
+{{{int mipDriveForward(MiP* pMiP, uint8_t speed, uint16_t time);}}}\\
+Commands the MiP robot to drive forward.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* speed: The speed at which the motion should take place.  The speed can have a value between 0 and 30 with 0 being the
+  slowest rate and 30 the fastest.
+* time: The time to drive forward in milliseconds.  This parameter can have a value between 0 and 1785 milliseconds. The
+  MiP only supports a granularity of 7 milliseconds for this parameter.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("DriveForwardBackward.ino - Use mipDriveForward() & mipDriveBackward() functions.\n"
+                 "Drive ahead and back, 1 second in each direction.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipDriveForward(g_pMiP, 15, 1000);
+    delay(2000);
+    result = mipDriveBackward(g_pMiP, 15, 1000);
+    delay(2000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipDriveBackward
+{{{int mipDriveBackward(MiP* pMiP, uint8_t speed, uint16_t time);}}}\\
+Commands the MiP robot to drive backward.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* speed: The speed at which the motion should take place.  The speed can have a value between 0 and 30 with 0 being the
+  slowest rate and 30 the fastest.
+* time: The time to drive backward in milliseconds.  This parameter can have a value between 0 and 1785 milliseconds.
+  The MiP only supports a granularity of 7 milliseconds for this parameter.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("DriveForwardBackward.ino - Use mipDriveForward() & mipDriveBackward() functions.\n"
+                 "Drive ahead and back, 1 second in each direction.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipDriveForward(g_pMiP, 15, 1000);
+    delay(2000);
+    result = mipDriveBackward(g_pMiP, 15, 1000);
+    delay(2000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipStop
+{{{int mipStop(MiP* pMiP);}}}\\
+Interrupt and stop current robot motion.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Stop.ino - Use mipStop() function.\n"
+                 "Interrupt a 360 degree turn with mipStop().\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipTurnLeft(g_pMiP, 360, 6);
+    delay(1000);
+    result = mipStop(g_pMiP);
+    delay(1000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipFallDown
+{{{int mipFallDown(MiP* pMiP, MiPFallDirection direction);}}}\\
+Have the MiP fall forward or backward.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* direction: In which direction should the MiP fall: **MIP_FALL_ON_BACK** or **MIP_FALL_FACE_DOWN**.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("FallDown.ino - Use mipFallDown().\n"
+                 "Fall forward.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipFallDown(g_pMiP, MIP_FALL_FACE_DOWN);
+    delay(2000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+=== mipGetUp
+{{{int mipGetUp(MiP* pMiP, MiPGetUp getup);}}}\\
+Attempt to get the MiP back up and balancing after falling to the back or front.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* getup: In which direction should the MiP attempt to get up from: **MIP_GETUP_FROM_FRONT**, **MIP_GETUP_FROM_BACK**,
+  and **MIP_GETUP_FROM_EITHER**.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:*
+* I haven't had this command work successfully during my testing.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                 result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("GetUp.ino - Use mipGetUp().\n"
+                 "Attempt to get up from a front fall.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipFallDown(g_pMiP, MIP_FALL_FACE_DOWN);
+    delay(3000);
+
+    result = mipGetUp(g_pMiP, MIP_GETUP_FROM_FRONT);
+    delay(3000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipPlaySound
+{{{int mipPlaySound(MiP* pMiP, const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount);}}}\\
+Have the MiP play a sequence of sounds.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pSounds: An array of MiPSound objects describing what sounds should be played.  There can be a maximum of 8 entries in
+  this array.  See notes below to learn more about the MiPSound objects.
+* soundCount: The number of entries in the pSounds array (1 - 8).
+* repeatCount: After the MiP plays the sounds in pSounds once, how many more times (0 - 255) should it repeat the
+  sequence.  A value of 0 means that the sound sequence will play once and then stop whereas a value of 1 means that it
+  would play the sequence a total of 2 times.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**\\
+This is the MiPSound structure used for the entries of the pSounds array:
+{{{
+typedef struct MiPSound
+{
+    MiPSoundIndex sound;
+    uint16_t      delay;
+} MiPSound;
+}}}
+**sound**: Used to specify the index of the sound or volume control setting to be used for this entry in the pSounds
+array.  The MiPSoundIndex enumeration is described below.\\
+**delay**: Used to specify the delay in milliseconds that the MiP should wait after playing this sound before playing
+the next (if any) in the pSounds array.  The granularity of this delay is 30 milliseconds.
+
+The MiPSoundIndex enumeration is used to specify the index of the sound or volume control setting in the sound field of
+the MiPSound structure.  It contains the following entries:
+| MIP_SOUND_ONEKHZ_500MS_8K16BIT |
+| MIP_SOUND_ACTION_BURPING |
+| MIP_SOUND_ACTION_DRINKING |
+| MIP_SOUND_ACTION_EATING |
+| MIP_SOUND_ACTION_FARTING_SHORT |
+| MIP_SOUND_ACTION_OUT_OF_BREATH |
+| MIP_SOUND_BOXING_PUNCHCONNECT_1 |
+| MIP_SOUND_BOXING_PUNCHCONNECT_2 |
+| MIP_SOUND_BOXING_PUNCHCONNECT_3 |
+| MIP_SOUND_FREESTYLE_TRACKING_1 |
+| MIP_SOUND_MIP_1 |
+| MIP_SOUND_MIP_2 |
+| MIP_SOUND_MIP_3 |
+| MIP_SOUND_MIP_APP |
+| MIP_SOUND_MIP_AWWW |
+| MIP_SOUND_MIP_BIG_SHOT |
+| MIP_SOUND_MIP_BLEH |
+| MIP_SOUND_MIP_BOOM |
+| MIP_SOUND_MIP_BYE |
+| MIP_SOUND_MIP_CONVERSE_1 |
+| MIP_SOUND_MIP_CONVERSE_2 |
+| MIP_SOUND_MIP_DROP |
+| MIP_SOUND_MIP_DUNNO |
+| MIP_SOUND_MIP_FALL_OVER_1 |
+| MIP_SOUND_MIP_FALL_OVER_2 |
+| MIP_SOUND_MIP_FIGHT |
+| MIP_SOUND_MIP_GAME |
+| MIP_SOUND_MIP_GLOAT |
+| MIP_SOUND_MIP_GO |
+| MIP_SOUND_MIP_GOGOGO |
+| MIP_SOUND_MIP_GRUNT_1 |
+| MIP_SOUND_MIP_GRUNT_2 |
+| MIP_SOUND_MIP_GRUNT_3 |
+| MIP_SOUND_MIP_HAHA_GOT_IT |
+| MIP_SOUND_MIP_HI_CONFIDENT |
+| MIP_SOUND_MIP_HI_NOT_SURE |
+| MIP_SOUND_MIP_HI_SCARED |
+| MIP_SOUND_MIP_HUH |
+| MIP_SOUND_MIP_HUMMING_1 |
+| MIP_SOUND_MIP_HUMMING_2 |
+| MIP_SOUND_MIP_HURT |
+| MIP_SOUND_MIP_HUUURGH |
+| MIP_SOUND_MIP_IN_LOVE |
+| MIP_SOUND_MIP_IT |
+| MIP_SOUND_MIP_JOKE |
+| MIP_SOUND_MIP_K |
+| MIP_SOUND_MIP_LOOP_1 |
+| MIP_SOUND_MIP_LOOP_2 |
+| MIP_SOUND_MIP_LOW_BATTERY |
+| MIP_SOUND_MIP_MIPPEE |
+| MIP_SOUND_MIP_MORE |
+| MIP_SOUND_MIP_MUAH_HA |
+| MIP_SOUND_MIP_MUSIC |
+| MIP_SOUND_MIP_OBSTACLE |
+| MIP_SOUND_MIP_OHOH |
+| MIP_SOUND_MIP_OH_YEAH |
+| MIP_SOUND_MIP_OOPSIE |
+| MIP_SOUND_MIP_OUCH_1 |
+| MIP_SOUND_MIP_OUCH_2 |
+| MIP_SOUND_MIP_PLAY |
+| MIP_SOUND_MIP_PUSH |
+| MIP_SOUND_MIP_RUN |
+| MIP_SOUND_MIP_SHAKE |
+| MIP_SOUND_MIP_SIGH |
+| MIP_SOUND_MIP_SINGING |
+| MIP_SOUND_MIP_SNEEZE |
+| MIP_SOUND_MIP_SNORE |
+| MIP_SOUND_MIP_STACK |
+| MIP_SOUND_MIP_SWIPE_1 |
+| MIP_SOUND_MIP_SWIPE_2 |
+| MIP_SOUND_MIP_TRICKS |
+| MIP_SOUND_MIP_TRIIICK |
+| MIP_SOUND_MIP_TRUMPET |
+| MIP_SOUND_MIP_WAAAAA |
+| MIP_SOUND_MIP_WAKEY |
+| MIP_SOUND_MIP_WHEEE |
+| MIP_SOUND_MIP_WHISTLING |
+| MIP_SOUND_MIP_WHOAH |
+| MIP_SOUND_MIP_WOO |
+| MIP_SOUND_MIP_YEAH |
+| MIP_SOUND_MIP_YEEESSS |
+| MIP_SOUND_MIP_YO |
+| MIP_SOUND_MIP_YUMMY |
+| MIP_SOUND_MOOD_ACTIVATED |
+| MIP_SOUND_MOOD_ANGRY |
+| MIP_SOUND_MOOD_ANXIOUS |
+| MIP_SOUND_MOOD_BORING |
+| MIP_SOUND_MOOD_CRANKY |
+| MIP_SOUND_MOOD_ENERGETIC |
+| MIP_SOUND_MOOD_EXCITED |
+| MIP_SOUND_MOOD_GIDDY |
+| MIP_SOUND_MOOD_GRUMPY |
+| MIP_SOUND_MOOD_HAPPY |
+| MIP_SOUND_MOOD_IDEA |
+| MIP_SOUND_MOOD_IMPATIENT |
+| MIP_SOUND_MOOD_NICE |
+| MIP_SOUND_MOOD_SAD |
+| MIP_SOUND_MOOD_SHORT |
+| MIP_SOUND_MOOD_SLEEPY |
+| MIP_SOUND_MOOD_TIRED |
+| MIP_SOUND_SOUND_BOOST |
+| MIP_SOUND_SOUND_CAGE |
+| MIP_SOUND_SOUND_GUNS |
+| MIP_SOUND_SOUND_ZINGS |
+| MIP_SOUND_SHORT_MUTE_FOR_STOP |
+| MIP_SOUND_FREESTYLE_TRACKING_2 |
+| MIP_SOUND_VOLUME_OFF |
+| MIP_SOUND_VOLUME_1 |
+| MIP_SOUND_VOLUME_2 |
+| MIP_SOUND_VOLUME_3 |
+| MIP_SOUND_VOLUME_4 |
+| MIP_SOUND_VOLUME_5 |
+| MIP_SOUND_VOLUME_6 |
+| MIP_SOUND_VOLUME_7 |
+**MIP_SOUND_VOLUME_OFF** to **MIP_SOUND_VOLUME_7** are used as entries in the pSounds array to change the volume before
+playing subsequent sounds in the array.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("PlaySound.ino - Use mipPlaySound().\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Play 1 sound.
+    const MiPSound sounds1[] = {{MIP_SOUND_ONEKHZ_500MS_8K16BIT, 0}};
+    result = mipPlaySound(g_pMiP, sounds1, sizeof(sounds1)/sizeof(sounds1[0]), 0);
+
+    delay(2000);
+
+    // Play 2 sounds with 1 second delay between them, repeating them a second time.
+    // Play the first at a lower volume than the second.
+    const MiPSound sounds2[] = {{MIP_SOUND_VOLUME_4, 0},            // Play eating sound at half volume.
+                                {MIP_SOUND_ACTION_EATING, 1000},
+                                {MIP_SOUND_VOLUME_7, 0},            // Play burping sound at full volume.
+                                {MIP_SOUND_ACTION_BURPING, 0},
+                                {MIP_SOUND_VOLUME_1, 0}};           // Finish by setting volume low.
+    result = mipPlaySound(g_pMiP, sounds2, sizeof(sounds2)/sizeof(sounds2[0]), 1);
+
+    delay(7000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipSetVolume
+{{{int mipSetVolume(MiP* pMiP, uint8_t volume);}}}\\
+Set the MiP's volume level.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* volume: The new volume level (0 - 7).  A level of 0 turns off the sound and 7 is the loudest setting.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int     result = -1;
+    uint8_t volume = 0;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Volume.ino - Use mipSet/GetVolume().\n"
+                 "Set volume level to 1 and read out afterwards.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetVolume(g_pMiP, 1);
+    result = mipGetVolume(g_pMiP, &volume);
+
+    Serial.print("Volume = ");
+      Serial.println(volume);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetVolume
+{{{int mipGetVolume(MiP* pMiP, uint8_t* pVolume);}}}\\
+Retrieve the MiP's current volume level.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pVolume: Points to the integer to be filled in with the current volume level (0 - 7).  A level of 0 means the sound is
+  off and 7 is the loudest setting.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if MiP doesn't return a valid state.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int     result = -1;
+    uint8_t volume = 0;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Volume.ino - Use mipSet/GetVolume().\n"
+                 "Set volume level to 1 and read out afterwards.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetVolume(g_pMiP, 1);
+    result = mipGetVolume(g_pMiP, &volume);
+
+    Serial.print("Volume = ");
+      Serial.println(volume);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipReadOdometer
+{{{int mipReadOdometer(MiP* pMiP, float* pDistanceInCm);}}}\\
+Read the current MiP odometer tally.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pDistanceInCm: Points to the floating point variable to be filled in with the distance travelled (in centimeters)
+  since the last reset.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if MiP doesn't return a valid state.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiP's odometer is similar to that in a car.  It maintains the total tally of the distance travelled, even across
+  power cycles.
+* The mipResetOdometer() call can be used to reset the odometer.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Odometer.ino - Use mipReadOdometer() and mipResetOdometer.\n"
+                 "Read out current odometer reading and reset.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    float cm = 0.0f;
+    result = mipReadOdometer(g_pMiP, &cm);
+    Serial.print("MiP has travelled ");
+        Serial.print(cm);
+        Serial.println(" cm since the last reset.");
+
+    result = mipResetOdometer(g_pMiP);
+    delay(1000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipResetOdometer
+{{{int mipResetOdometer(MiP* pMiP);}}}\\
+Reset the MiP's odometer.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiP's odometer doesn't automatically reset during a power cycle.
+* The developer should call this function if they want to manually reset it.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Odometer.ino - Use mipReadOdometer() and mipResetOdometer.\n"
+                 "Read out current odometer reading and reset.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    float cm = 0.0f;
+    result = mipReadOdometer(g_pMiP, &cm);
+    Serial.print("MiP has travelled ");
+        Serial.print(cm);
+        Serial.println(" cm since the last reset.");
+
+    result = mipResetOdometer(g_pMiP);
+    delay(1000);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetStatus
+{{{int mipGetStatus(MiP* pMiP, MiPStatus* pStatus);}}}\\
+Get the MiP's current status (battery level and position).
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pStatus: A pointer to the MiPStatus structure to be filled in with the contents of the current MiP status.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the status.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The **battery** field in the MiPStatus structure contains the current battery voltage level between 4.0V and 6.4V.
+* The **position** field in the MiPStatus structure indicates the current position of the MiP robot.  The expected
+  values are **MIP_POSITION_ON_BACK**, **MIP_POSITION_FACE_DOWN**, **MIP_POSITION_UPRIGHT**, **MIP_POSITION_PICKED_UP**
+  , **MIP_POSITION_HAND_STAND**, **MIP_POSITION_FACE_DOWN_ON_TRAY**, or **MIP_POSITION_ON_BACK_WITH_KICKSTAND**.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Status.ino - Use mipGetStatus() and mipGetLatestStatusNotification().\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPStatus status;
+    PRINTLN("Call mipGetStatus()");
+    result = mipGetStatus(g_pMiP, &status);
+    printStatus(&status);
+
+    PRINTLN("Waiting for next MiP status notification.");
+    while (MIP_ERROR_NONE != mipGetLatestStatusNotification(g_pMiP, &status))
+    {
+    }
+    printStatus(&status);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+
+static void printStatus(const MiPStatus* pStatus)
+{
+    PRINT("Battery voltage: ");
+        PRINTLN(pStatus->battery);
+    PRINT("Position: ");
+        PRINTLN(pStatus->position);
+}
+}}}
+
+
+===mipGetLatestStatusNotification
+{{{int mipGetLatestStatusNotification(MiP* pMiP, MiPStatus* pStatus);}}}\\
+Retrieves the most recent status notification from the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pStatus: A pointer to the MiPStatus structure to be filled in with the contents of the latest MiP status.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_EMPTY if the MiP hasn't sent a radar notification since the connection was made.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the radar notification.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* This notification is sent every 30 seconds or earlier if the MiP detects a change in position.
+* The **millisec** field in the MiPStatus structure can be checked by the caller to see if this notification is the same
+  as the last one retrieved since newer notifications will contain a different value in this  field.
+* The **battery** field in the MiPStatus structure contains the current battery voltage level between 4.0V and 6.4V.
+* The **position** field in the MiPStatus structure indicates the current position of the MiP robot.  The expected
+  values are **MIP_POSITION_ON_BACK**, **MIP_POSITION_FACE_DOWN**, **MIP_POSITION_UPRIGHT**, **MIP_POSITION_PICKED_UP**
+  , **MIP_POSITION_HAND_STAND**, **MIP_POSITION_FACE_DOWN_ON_TRAY**, or **MIP_POSITION_ON_BACK_WITH_KICKSTAND**.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Status.ino - Use mipGetStatus() and mipGetLatestStatusNotification().\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPStatus status;
+    PRINTLN("Call mipGetStatus()");
+    result = mipGetStatus(g_pMiP, &status);
+    printStatus(&status);
+
+    PRINTLN("Waiting for next MiP status notification.");
+    while (MIP_ERROR_NONE != mipGetLatestStatusNotification(g_pMiP, &status))
+    {
+    }
+    printStatus(&status);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+
+static void printStatus(const MiPStatus* pStatus)
+{
+    PRINT("Battery voltage: ");
+        PRINTLN(pStatus->battery);
+    PRINT("Position: ");
+        PRINTLN(pStatus->position);
+}
+}}}
+
+
+===mipGetLatestRadarNotification
+{{{int mipGetLatestRadarNotification(MiP* pMiP, MiPRadarNotification* pNotification);}}}\\
+Retrieves the most recent radar notification from the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pNotification: A pointer to the MiPRadarNotification structure to be filled in with the contents of the most recent
+  radar notification from the MiP.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_EMPTY if the MiP hasn't sent a radar notification since the connection was made.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the radar notification.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* Must enable radar mode via the mipSetGestureRadarMode() function before the MiP will start sending notification of
+  this type.
+* The **millisec** field in the returned MiPRadarNotification structure can be checked by the caller to see if this
+  notification is the same as the last one retrieved since newer notifications will contain a different value in this
+  field.
+* The **radar** field in the returned MiPRadarNotification structure will contain one of these
+  values: **MIP_RADAR_NONE** (the MiP detects nothing in front of it), **MIP_RADAR_10CM_30CM** (the MiP detects
+  something between 10cm and 30cm), and **MIP_RADAR_0CM_10CM** (the MiP detects something closer than 10cm).
+* These radar notifications will be suppressed while the MiP is executing long running commands.  Shorter commands like
+  mipContinuousDrive() do allow the MiP to send the notifications in a timely fashion.
+* These radar notifications will only be sent when the MiP is actively balancing.  They will be suppressed if the MiP is
+  laying back on its kickstand for example.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                  result = -1;
+    MiPRadarNotification radar = {0, MIP_RADAR_NONE};
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Radar.ino - Use mipGetLatestRadarNotification() function.\n"
+                 "Program should end once you place your handle <10cm from MiP's face.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetGestureRadarMode(g_pMiP, MIP_RADAR);
+    do
+    {
+        result = mipGetLatestRadarNotification(g_pMiP, &radar);
+    } while (radar.radar != MIP_RADAR_0CM_10CM);
+    PRINTLN("Hand detected. Shutting down.");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetLatestGestureNotification
+{{{int mipGetLatestGestureNotification(MiP* pMiP, MiPGestureNotification* pNotification);}}}\\
+Retrieves the most recent gesture notification from the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pNotification: A pointer to the MiPGestureNotification structure to be filled in with the contents of the most recent
+  gesture notification from the MiP.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_EMPTY if the MiP hasn't sent a gesture notification since the connection was made.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the gesture notification.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* Must enable gesture mode via the mipSetGestureRadarMode() function before the MiP will start sending notification of
+  this type.
+* The **millisec** field in the returned MiPGestureNotification structure can be checked by the caller to see if this
+  notification is the same as the last one retrieved since newer notifications will contain a different value in this
+  field.
+* The **gesture** field in the returned MiPGestureNotification structure will contain one of the values from the following table.
+* These gesture notifications will be suppressed while the MiP is executing long running commands.  Shorter commands
+  like mipContinuousDrive() do allow the MiP to send the notifications in a timely fashion.
+* These gesture notifications will only be sent when the MiP is actively balancing.  They will be suppressed if the MiP
+  is laying back on its kickstand for example.
+
+| MIP_GESTURE_LEFT |
+| MIP_GESTURE_RIGHT |
+| MIP_GESTURE_CENTER_SWEEP_LEFT |
+| MIP_GESTURE_CENTER_SWEEP_RIGHT |
+| MIP_GESTURE_CENTER_HOLD |
+| MIP_GESTURE_FORWARD |
+| MIP_GESTURE_BACKWARD |
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                    result = -1;
+    MiPGestureNotification gesture = {0, 0};
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Gesture.ino - Use mipGetLatestGestureNotification() function.\n"
+                 "Swipe your hand in front of MiP to create gesture.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipSetGestureRadarMode(g_pMiP, MIP_GESTURE);
+    while (MIP_ERROR_NONE != mipGetLatestGestureNotification(g_pMiP, &gesture))
+    {
+    }
+    PRINT("Gesture = "); PRINTLN(gesture.gesture);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetLatestShakeNotification
+{{{int mipGetLatestShakeNotification(MiP* pMiP);}}}\\
+Determine whether the MiP has been shaken since the last call.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_EMPTY if the MiP hasn't sent a shake notification since the last call.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the shake notification.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                 result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Shake.ino - Use mipGetLatestShakeNotification() function.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    PRINTLN("Waiting for user to shake MiP.");
+    while (MIP_ERROR_NONE != mipGetLatestShakeNotification(g_pMiP))
+    {
+    }
+    PRINTLN("Shake detected.");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetWeight
+{{{int mipGetWeight(MiP* pMiP, MiPWeight* pWeight);}}}\\
+Get MiP's current weight / tilt reading.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pWeight: A pointer to the MiPWeight structure to be filled in with the contents of the current MiP weight / tilt
+  reading.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the status.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The **weight** field in the MiPWeight structure contains the signed indication of how much it is tilted to keep its
+  center of balance beneath the current weight.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Weight.ino - Use weight update functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPWeight weight;
+    result = mipGetWeight(g_pMiP, &weight);
+    PRINT("weight = ");
+        PRINTLN(weight.weight);
+    PRINTLN("Waiting for next weight update.");
+    while (MIP_ERROR_NONE != mipGetLatestWeightNotification(g_pMiP, &weight))
+    {
+    }
+    PRINT("weight = ");
+        PRINTLN(weight.weight);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetLatestWeightNotification
+{{{int mipGetLatestWeightNotification(MiP* pMiP, MiPWeight* pWeight);}}}\\
+Retrieves the most recent weight / tilt status from the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pWeight: A pointer to the MiPWeight structure to be filled in with the contents of the latest MiP weight / tilt
+  status.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_EMPTY if the MiP hasn't sent a weight notification since the connection was made.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the weight notification.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The **millisec** field in the MiPWeight structure can be checked by the caller to see if this notification is the same
+  as the last one retrieved since newer notifications will contain a different value in this  field.
+* The **weight** field in the MiPWeight structure contains the signed indication of how much it is tilted to keep its
+  center of balance beneath the current weight.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Weight.ino - Use weight update functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPWeight weight;
+    result = mipGetWeight(g_pMiP, &weight);
+    PRINT("weight = ");
+        PRINTLN(weight.weight);
+    PRINTLN("Waiting for next weight update.");
+    while (MIP_ERROR_NONE != mipGetLatestWeightNotification(g_pMiP, &weight))
+    {
+    }
+    PRINT("weight = ");
+        PRINTLN(weight.weight);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetClapSettings
+{{{int mipGetClapSettings(MiP* pMiP, MiPClapSettings* pSettings);}}}\\
+Get the current clap configuration (clap delay and enable settings).
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pSettings: A pointer to the MiPClapSettings structure to be filled in with the contents of the current MiP clap enable
+  and delay settings.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected value in the response.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The **enabled** field will indicate whether clap detection is enabled or not (**MIP_CLAP_DISABLED**
+  or **MIP_CLAP_ENABLED**).  It defaults to being in the disabled state.
+* The **delay** field indicates the current setting of the delay expected between claps.  It defaults to 500.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Clap.ino - Use clap related functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPClapSettings settings;
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Initial clap settings.");
+    printClapSettings(&settings);
+
+    // Modify clap settings.
+    // NOTE: Need some delay between settings or second one will be dropped.
+    result = mipEnableClap(g_pMiP, MIP_CLAP_ENABLED);
+    delay(1000);
+    result = mipSetClapDelay(g_pMiP, 501);
+
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Updated clap settings.");
+    printClapSettings(&settings);
+
+    PRINTLN("Waiting for user to clap.");
+    MiPClap clap;
+    while (MIP_ERROR_NONE != mipGetLatestClapNotification(g_pMiP, &clap))
+    {
+    }
+    PRINT("Detected ");
+        PRINT(clap.count);
+        PRINTLN(" claps");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+
+static void printClapSettings(const MiPClapSettings* pSettings)
+{
+    PRINT("  Enabled = ");
+        PRINTLN(pSettings->enabled ? "ON" : "OFF");
+    PRINT("    Delay = ");
+        PRINTLN(pSettings->delay);
+}
+}}}
+
+
+===mipEnableClap
+{{{int mipEnableClap(MiP* pMiP, MiPClapEnabled enabled);}}}\\
+Enable or disable MiP clap detection.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* enabled: Should the clap detection feature be **MIP_CLAP_DISABLED** or **MIP_CLAP_ENABLED**.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiP defaults to having the clap feature disabled after an application attaches.
+* Attempting to set both the clap delay and this enable state too quickly in succession (< 1 second) can cause one of
+  them to be ignored.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Clap.ino - Use clap related functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPClapSettings settings;
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Initial clap settings.");
+    printClapSettings(&settings);
+
+    // Modify clap settings.
+    // NOTE: Need some delay between settings or second one will be dropped.
+    result = mipEnableClap(g_pMiP, MIP_CLAP_ENABLED);
+    delay(1000);
+    result = mipSetClapDelay(g_pMiP, 501);
+
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Updated clap settings.");
+    printClapSettings(&settings);
+
+    PRINTLN("Waiting for user to clap.");
+    MiPClap clap;
+    while (MIP_ERROR_NONE != mipGetLatestClapNotification(g_pMiP, &clap))
+    {
+    }
+    PRINT("Detected ");
+        PRINT(clap.count);
+        PRINTLN(" claps");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+
+static void printClapSettings(const MiPClapSettings* pSettings)
+{
+    PRINT("  Enabled = ");
+        PRINTLN(pSettings->enabled ? "ON" : "OFF");
+    PRINT("    Delay = ");
+        PRINTLN(pSettings->delay);
+}
+}}}
+
+
+===mipSetClapDelay
+{{{int mipSetClapDelay(MiP* pMiP, uint16_t delay);}}}\\
+Sets the expected delay between user claps.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* delay: The new delay to be used for clap detection.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* //I don't know what the units are for this setting.  Maybe milliseconds?//
+* The MiP defaults to having the clap delay set to 500 after the application first connects.
+* Attempting to set both the clap delay and the clap enable state too quickly in succession (< 1 second) can cause one
+  of them to be ignored.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Clap.ino - Use clap related functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPClapSettings settings;
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Initial clap settings.");
+    printClapSettings(&settings);
+
+    // Modify clap settings.
+    // NOTE: Need some delay between settings or second one will be dropped.
+    result = mipEnableClap(g_pMiP, MIP_CLAP_ENABLED);
+    delay(1000);
+    result = mipSetClapDelay(g_pMiP, 501);
+
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Updated clap settings.");
+    printClapSettings(&settings);
+
+    PRINTLN("Waiting for user to clap.");
+    MiPClap clap;
+    while (MIP_ERROR_NONE != mipGetLatestClapNotification(g_pMiP, &clap))
+    {
+    }
+    PRINT("Detected ");
+        PRINT(clap.count);
+        PRINTLN(" claps");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+
+static void printClapSettings(const MiPClapSettings* pSettings)
+{
+    PRINT("  Enabled = ");
+        PRINTLN(pSettings->enabled ? "ON" : "OFF");
+    PRINT("    Delay = ");
+        PRINTLN(pSettings->delay);
+}
+}}}
+
+
+===mipGetLatestClapNotification
+{{{int mipGetLatestClapNotification(MiP* pMiP, MiPClap* pClap);}}}\\
+Retrieves the most recent clap count detected by the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pClap: A pointer to the MiPClap structure to be filled in with the information describing the latest MiP clap
+  detection.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_EMPTY if the MiP hasn't sent a clap notification since the connection was made.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The **millisec** field in the MiPClap structure can be checked by the caller to see if this notification is the same
+  as the last one retrieved since newer notifications will contain a different value in this  field.
+* The **count** field in the MiPClap structure contains the number of claps detected in the last event.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int result = -1;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("Clap.ino - Use clap related functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    MiPClapSettings settings;
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Initial clap settings.");
+    printClapSettings(&settings);
+
+    // Modify clap settings.
+    // NOTE: Need some delay between settings or second one will be dropped.
+    result = mipEnableClap(g_pMiP, MIP_CLAP_ENABLED);
+    delay(1000);
+    result = mipSetClapDelay(g_pMiP, 501);
+
+    result = mipGetClapSettings(g_pMiP, &settings);
+    PRINTLN("Updated clap settings.");
+    printClapSettings(&settings);
+
+    PRINTLN("Waiting for user to clap.");
+    MiPClap clap;
+    while (MIP_ERROR_NONE != mipGetLatestClapNotification(g_pMiP, &clap))
+    {
+    }
+    PRINT("Detected ");
+        PRINT(clap.count);
+        PRINTLN(" claps");
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+
+static void printClapSettings(const MiPClapSettings* pSettings)
+{
+    PRINT("  Enabled = ");
+        PRINTLN(pSettings->enabled ? "ON" : "OFF");
+    PRINT("    Delay = ");
+        PRINTLN(pSettings->delay);
+}
+}}}
+
+
+===mipGetSoftwareVersion
+{{{int mipGetSoftwareVersion(MiP* pMiP, MiPSoftwareVersion* pSoftware);}}}\\
+Get the version information for the software in the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pSoftware: A pointer to the MiPSoftwareVersion structure to be filled in with the version information of the MiP
+  software.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected response.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiPSoftwareVersion structure has **year**, **month**, **day**, and **uniqueVersion** fields.
+  The **uniqueVersion** field is used to differentiate between software builds from the same day.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                result = -1;
+    MiPHardwareInfo    hardwareInfo;
+    MiPSoftwareVersion softwareVersion;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("GetSoftwareHardwareVersion.c - Use mipGetSoftwareVersion() & mipGetHardwareInfo() functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipGetSoftwareVersion(g_pMiP, &softwareVersion);
+    Serial.print("software version: ");
+        Serial.print(softwareVersion.year);
+        Serial.print('-');
+        Serial.print(softwareVersion.month);
+        Serial.print('-');
+        Serial.print(softwareVersion.day);
+        Serial.print('.');
+        Serial.println(softwareVersion.uniqueVersion);
+
+    result = mipGetHardwareInfo(g_pMiP, &hardwareInfo);
+    Serial.println("hardware info");
+    Serial.print("  voice chip version: ");
+        Serial.println(hardwareInfo.voiceChip);
+    Serial.print("  hardware version: ");
+        Serial.println(hardwareInfo.hardware);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipGetHardwareInfo
+{{{int mipGetHardwareInfo(MiP* pMiP, MiPHardwareInfo* pHardware);}}}\\
+Get the version information for the hardware in the MiP.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pHardware: A pointer to the MiPHardwareInfo structure to be filled in with the version information of the MiP
+  hardware.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_BAD_RESPONSE if the MiP sent back an unexpected response.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* The MiPHardwareInfo structure has **voiceChip** and **hardware** fields.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int                result = -1;
+    MiPHardwareInfo    hardwareInfo;
+    MiPSoftwareVersion softwareVersion;
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("GetSoftwareHardwareVersion.c - Use mipGetSoftwareVersion() & mipGetHardwareInfo() functions.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    result = mipGetSoftwareVersion(g_pMiP, &softwareVersion);
+    Serial.print("software version: ");
+        Serial.print(softwareVersion.year);
+        Serial.print('-');
+        Serial.print(softwareVersion.month);
+        Serial.print('-');
+        Serial.print(softwareVersion.day);
+        Serial.print('.');
+        Serial.println(softwareVersion.uniqueVersion);
+
+    result = mipGetHardwareInfo(g_pMiP, &hardwareInfo);
+    Serial.println("hardware info");
+    Serial.print("  voice chip version: ");
+        Serial.println(hardwareInfo.voiceChip);
+    Serial.print("  hardware version: ");
+        Serial.println(hardwareInfo.hardware);
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipRawSend
+{{{int mipRawSend(MiP* pMiP, const uint8_t* pRequest, size_t requestLength);}}}\\
+Send a raw command to the MiP robot.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pRequest: Is a pointer to the array of the command bytes to be sent to the robot.
+* requestLength: Is the number of bytes in the pRequest buffer to be sent to the robot.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* There are typically higher level APIs that can be used to send commands to the MiP but in cases where the
+  functionality you need isn't already implemented in the MiP C API, you can use this function to send the raw command
+  bytes directly to the MiP.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int     result = -1;
+    size_t  responseLength = 0;
+    uint8_t response[5];
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("RawSendReceive.ino - Use mipRaw*() functions.\n"
+                 "Should set chest LED to purple and display MiP firmware revision\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Send 4-byte MiP command to set Chest LED to Purple.
+    static const uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
+    result = mipRawSend(g_pMiP, setChestPurple, sizeof(setChestPurple)-1);
+
+    // Request the MiP firmware revision information and display it.
+    static const uint8_t getMiPSoftwareVersion[] = "\x14";
+    result = mipRawReceive(g_pMiP, getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion)-1,
+                                 response, sizeof(response), &responseLength);
+    if (result == MIP_ERROR_NONE && responseLength == 5 && response[0] == 0x14)
+    {
+        Serial.print("MiP Software Version: ");
+            Serial.print(response[1] + 2000);
+            Serial.print('-');
+            Serial.print(response[2]);
+            Serial.print('-');
+            Serial.print(response[3]);
+            Serial.print(" (build #");
+            Serial.print(response[4]);
+            Serial.println(')');
+    }
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+=== mipRawReceive
+{{{int mipRawReceive(MiP* pMiP, const uint8_t* pRequest, size_t requestLength, uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);}}}\\
+Send a raw request to the MiP and receive its raw response.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pRequest: Is a pointer to the array of the command bytes to be sent to the robot.
+* requestLength: Is the number of bytes in the pRequest buffer to be sent to the robot.
+* pResponseBuffer: Is a pointer to the array of bytes into which the response should be copied.
+* responseBufferSize: Is the number of bytes in the pResponseBuffer.
+* pResponseLength: Is a pointer to where the actual number of bytes in the response should be placed.  This value may be
+  truncated to responseBufferSize if the actual response was > responseBufferSize.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* MIP_ERROR_TIMEOUT if MiP doesn't respond to request after multiple retries.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* There are typically higher level APIs that can be used to send requests to the MiP but in cases where the
+  functionality you need isn't already implemented in the MiP C API, you can use this function to send the raw request
+  to the MiP and receive the raw resulting bytes.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int     result = -1;
+    size_t  responseLength = 0;
+    uint8_t response[5];
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("RawSendReceive.ino - Use mipRaw*() functions.\n"
+                 "Should set chest LED to purple and display MiP firmware revision\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Send 4-byte MiP command to set Chest LED to Purple.
+    static const uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
+    result = mipRawSend(g_pMiP, setChestPurple, sizeof(setChestPurple)-1);
+
+    // Request the MiP firmware revision information and display it.
+    static const uint8_t getMiPSoftwareVersion[] = "\x14";
+    result = mipRawReceive(g_pMiP, getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion)-1,
+                                 response, sizeof(response), &responseLength);
+    if (result == MIP_ERROR_NONE && responseLength == 5 && response[0] == 0x14)
+    {
+        Serial.print("MiP Software Version: ");
+            Serial.print(response[1] + 2000);
+            Serial.print('-');
+            Serial.print(response[2]);
+            Serial.print('-');
+            Serial.print(response[3]);
+            Serial.print(" (build #");
+            Serial.print(response[4]);
+            Serial.println(')');
+    }
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
+
+
+===mipRawReceiveNotification
+{{{int mipRawReceiveNotification(MiP* pMiP, uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength);}}}\\
+Get an out of band notification sent by the MiP robot.
+
+**Parameters:**
+* pMiP: An object that was previously returned from the mipInit() call.
+* pNotifyBuffer: Is a pointer to the array of bytes into which the notification should be copied.
+* notifyBufferSize: Is the number of bytes in the pNotifyBuffer.
+* pNotifyLength: Is a pointer to where the actual number of bytes in the notification should be placed.  This value may
+  be truncated to notifyBufferSize if the actual response was > notifyBufferSize.
+
+**Returns:**
+* MIP_ERROR_NONE on success.
+* Non-zero MIP_ERROR_* code otherwise.
+
+**Notes:**
+* Sometimes the MiP robot sends notifications which aren't in direct response to the last request made.  This function
+  will return one of these responses/notifications.
+* There are typically higher level APIs that can be used to receive latest notifications from the MiP but in cases where
+  the functionality you need isn't already implemented in the MiP C API, you can use this function instead.
+
+**Example:**
+{{{
+#include <mip.h>
+
+static MiP* g_pMiP = NULL;
+
+void setup()
+{
+    int     result = -1;
+    size_t  responseLength = 0;
+    uint8_t response[MIP_RESPONSE_MAX_LEN];
+
+    g_pMiP = mipInit(NULL);
+
+    Serial.begin(115200);
+    Serial.print("RawReceiveNotification.ino - Use mipRawReceiveNotification() functions.\n"
+                 "In less than half a minute, a notification should be displayed.\n");
+    Serial.end();
+
+    // Connect to first MiP robot discovered.
+    result = mipConnectToRobot(g_pMiP, NULL);
+
+    // Wait for first out of band notification to arrive.
+    while (MIP_ERROR_EMPTY == mipRawReceiveNotification(g_pMiP, response, sizeof(response), &responseLength))
+    {
+    }
+
+    // Display notification contents.
+    PRINT("notification -> ");
+    for (int i = 0 ; i < responseLength ; i++)
+    {
+        PRINT(response[i], HEX);
+        if (i != responseLength - 1)
+            PRINT(',');
+    }
+    PRINTLN();
+
+    mipUninit(g_pMiP);
+}
+
+void loop()
+{
+}
+}}}
