@@ -13,43 +13,35 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipContinuousDrive()
+    continuousDrive()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                 result = -1;
-    MiPGestureRadarMode mode = MIP_GESTURE_RADAR_DISABLED;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("ContinuousDrive.c - Use mipContinuousDrive() function.\n"
-                 "\tDrive forward with right turn and then backward with left turn.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("ContinuousDrive.ino - Use continuousDrive() function.\n"
+              "Drive forward with right turn and then backward with left turn."));
 
     for (int i = 0 ; i < 40 ; i++)
     {
         // Drive forward at half-speed and turn right at quarter rate.
-        result = mipContinuousDrive(g_pMiP, 16, 8);
+        int result = mip.continuousDrive(16, 8);
         // Pace out the continuous drive commands by 50 msec.
         delay(50);
     }
     for (int i = 0 ; i < 40 ; i++)
     {
         // Drive backward at half-speed and turn left at quarter rate.
-        result = mipContinuousDrive(g_pMiP, -16, -8);
+        int result = mip.continuousDrive(-16, -8);
         // Pace out the continuous drive commands by 50 msec.
         delay(50);
     }
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

@@ -13,34 +13,27 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipSetChestLED()
+    setChestLED()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int           result = -1;
+    mip.begin();
+
+    PRINTLN(F("SetChestLED.ino - Use setChestLED() function.\n"
+              "Should switch chest LED to magenta.\n"));
+
     const uint8_t red = 0xff;
     const uint8_t green = 0x00;
     const uint8_t blue = 0xff;
-
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("SetChestLED.ino - Use mipSetChestLED() function.\n"
-                 "Should switch chest LED to magenta.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipSetChestLED(g_pMiP, red, green, blue);
+    int result = mip.setChestLED(red, green, blue);
 
     delay(3000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

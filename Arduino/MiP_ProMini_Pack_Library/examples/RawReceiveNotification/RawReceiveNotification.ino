@@ -13,30 +13,23 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipRawReceiveNotification()
+    rawReceiveNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int     result = -1;
-    size_t  responseLength = 0;
-    uint8_t response[MIP_RESPONSE_MAX_LEN];
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("RawReceiveNotification.ino - Use mipRawReceiveNotification() functions.\n"
-                 "In less than half a minute, a notification should be displayed.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("RawReceiveNotification.ino - Use rawReceiveNotification() functions.\n"
+              "In less than half a minute, a notification should be displayed."));
 
     // Wait for first out of band notification to arrive.
-    while (MIP_ERROR_EMPTY == mipRawReceiveNotification(g_pMiP, response, sizeof(response), &responseLength))
+    size_t  responseLength = 0;
+    uint8_t response[MIP_RESPONSE_MAX_LEN];
+    while (MIP_ERROR_EMPTY == mip.rawReceiveNotification(response, sizeof(response), &responseLength))
     {
     }
 
@@ -50,7 +43,7 @@ void setup()
     }
     PRINTLN();
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

@@ -13,37 +13,30 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipReadOdometer()
-    mipResetOdometer()
+    readOdometer()
+    resetOdometer()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
+    PRINTLN(F("Odometer.ino - Use readOdometer() and resetOdometer.\n"
+              "Read out current odometer reading and reset."));
 
-    Serial.begin(115200);
-    Serial.print("Odometer.ino - Use mipReadOdometer() and mipResetOdometer.\n"
-                 "Read out current odometer reading and reset.\n");
-    Serial.end();
+    float cm;
+    int result = mip.readOdometer(&cm);
+    PRINT(F("MiP has travelled "));
+        PRINT(cm);
+        PRINTLN(F(" cm since the last reset."));
 
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    float cm = 0.0f;
-    result = mipReadOdometer(g_pMiP, &cm);
-    Serial.print("MiP has travelled ");
-        Serial.print(cm);
-        Serial.println(" cm since the last reset.");
-
-    result = mipResetOdometer(g_pMiP);
+    result = mip.resetOdometer();
     delay(1000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

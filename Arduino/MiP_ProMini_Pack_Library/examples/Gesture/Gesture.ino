@@ -13,34 +13,27 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetLatestGestureNotification()
+    getLatestGestureNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                    result = -1;
-    MiPGestureNotification gesture = {0, 0};
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
+    PRINTLN(F("Gesture.ino - Use getLatestGestureNotification() function.\n"
+              "Swipe your hand in front of MiP to create gesture."));
 
-    Serial.begin(115200);
-    Serial.print("Gesture.ino - Use mipGetLatestGestureNotification() function.\n"
-                 "Swipe your hand in front of MiP to create gesture.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipSetGestureRadarMode(g_pMiP, MIP_GESTURE);
-    while (MIP_ERROR_NONE != mipGetLatestGestureNotification(g_pMiP, &gesture))
+    MiPGestureNotification gesture;
+    int result = mip.setGestureRadarMode(MIP_GESTURE);
+    while (MIP_ERROR_NONE != mip.getLatestGestureNotification(&gesture))
     {
     }
-    PRINT("Gesture = "); PRINTLN(gesture.gesture);
+    PRINT(F("Gesture = ")); PRINTLN(gesture.gesture);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

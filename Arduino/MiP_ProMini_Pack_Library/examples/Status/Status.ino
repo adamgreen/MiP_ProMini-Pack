@@ -13,38 +13,31 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetStatus()
-    mipGetLatestStatusNotification()
+    getStatus()
+    getLatestStatusNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("Status.ino - Use mipGetStatus() and mipGetLatestStatusNotification().\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("Status.ino - Use getStatus() and getLatestStatusNotification()."));
 
     MiPStatus status;
-    PRINTLN("Call mipGetStatus()");
-    result = mipGetStatus(g_pMiP, &status);
+    PRINTLN(F("Call mipGetStatus()"));
+    int result = mip.getStatus(&status);
     printStatus(&status);
 
-    PRINTLN("Waiting for next MiP status notification.");
-    while (MIP_ERROR_NONE != mipGetLatestStatusNotification(g_pMiP, &status))
+    PRINTLN(F("Waiting for next MiP status notification."));
+    while (MIP_ERROR_NONE != mip.getLatestStatusNotification(&status))
     {
     }
     printStatus(&status);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()
@@ -53,8 +46,8 @@ void loop()
 
 static void printStatus(const MiPStatus* pStatus)
 {
-    PRINT("Battery voltage: ");
+    PRINT(F("Battery voltage: "));
         PRINTLN(pStatus->battery);
-    PRINT("Position: ");
+    PRINT(F("Position: "));
         PRINTLN(pStatus->position);
 }

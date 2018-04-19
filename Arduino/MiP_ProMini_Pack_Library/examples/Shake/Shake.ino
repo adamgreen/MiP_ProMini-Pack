@@ -13,32 +13,25 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetLatestShakeNotification()
+    getLatestShakeNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                 result = -1;
+    mip.begin();
+    
+    PRINTLN(F("Shake.ino - Use getLatestShakeNotification() function."));
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("Shake.ino - Use mipGetLatestShakeNotification() function.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    PRINTLN("Waiting for user to shake MiP.");
-    while (MIP_ERROR_NONE != mipGetLatestShakeNotification(g_pMiP))
+    PRINTLN(F("Waiting for user to shake MiP."));
+    while (MIP_ERROR_NONE != mip.getLatestShakeNotification())
     {
     }
-    PRINTLN("Shake detected.");
+    PRINTLN(F("Shake detected."));
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

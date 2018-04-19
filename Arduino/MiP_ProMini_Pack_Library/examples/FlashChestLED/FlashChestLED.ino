@@ -13,53 +13,47 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipFlashChestLED()
-    mipGetChestLED()
+    flashChestLED()
+    getChestLED()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int            result = -1;
+    mip.begin();
+
+    PRINTLN(F("FlashChestLED.ino - Use flashChestLED() and getChestLED() functions.\n"
+              "Should flash chest LED red."));
+
     const uint8_t  red = 0xff;
     const uint8_t  green = 0x00;
     const uint8_t  blue = 0x00;
     const uint16_t onTime = 1000;    // 1000 msecs / sec
     const uint16_t offTime = 1000;   // 1000 msecs / sec
-    MiPChestLED    chestLED;
-
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("FlashChestLED.ino - Use mipFlashChestLED() and mipGetChestLED() functions.\n"
-                 "Should flash chest LED red.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipFlashChestLED(g_pMiP, red, green, blue, onTime, offTime);
+    int result = mip.flashChestLED(red, green, blue, onTime, offTime);
 
     delay(4000);
 
-    result = mipGetChestLED(g_pMiP, &chestLED);
-    Serial.println("chestLED");
-    Serial.print("red: ");
-        Serial.println(chestLED.red);
-    Serial.print("green: ");
-        Serial.println(chestLED.green);
-    Serial.print("blue: ");
-        Serial.println(chestLED.blue);
-    Serial.print("on time: ");
-        Serial.print(chestLED.onTime);
-        Serial.println(" milliseconds");
-    Serial.print("off time: ");
-        Serial.print(chestLED.offTime);
-        Serial.println(" milliseconds");
+    MiPChestLED chestLED;
+    result = mip.getChestLED(&chestLED);
+    
+    PRINTLN(F("chestLED"));
+    PRINT(F("red: "));
+        PRINTLN(chestLED.red);
+    PRINT(F("green: "));
+        PRINTLN(chestLED.green);
+    PRINT(F("blue: "));
+        PRINTLN(chestLED.blue);
+    PRINT(F("on time: "));
+        PRINT(chestLED.onTime);
+        PRINTLN(F(" milliseconds"));
+    PRINT(F("off time: "));
+        PRINT(chestLED.offTime);
+        PRINTLN(F(" milliseconds"));
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

@@ -13,51 +13,44 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipRawSend()
-    mipRawReceive()
+    rawSend()
+    rawReceive()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int     result = -1;
-    size_t  responseLength = 0;
-    uint8_t response[5];
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("RawSendReceive.ino - Use mipRaw*() functions.\n"
-                 "Should set chest LED to purple and display MiP firmware revision\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("RawSendReceive.ino - Use raw*() functions.\n"
+              "Should set chest LED to purple and display MiP firmware revision"));
 
     // Send 4-byte MiP command to set Chest LED to Purple.
-    static const uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
-    result = mipRawSend(g_pMiP, setChestPurple, sizeof(setChestPurple)-1);
+    uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
+    int result = mip.rawSend(setChestPurple, sizeof(setChestPurple)-1);
 
     // Request the MiP firmware revision information and display it.
-    static const uint8_t getMiPSoftwareVersion[] = "\x14";
-    result = mipRawReceive(g_pMiP, getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion)-1,
-                                 response, sizeof(response), &responseLength);
+    uint8_t getMiPSoftwareVersion[] = "\x14";
+    size_t  responseLength = 0;
+    uint8_t response[5];
+    result = mip.rawReceive(getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion)-1,
+                            response, sizeof(response), &responseLength);
     if (result == MIP_ERROR_NONE && responseLength == 5 && response[0] == 0x14)
     {
-        Serial.print("MiP Software Version: ");
-            Serial.print(response[1] + 2000);
-            Serial.print('-');
-            Serial.print(response[2]);
-            Serial.print('-');
-            Serial.print(response[3]);
-            Serial.print(" (build #");
-            Serial.print(response[4]);
-            Serial.println(')');
+        PRINT(F("MiP Software Version: "));
+            PRINT(response[1] + 2000);
+            PRINT('-');
+            PRINT(response[2]);
+            PRINT('-');
+            PRINT(response[3]);
+            PRINT(F(" (build #"));
+            PRINT(response[4]);
+            PRINT(')');
     }
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

@@ -55,97 +55,80 @@
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
 
 
-// MiP::flags bits
-#define MIP_FLAG_RADAR_VALID   (1 << 0)
-#define MIP_FLAG_STATUS_VALID  (1 << 1)
-#define MIP_FLAG_GESTURE_VALID (1 << 2)
-#define MIP_FLAG_SHAKE_VALID   (1 << 3)
-#define MIP_FLAG_WEIGHT_VALID  (1 << 4)
-#define MIP_FLAG_CLAP_VALID    (1 << 5)
+// MiP::m_flags bits
+#define MIP_FLAG_RADAR_VALID    (1 << 0)
+#define MIP_FLAG_STATUS_VALID   (1 << 1)
+#define MIP_FLAG_GESTURE_VALID  (1 << 2)
+#define MIP_FLAG_SHAKE_VALID    (1 << 3)
+#define MIP_FLAG_WEIGHT_VALID   (1 << 4)
+#define MIP_FLAG_CLAP_VALID     (1 << 5)
+#define MIP_FLAG_RELEASE_SERIAL (1 << 6)
 
 
-struct MiP
+
+MiP::MiP(int8_t serialSelectPin /* = MIP_UART_SELECT_PIN*/ , bool releaseSerialToPc /* = true */)
 {
-    MiPTransport*             pTransport;
-    MiPRadarNotification      lastRadar;
-    MiPGestureNotification    lastGesture;
-    MiPStatus                 lastStatus;
-    MiPWeight                 lastWeight;
-    MiPClap                   lastClap;
-    uint32_t                  flags;
-};
+    m_pTransport = NULL;
+    // UNDONE: If these are turned into classes then we don't need to memset them (constructors will do it for us).
+    memset(&m_lastRadar, 0, sizeof(m_lastRadar));
+    memset(&m_lastGesture, 0, sizeof(m_lastGesture));
+    memset(&m_lastStatus, 0, sizeof(m_lastStatus));
+    memset(&m_lastWeight, 0, sizeof(m_lastWeight));
+    memset(&m_lastClap, 0, sizeof(m_lastClap));
+    m_flags = 0;
 
-
-// Forward Function Declarations.
-static int isValidHeadLED(MiPHeadLED led);
-static int parseStatus(MiP* pMiP, MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength);
-static int parseWeight(MiP* pMiP, MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
-static void readNotifications(MiP* pMiP);
-
-
-MiP* mipInit(const char* pInitOptions)
-{
-    MiP* pMiP = NULL;
-
-    pMiP = calloc(1, sizeof(*pMiP));
-    if (!pMiP)
-        goto Error;
-    pMiP->pTransport = mipTransportInit(pInitOptions);
-    if (!pMiP->pTransport)
-        goto Error;
-
-    return pMiP;
-
-Error:
-    if (pMiP)
+    m_serialSelectPin = serialSelectPin;
+    if (releaseSerialToPc)
     {
-        mipTransportUninit(pMiP->pTransport);
-        free(pMiP);
+        m_flags |= MIP_FLAG_RELEASE_SERIAL;
     }
-    return NULL;
+
+    // UNDONE: Doesn't really do much anyway.
+    m_pTransport = mipTransportInit(NULL);
 }
 
-void mipUninit(MiP* pMiP)
+MiP::~MiP()
 {
-    if (!pMiP)
-        return;
-    mipTransportUninit(pMiP->pTransport);
+    mipTransportUninit(m_pTransport);
 }
 
-int mipConnectToRobot(MiP* pMiP, const char* pRobotName)
+
+int MiP::begin()
 {
-    assert( pMiP );
-    return mipTransportConnectToRobot(pMiP->pTransport, pRobotName);
+    return mipTransportConnectToRobot(m_pTransport, NULL);
 }
 
-int mipDisconnectFromRobot(MiP* pMiP)
+int MiP::end()
 {
-    assert( pMiP );
-    return mipTransportDisconnectFromRobot(pMiP->pTransport);
+    return mipTransportDisconnectFromRobot(m_pTransport);
 }
 
-int mipSetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode mode)
+
+int MiP::setGestureRadarMode(MiPGestureRadarMode mode)
 {
     uint8_t command[1+1];
 
-    assert( pMiP );
     assert( mode == MIP_GESTURE_RADAR_DISABLED || mode == MIP_GESTURE || mode == MIP_RADAR );
 
     command[0] = MIP_CMD_SET_GESTURE_RADAR_MODE;
     command[1] = mode;
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode* pMode)
+int MiP::getGestureRadarMode(MiPGestureRadarMode* pMode)
 {
-    static const uint8_t getGestureRadarMode[1] = { MIP_CMD_GET_GESTURE_RADAR_MODE };
-    uint8_t              response[1+1];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getGestureRadarMode[1] = { MIP_CMD_GET_GESTURE_RADAR_MODE };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int           result;
 
-    result = mipRawReceive(pMiP, getGestureRadarMode, sizeof(getGestureRadarMode), response, sizeof(response), &responseLength);
+    assert ( pMode );
+    
+    result = rawReceive(getGestureRadarMode, sizeof(getGestureRadarMode), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != 2 ||
         response[0] != MIP_CMD_GET_GESTURE_RADAR_MODE ||
         (response[1] != MIP_GESTURE_RADAR_DISABLED &&
@@ -159,24 +142,21 @@ int mipGetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode* pMode)
     return result;
 }
 
-int mipSetChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue)
+int MiP::setChestLED(uint8_t red, uint8_t green, uint8_t blue)
 {
     uint8_t command[1+3];
-
-    assert( pMiP );
 
     command[0] = MIP_CMD_SET_CHEST_LED;
     command[1] = red;
     command[2] = green;
     command[3] = blue;
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipFlashChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime)
+int MiP::flashChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime)
 {
     uint8_t command[1+5];
 
-    assert( pMiP );
     // on/off time are in units of 20 msecs.
     assert( onTime / 20 <= 255 && offTime / 20 <= 255 );
 
@@ -187,22 +167,23 @@ int mipFlashChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue, uint16
     command[4] = onTime / 20;
     command[5] = offTime / 20;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetChestLED(MiP* pMiP, MiPChestLED* pChestLED)
+int MiP::getChestLED(MiPChestLED* pChestLED)
 {
-    static const uint8_t getChestLED[1] = { MIP_CMD_GET_CHEST_LED };
-    uint8_t              response[1+5];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getChestLED[1] = { MIP_CMD_GET_CHEST_LED };
+    uint8_t       response[1+5];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pChestLED );
 
-    result = mipRawReceive(pMiP, getChestLED, sizeof(getChestLED), response, sizeof(response), &responseLength);
+    result = rawReceive(getChestLED, sizeof(getChestLED), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) || response[0] != MIP_CMD_GET_CHEST_LED )
     {
         return MIP_ERROR_BAD_RESPONSE;
@@ -217,11 +198,9 @@ int mipGetChestLED(MiP* pMiP, MiPChestLED* pChestLED)
     return result;
 }
 
-int mipSetHeadLEDs(MiP* pMiP, MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4)
+int MiP::setHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4)
 {
     uint8_t command[1+4];
-
-    assert( pMiP );
 
     command[0] = MIP_CMD_SET_HEAD_LEDS;
     command[1] = led1;
@@ -229,22 +208,23 @@ int mipSetHeadLEDs(MiP* pMiP, MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3,
     command[3] = led3;
     command[4] = led4;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetHeadLEDs(MiP* pMiP, MiPHeadLEDs* pHeadLEDs)
+int MiP::getHeadLEDs(MiPHeadLEDs* pHeadLEDs)
 {
-    static const uint8_t getHeadLEDs[1] = { MIP_CMD_GET_HEAD_LEDS };
-    uint8_t              response[1+4];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getHeadLEDs[1] = { MIP_CMD_GET_HEAD_LEDS };
+    uint8_t       response[1+4];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pHeadLEDs );
 
-    result = mipRawReceive(pMiP, getHeadLEDs, sizeof(getHeadLEDs), response, sizeof(response), &responseLength);
+    result = rawReceive(getHeadLEDs, sizeof(getHeadLEDs), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) ||
         response[0] != MIP_CMD_GET_HEAD_LEDS ||
         !isValidHeadLED(response[1]) ||
@@ -262,44 +242,54 @@ int mipGetHeadLEDs(MiP* pMiP, MiPHeadLEDs* pHeadLEDs)
     return result;
 }
 
-static int isValidHeadLED(MiPHeadLED led)
+int MiP::isValidHeadLED(MiPHeadLED led)
 {
     return led >= MIP_HEAD_LED_OFF && led <= MIP_HEAD_LED_BLINK_FAST;
 }
 
-int mipContinuousDrive(MiP* pMiP, int8_t velocity, int8_t turnRate)
+int MiP::continuousDrive(int8_t velocity, int8_t turnRate)
 {
     uint8_t command[1+2];
 
-    assert( pMiP );
     assert( velocity >= -32 && velocity <= 32 );
     assert( turnRate >= -32 && turnRate <= 32 );
 
     command[0] = MIP_CMD_CONTINUOUS_DRIVE;
 
     if (velocity == 0)
+    {
         command[1] = 0x00;
+    }
     else if (velocity < 0)
+    {
         command[1] = 0x20 + (-velocity);
+    }
     else
+    {
         command[1] = velocity;
+    }
 
     if (turnRate == 0)
+    {
         command[2] = 0x00;
+    }
     else if (turnRate < 0)
+    {
         command[2] = 0x60 + (-turnRate);
+    }
     else
+    {
         command[2] = 0x40 + turnRate;
+    }
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipDistanceDrive(MiP* pMiP, MiPDriveDirection driveDirection, uint8_t cm,
-                                MiPTurnDirection turnDirection, uint16_t degrees)
+int MiP::distanceDrive(MiPDriveDirection driveDirection, uint8_t cm,
+                       MiPTurnDirection turnDirection, uint16_t degrees)
 {
     uint8_t command[1+5];
 
-    assert( pMiP );
     assert( degrees <= 360 );
 
     command[0] = MIP_CMD_DISTANCE_DRIVE;
@@ -309,16 +299,15 @@ int mipDistanceDrive(MiP* pMiP, MiPDriveDirection driveDirection, uint8_t cm,
     command[4] = degrees >> 8;
     command[5] = degrees & 0xFF;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipTurnLeft(MiP* pMiP, uint16_t degrees, uint8_t speed)
+int MiP::turnLeft(uint16_t degrees, uint8_t speed)
 {
     // The turn command is in units of 5 degrees.
     uint8_t angle = degrees / 5;
     uint8_t command[1+2];
 
-    assert( pMiP );
     assert( degrees <= 255 * 5 );
     assert( speed <= 24 );
 
@@ -326,16 +315,15 @@ int mipTurnLeft(MiP* pMiP, uint16_t degrees, uint8_t speed)
     command[1] = angle;
     command[2] = speed;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipTurnRight(MiP* pMiP, uint16_t degrees, uint8_t speed)
+int MiP::turnRight(uint16_t degrees, uint8_t speed)
 {
     // The turn command is in units of 5 degrees.
     uint8_t angle = degrees / 5;
     uint8_t command[1+2];
 
-    assert( pMiP );
     assert( degrees <= 255 * 5 );
     assert( speed <= 24 );
 
@@ -343,15 +331,14 @@ int mipTurnRight(MiP* pMiP, uint16_t degrees, uint8_t speed)
     command[1] = angle;
     command[2] = speed;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipDriveForward(MiP* pMiP, uint8_t speed, uint16_t time)
+int MiP::driveForward(uint8_t speed, uint16_t time)
 {
     // The time parameters is in units of 7 milliseconds.
     uint8_t command[1+2];
 
-    assert( pMiP );
     assert( speed <= 30 );
     assert( time <= 255 * 7 );
 
@@ -359,15 +346,14 @@ int mipDriveForward(MiP* pMiP, uint8_t speed, uint16_t time)
     command[1] = speed;
     command[2] = time / 7;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipDriveBackward(MiP* pMiP, uint8_t speed, uint16_t time)
+int MiP::driveBackward(uint8_t speed, uint16_t time)
 {
     // The time parameters is in units of 7 milliseconds.
     uint8_t command[1+2];
 
-    assert( pMiP );
     assert( speed <= 30 );
     assert( time <= 255 * 7 );
 
@@ -375,49 +361,42 @@ int mipDriveBackward(MiP* pMiP, uint8_t speed, uint16_t time)
     command[1] = speed;
     command[2] = time / 7;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipStop(MiP* pMiP)
+int MiP::stop()
 {
     uint8_t command[1];
 
-    assert( pMiP );
-
     command[0] = MIP_CMD_STOP;
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipFallDown(MiP* pMiP, MiPFallDirection direction)
+int MiP::fallDown(MiPFallDirection direction)
 {
     uint8_t command[1+1];
-
-    assert( pMiP );
 
     command[0] = MIP_CMD_SET_POSITION;
     command[1] = direction;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetUp(MiP* pMiP, MiPGetUp getup)
+int MiP::getUp(MiPGetUp getup)
 {
     uint8_t command[1+1];
-
-    assert( pMiP );
 
     command[0] = MIP_CMD_GET_UP;
     command[1] = getup;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipPlaySound(MiP* pMiP, const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount)
+int MiP::playSound(const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount)
 {
     size_t  i;
     uint8_t command[1+17];
 
-    assert( pMiP );
     assert( pSounds );
     assert( soundCount <= 8 );
 
@@ -439,35 +418,35 @@ int mipPlaySound(MiP* pMiP, const MiPSound* pSounds, size_t soundCount, uint8_t 
     }
     command[17] = repeatCount;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipSetVolume(MiP* pMiP, uint8_t volume)
+int MiP::setVolume(uint8_t volume)
 {
     uint8_t command[1+1];
 
-    assert( pMiP );
     assert( volume <= 7 );
 
     command[0] = MIP_CMD_SET_VOLUME;
     command[1] = volume;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetVolume(MiP* pMiP, uint8_t* pVolume)
+int MiP::getVolume(uint8_t* pVolume)
 {
-    static const uint8_t getVolume[1] = { MIP_CMD_GET_VOLUME };
-    uint8_t              response[1+1];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getVolume[1] = { MIP_CMD_GET_VOLUME };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pVolume );
 
-    result = mipRawReceive(pMiP, getVolume, sizeof(getVolume), response, sizeof(response), &responseLength);
+    result = rawReceive(getVolume, sizeof(getVolume), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) ||
         response[0] != MIP_CMD_GET_VOLUME ||
         response[1] > 7)
@@ -479,20 +458,21 @@ int mipGetVolume(MiP* pMiP, uint8_t* pVolume)
     return result;
 }
 
-int mipReadOdometer(MiP* pMiP, float* pDistanceInCm)
+int MiP::readOdometer(float* pDistanceInCm)
 {
-    static const uint8_t readOdometer[1] = { MIP_CMD_READ_ODOMETER };
-    uint8_t              response[1+4];
-    size_t               responseLength;
-    uint32_t             ticks;
-    int                  result;
+ const uint8_t readOdometer[1] = { MIP_CMD_READ_ODOMETER };
+    uint8_t    response[1+4];
+    size_t     responseLength;
+    uint32_t   ticks;
+    int        result;
 
-    assert( pMiP );
     assert( pDistanceInCm );
 
-    result = mipRawReceive(pMiP, readOdometer, sizeof(readOdometer), response, sizeof(response), &responseLength);
+    result = rawReceive(readOdometer, sizeof(readOdometer), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) ||
         response[0] != MIP_CMD_READ_ODOMETER)
     {
@@ -506,34 +486,33 @@ int mipReadOdometer(MiP* pMiP, float* pDistanceInCm)
     return result;
 }
 
-int mipResetOdometer(MiP* pMiP)
+int MiP::resetOdometer()
 {
     uint8_t command[1];
 
-    assert( pMiP );
-
     command[0] = MIP_CMD_RESET_ODOMETER;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetStatus(MiP* pMiP, MiPStatus* pStatus)
+int MiP::getStatus(MiPStatus* pStatus)
 {
-    static const uint8_t getStatus[1] = { MIP_CMD_GET_STATUS };
-    uint8_t              response[1+2];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getStatus[1] = { MIP_CMD_GET_STATUS };
+    uint8_t       response[1+2];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pStatus );
 
-    result = mipRawReceive(pMiP, getStatus, sizeof(getStatus), response, sizeof(response), &responseLength);
+    result = rawReceive(getStatus, sizeof(getStatus), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
-    return parseStatus(pMiP, pStatus, response, responseLength);
+    }
+    return parseStatus(pStatus, response, responseLength);
 }
 
-static int parseStatus(MiP* pMiP, MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength)
+int MiP::parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength)
 {
     if (responseLength != 3 ||
         pResponse[0] != MIP_CMD_GET_STATUS ||
@@ -543,29 +522,30 @@ static int parseStatus(MiP* pMiP, MiPStatus* pStatus, const uint8_t* pResponse, 
     }
 
     // Convert battery integer value to floating point voltage value.
-    pStatus->millisec = mipTransportGetMilliseconds(pMiP->pTransport);
+    pStatus->millisec = millis();
     pStatus->battery = (float)(((pResponse[1] - 0x4D) / (float)(0x7C - 0x4D)) * (6.4f - 4.0f)) + 4.0f;
     pStatus->position = pResponse[2];
     return MIP_ERROR_NONE;
 }
 
-int mipGetWeight(MiP* pMiP, MiPWeight* pWeight)
+int MiP::getWeight(MiPWeight* pWeight)
 {
-    static const uint8_t getWeight[1] = { MIP_CMD_GET_WEIGHT };
-    uint8_t              response[1+1];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getWeight[1] = { MIP_CMD_GET_WEIGHT };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pWeight );
 
-    result = mipRawReceive(pMiP, getWeight, sizeof(getWeight), response, sizeof(response), &responseLength);
+    result = rawReceive(getWeight, sizeof(getWeight), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
-    return parseWeight(pMiP, pWeight, response, responseLength);
+    }
+    return parseWeight(pWeight, response, responseLength);
 }
 
-static int parseWeight(MiP* pMiP, MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength)
+int MiP::parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength)
 {
     if (responseLength != 2 ||
         pResponse[0] != MIP_CMD_GET_WEIGHT)
@@ -573,24 +553,25 @@ static int parseWeight(MiP* pMiP, MiPWeight* pWeight, const uint8_t* pResponse, 
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pWeight->millisec = mipTransportGetMilliseconds(pMiP->pTransport);
+    pWeight->millisec = millis();
     pWeight->weight = pResponse[1];
     return MIP_ERROR_NONE;
 }
 
-int mipGetClapSettings(MiP* pMiP, MiPClapSettings* pSettings)
+int MiP::getClapSettings(MiPClapSettings* pSettings)
 {
-    static const uint8_t getClapSettings[1] = { MIP_CMD_GET_CLAP_SETTINGS };
-    uint8_t              response[1+3];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getClapSettings[1] = { MIP_CMD_GET_CLAP_SETTINGS };
+    uint8_t       response[1+3];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pSettings );
 
-    result = mipRawReceive(pMiP, getClapSettings, sizeof(getClapSettings), response, sizeof(response), &responseLength);
+    result = rawReceive(getClapSettings, sizeof(getClapSettings), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) ||
         response[0] != MIP_CMD_GET_CLAP_SETTINGS ||
         (response[1] != MIP_CLAP_DISABLED && response[1] != MIP_CLAP_ENABLED))
@@ -603,184 +584,215 @@ int mipGetClapSettings(MiP* pMiP, MiPClapSettings* pSettings)
     return MIP_ERROR_NONE;
 }
 
-int mipEnableClap(MiP* pMiP, MiPClapEnabled enabled)
+int MiP::enableClap(MiPClapEnabled enabled)
 {
     uint8_t command[1+1];
-
-    assert( pMiP );
 
     command[0] = MIP_CMD_ENABLE_CLAP;
     command[1] = enabled;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipSetClapDelay(MiP* pMiP, uint16_t delay)
+int MiP::setClapDelay(uint16_t delay)
 {
     uint8_t command[1+2];
-
-    assert( pMiP );
 
     command[0] = MIP_CMD_SET_CLAP_DELAY;
     command[1] = delay >> 8;
     command[2] = delay & 0xFF;
 
-    return mipRawSend(pMiP, command, sizeof(command));
+    return rawSend(command, sizeof(command));
 }
 
-int mipGetLatestRadarNotification(MiP* pMiP, MiPRadarNotification* pNotification)
+int MiP::getLatestRadarNotification(MiPRadarNotification* pNotification)
 {
     MiPRadar radar;
 
-    readNotifications(pMiP);
+    readNotifications();
 
-    if ((pMiP->flags & MIP_FLAG_RADAR_VALID) == 0)
+    if ((m_flags & MIP_FLAG_RADAR_VALID) == 0)
+    {
         return MIP_ERROR_EMPTY;
-    radar = pMiP->lastRadar.radar;
+    }
+    radar = m_lastRadar.radar;
     if (radar != MIP_RADAR_NONE && radar != MIP_RADAR_10CM_30CM && radar != MIP_RADAR_0CM_10CM)
+    {
         return MIP_ERROR_BAD_RESPONSE;
+    }
 
-    *pNotification = pMiP->lastRadar;
+    *pNotification = m_lastRadar;
     return MIP_ERROR_NONE;
 }
 
-static void readNotifications(MiP* pMiP)
+void MiP::readNotifications()
 {
     int     result = -1;
     size_t  responseLength = 0;
     uint8_t response[MIP_RESPONSE_MAX_LEN];
 
-    while (MIP_ERROR_NONE == mipRawReceiveNotification(pMiP, response, sizeof(response), &responseLength))
+    while (MIP_ERROR_NONE == rawReceiveNotification(response, sizeof(response), &responseLength))
     {
         // Must have at least one byte to indicate which response is being given.
         if (responseLength < 1)
+        {
             continue;
+        }
         switch (response[0])
         {
         case MIP_CMD_GET_RADAR_RESPONSE:
             if (responseLength == 2)
             {
-                pMiP->lastRadar.millisec = mipTransportGetMilliseconds(pMiP->pTransport);
-                pMiP->lastRadar.radar = response[1];
-                pMiP->flags |= MIP_FLAG_RADAR_VALID;
+                m_lastRadar.millisec = millis();
+                m_lastRadar.radar = response[1];
+                m_flags |= MIP_FLAG_RADAR_VALID;
             }
             break;
         case MIP_CMD_GET_GESTURE_RESPONSE:
             if (responseLength == 2)
             {
-                pMiP->lastGesture.millisec = mipTransportGetMilliseconds(pMiP->pTransport);
-                pMiP->lastGesture.gesture = response[1];
-                pMiP->flags |= MIP_FLAG_GESTURE_VALID;
+                m_lastGesture.millisec = millis();
+                m_lastGesture.gesture = response[1];
+                m_flags |= MIP_FLAG_GESTURE_VALID;
             }
             break;
         case MIP_CMD_SHAKE_RESPONSE:
             if (responseLength == 1)
             {
-                pMiP->flags |= MIP_FLAG_SHAKE_VALID;
+                m_flags |= MIP_FLAG_SHAKE_VALID;
             }
             break;
         case MIP_CMD_GET_STATUS:
-            result = parseStatus(pMiP, &pMiP->lastStatus, response, responseLength);
+            result = parseStatus(&m_lastStatus, response, responseLength);
             if (result == MIP_ERROR_NONE)
-                pMiP->flags |= MIP_FLAG_STATUS_VALID;
+            {
+                m_flags |= MIP_FLAG_STATUS_VALID;
+            }
             break;
         case MIP_CMD_GET_WEIGHT:
-            result = parseWeight(pMiP, &pMiP->lastWeight, response, responseLength);
+            result = parseWeight(&m_lastWeight, response, responseLength);
             if (result == MIP_ERROR_NONE)
-                pMiP->flags |= MIP_FLAG_WEIGHT_VALID;
+            {
+                m_flags |= MIP_FLAG_WEIGHT_VALID;
+            }
             break;
         case MIP_CMD_CLAP_RESPONSE:
             if (responseLength == 2)
             {
-                pMiP->lastClap.millisec = mipTransportGetMilliseconds(pMiP->pTransport);
-                pMiP->lastClap.count = response[1];
-                pMiP->flags |= MIP_FLAG_CLAP_VALID;
+                m_lastClap.millisec = millis();
+                m_lastClap.count = response[1];
+                m_flags |= MIP_FLAG_CLAP_VALID;
             }
             break;
         default:
-#ifdef UNDONE
-            printf("notification -> ");
+            PRINT(F("mip: Bad notification: "));
             for (int i = 0 ; i < responseLength ; i++)
-                printf("%02X", response[i]);
-            printf("\n");
-#endif // UNDONE
+            {
+                PRINT(response[i]);
+                if (i != responseLength - 1)
+                {
+                    PRINT(',');
+                }
+            }
+            PRINTLN();
             break;
         }
     }
 }
 
-int mipGetLatestGestureNotification(MiP* pMiP, MiPGestureNotification* pNotification)
+int MiP::getLatestGestureNotification(MiPGestureNotification* pNotification)
 {
     MiPGesture gesture;
 
-    readNotifications(pMiP);
+    assert ( pNotification );
+    
+    readNotifications();
 
-    if ((pMiP->flags & MIP_FLAG_GESTURE_VALID) == 0)
+    if ((m_flags & MIP_FLAG_GESTURE_VALID) == 0)
+    {
         return MIP_ERROR_EMPTY;
-    gesture = pMiP->lastGesture.gesture;
+    }
+    gesture = m_lastGesture.gesture;
     if (gesture < MIP_GESTURE_LEFT || gesture > MIP_GESTURE_BACKWARD)
+    {
         return MIP_ERROR_BAD_RESPONSE;
+    }
 
-    *pNotification = pMiP->lastGesture;
+    *pNotification = m_lastGesture;
     return MIP_ERROR_NONE;
 }
 
-int mipGetLatestStatusNotification(MiP* pMiP, MiPStatus* pStatus)
+int MiP::getLatestStatusNotification(MiPStatus* pStatus)
 {
-    readNotifications(pMiP);
+    assert ( pStatus );
+    
+    readNotifications();
 
-    if ((pMiP->flags & MIP_FLAG_STATUS_VALID) == 0)
+    if ((m_flags & MIP_FLAG_STATUS_VALID) == 0)
+    {
         return MIP_ERROR_EMPTY;
+    }
 
-    *pStatus = pMiP->lastStatus;
+    *pStatus = m_lastStatus;
     return MIP_ERROR_NONE;
 }
 
-int mipGetLatestShakeNotification(MiP* pMiP)
+int MiP::getLatestShakeNotification()
 {
-    readNotifications(pMiP);
+    readNotifications();
 
-    if ((pMiP->flags & MIP_FLAG_SHAKE_VALID) == 0)
+    if ((m_flags & MIP_FLAG_SHAKE_VALID) == 0)
+    {
         return MIP_ERROR_EMPTY;
-    pMiP->flags &= ~MIP_FLAG_SHAKE_VALID;
+    }
+    m_flags &= ~MIP_FLAG_SHAKE_VALID;
     return MIP_ERROR_NONE;
 }
 
-int mipGetLatestWeightNotification(MiP* pMiP, MiPWeight* pWeight)
+int MiP::getLatestWeightNotification(MiPWeight* pWeight)
 {
-    readNotifications(pMiP);
+    assert ( pWeight );
+    
+    readNotifications();
 
-    if ((pMiP->flags & MIP_FLAG_WEIGHT_VALID) == 0)
+    if ((m_flags & MIP_FLAG_WEIGHT_VALID) == 0)
+    {
         return MIP_ERROR_EMPTY;
+    }
 
-    *pWeight = pMiP->lastWeight;
+    *pWeight = m_lastWeight;
     return MIP_ERROR_NONE;
 }
 
-int mipGetLatestClapNotification(MiP* pMiP, MiPClap* pClap)
+int MiP::getLatestClapNotification(MiPClap* pClap)
 {
-    readNotifications(pMiP);
+    assert ( pClap );
+    
+    readNotifications();
 
-    if ((pMiP->flags & MIP_FLAG_CLAP_VALID) == 0)
+    if ((m_flags & MIP_FLAG_CLAP_VALID) == 0)
+    {
         return MIP_ERROR_EMPTY;
+    }
 
-    *pClap = pMiP->lastClap;
+    *pClap = m_lastClap;
     return MIP_ERROR_NONE;
 }
 
-int mipGetSoftwareVersion(MiP* pMiP, MiPSoftwareVersion* pSoftware)
+int MiP::getSoftwareVersion(MiPSoftwareVersion* pSoftware)
 {
-    static const uint8_t getSoftwareVersion[1] = { MIP_CMD_GET_SOFTWARE_VERSION };
-    uint8_t              response[1+4];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getSoftwareVersion[1] = { MIP_CMD_GET_SOFTWARE_VERSION };
+    uint8_t       response[1+4];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pSoftware );
 
-    result = mipRawReceive(pMiP, getSoftwareVersion, sizeof(getSoftwareVersion), response, sizeof(response), &responseLength);
+    result = rawReceive(getSoftwareVersion, sizeof(getSoftwareVersion), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) || response[0] != MIP_CMD_GET_SOFTWARE_VERSION)
     {
         return MIP_ERROR_BAD_RESPONSE;
@@ -793,19 +805,20 @@ int mipGetSoftwareVersion(MiP* pMiP, MiPSoftwareVersion* pSoftware)
     return result;
 }
 
-int mipGetHardwareInfo(MiP* pMiP, MiPHardwareInfo* pHardware)
+int MiP::getHardwareInfo(MiPHardwareInfo* pHardware)
 {
-    static const uint8_t getHardwareInfo[1] = { MIP_CMD_GET_HARDWARE_INFO };
-    uint8_t              response[1+2];
-    size_t               responseLength;
-    int                  result;
+    const uint8_t getHardwareInfo[1] = { MIP_CMD_GET_HARDWARE_INFO };
+    uint8_t       response[1+2];
+    size_t        responseLength;
+    int           result;
 
-    assert( pMiP );
     assert( pHardware );
 
-    result = mipRawReceive(pMiP, getHardwareInfo, sizeof(getHardwareInfo), response, sizeof(response), &responseLength);
+    result = rawReceive(getHardwareInfo, sizeof(getHardwareInfo), response, sizeof(response), &responseLength);
     if (result)
+    {
         return result;
+    }
     if (responseLength != sizeof(response) || response[0] != MIP_CMD_GET_HARDWARE_INFO)
     {
         return MIP_ERROR_BAD_RESPONSE;
@@ -816,27 +829,25 @@ int mipGetHardwareInfo(MiP* pMiP, MiPHardwareInfo* pHardware)
     return result;
 }
 
-int mipRawSend(MiP* pMiP, const uint8_t* pRequest, size_t requestLength)
+int MiP::rawSend(const uint8_t* pRequest, size_t requestLength)
 {
-    assert( pMiP );
-    return mipTransportSendRequest(pMiP->pTransport, pRequest, requestLength, MIP_EXPECT_NO_RESPONSE);
+    return mipTransportSendRequest(m_pTransport, pRequest, requestLength, MIP_EXPECT_NO_RESPONSE);
 }
 
-int mipRawReceive(MiP* pMiP, const uint8_t* pRequest, size_t requestLength,
-                             uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength)
+int MiP::rawReceive(const uint8_t* pRequest, size_t requestLength,
+                          uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength)
 {
     int result = -1;
 
-    assert( pMiP );
-
-    result = mipTransportSendRequest(pMiP->pTransport, pRequest, requestLength, MIP_EXPECT_RESPONSE);
+    result = mipTransportSendRequest(m_pTransport, pRequest, requestLength, MIP_EXPECT_RESPONSE);
     if (result)
+    {
         return result;
-    return mipTransportGetResponse(pMiP->pTransport, pResponseBuffer, responseBufferSize, pResponseLength);
+    }
+    return mipTransportGetResponse(m_pTransport, pResponseBuffer, responseBufferSize, pResponseLength);
 }
 
-int mipRawReceiveNotification(MiP* pMiP, uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength)
+int MiP::rawReceiveNotification(uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength)
 {
-    assert( pMiP );
-    return mipTransportGetOutOfBandResponse(pMiP->pTransport, pNotifyBuffer, notifyBufferSize, pNotifyLength);
+    return mipTransportGetOutOfBandResponse(m_pTransport, pNotifyBuffer, notifyBufferSize, pNotifyLength);
 }

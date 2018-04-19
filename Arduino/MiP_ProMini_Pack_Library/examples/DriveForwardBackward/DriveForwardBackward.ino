@@ -13,33 +13,26 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipDriveForward()
-    mipDriveBackward()
+    driveForward()
+    driveBackward()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
+    
+    PRINTLN(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions.\n"
+              "Drive ahead and back, 1 second in each direction."));
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("DriveForwardBackward.ino - Use mipDriveForward() & mipDriveBackward() functions.\n"
-                 "Drive ahead and back, 1 second in each direction.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipDriveForward(g_pMiP, 15, 1000);
+    int result = mip.driveForward(15, 1000);
     delay(2000);
-    result = mipDriveBackward(g_pMiP, 15, 1000);
+    result = mip.driveBackward(15, 1000);
     delay(2000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

@@ -13,38 +13,31 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipDistanceDrive()
+    distanceDrive()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("DistanceDrive.ino - Use mipDistanceDrive function.\n"
-                 "Drive forward, turn 360 degrees in each direction and backward.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("DistanceDrive.ino - Use distanceDrive function.\n"
+              "Drive forward, turn 360 degrees in each direction and backward."));
 
     // Queue up multiple commands to run in sequence.
-    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+    int result = mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
     // Don't queue up multiple commands too fast.
     delay(500);
-    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
+    result = mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
     delay(500);
-    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
+    result = mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
     delay(500);
-    result = mipDistanceDrive(g_pMiP, MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
+    result = mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
     delay(500);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

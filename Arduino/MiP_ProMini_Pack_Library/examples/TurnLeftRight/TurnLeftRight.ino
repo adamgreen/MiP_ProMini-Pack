@@ -13,33 +13,26 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipTurnLeft()
-    mipTurnRight()
+    turnLeft()
+    turnRight()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
+    PRINTLN(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions.\n"
+              "Turn 180 degrees to left and then 180 degrees to right."));
 
-    Serial.begin(115200);
-    Serial.print("TurnLeftRight.ino - Use mipTurnLeft & mipTurnRight() functions.\n"
-                 "Turn 180 degrees to left and then 180 degrees to right.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipTurnLeft(g_pMiP, 180, 12);
+    int result = mip.turnLeft(180, 12);
     delay(2000);
-    result = mipTurnRight(g_pMiP, 180, 12);
+    result = mip.turnRight(180, 12);
     delay(2000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

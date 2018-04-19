@@ -13,35 +13,28 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetLatestRadarNotification()
+    getLatestRadarNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                  result = -1;
-    MiPRadarNotification radar = {0, MIP_RADAR_NONE};
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
+    PRINTLN(F("Radar.ino - Use getLatestRadarNotification() function.\n"
+              "Program should end once you place your handle <10cm from MiP's face."));
 
-    Serial.begin(115200);
-    Serial.print("Radar.ino - Use mipGetLatestRadarNotification() function.\n"
-                 "Program should end once you place your handle <10cm from MiP's face.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipSetGestureRadarMode(g_pMiP, MIP_RADAR);
+    MiPRadarNotification radar;
+    int result = mip.setGestureRadarMode(MIP_RADAR);
     do
     {
-        result = mipGetLatestRadarNotification(g_pMiP, &radar);
+        result = mip.getLatestRadarNotification(&radar);
     } while (radar.radar != MIP_RADAR_0CM_10CM);
-    PRINTLN("Hand detected. Shutting down.");
+    PRINTLN(F("Hand detected. Shutting down."));
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

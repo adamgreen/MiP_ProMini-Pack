@@ -13,30 +13,22 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipFallDown()
+    fallDown()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
-
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("FallDown.ino - Use mipFallDown().\n"
-                 "Fall forward.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipFallDown(g_pMiP, MIP_FALL_FACE_DOWN);
+    mip.begin();
+    
+    PRINTLN(F("FallDown.ino - Use fallDown().\n"
+               "Fall forward.\n"));
+    int result = mip.fallDown(MIP_FALL_FACE_DOWN);
     delay(2000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

@@ -511,8 +511,3 @@ int mipTransportGetOutOfBandResponse(MiPTransport* pTransport, uint8_t* pRespons
 
     return MIP_ERROR_NONE;
 }
-
-uint32_t mipTransportGetMilliseconds(MiPTransport* pTransport)
-{
-    return millis();
-}

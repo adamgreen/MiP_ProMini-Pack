@@ -13,28 +13,21 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipPlaySound()
+    playSound()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
-
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("PlaySound.ino - Use mipPlaySound().\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    mip.begin();
+    
+    PRINTLN(F("PlaySound.ino - Use playSound()."));
 
     // Play 1 sound.
     const MiPSound sounds1[] = {{MIP_SOUND_ONEKHZ_500MS_8K16BIT, 0}};
-    result = mipPlaySound(g_pMiP, sounds1, sizeof(sounds1)/sizeof(sounds1[0]), 0);
+    int result = mip.playSound(sounds1, sizeof(sounds1)/sizeof(sounds1[0]), 0);
 
     delay(2000);
 
@@ -45,11 +38,11 @@ void setup()
                                 {MIP_SOUND_VOLUME_7, 0},            // Play burping sound at full volume.
                                 {MIP_SOUND_ACTION_BURPING, 0},
                                 {MIP_SOUND_VOLUME_1, 0}};           // Finish by setting volume low.
-    result = mipPlaySound(g_pMiP, sounds2, sizeof(sounds2)/sizeof(sounds2[0]), 1);
+    result = mip.playSound(sounds2, sizeof(sounds2)/sizeof(sounds2[0]), 1);
 
     delay(7000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

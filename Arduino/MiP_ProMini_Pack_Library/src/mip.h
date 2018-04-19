@@ -18,10 +18,12 @@
 #ifndef MIP_H_
 #define MIP_H_
 
+#include <Arduino.h>
 #include <stdint.h>
 #include <stdlib.h>
+// UNDONE:
+#include "mip-transport.h"
 
-// UNDONE: Might not want to hardcode this here.
 // Pin used by the TS3USB221A switch to connect the AVR UART to the MiP or PC.
 // Set to HIGH, it selects the MiP.
 // Set to LOW, it selects the PC.
@@ -328,67 +330,101 @@ typedef struct MiPClapSettings
     uint16_t       delay;
 } MiPClapSettings;
 
-// Abstraction of the pointer type returned by mipInit() and subsequently passed into all other mip*() functions.
-typedef struct MiP MiP;
 
 
-// The documentation for these functions can be found at the following link:
-//  https://github.com/adamgreen/MiP/tree/master/OSX_ConsoleSample#readme
-MiP* mipInit(const char* pInitOptions);
-void mipUninit(MiP* pMiP);
+class MiP
+{
+public:
+    // Constructor/Destructors.
+    MiP(int8_t serialSelectPin = MIP_UART_SELECT_PIN, bool releaseSerialToPc = true);
+    ~MiP();
 
-int mipConnectToRobot(MiP* pMiP, const char* pRobotName);
-int mipDisconnectFromRobot(MiP* pMiP);
+    // UNDONE: Will probably make these void. Serial & SoftwareSerial do.
+    int begin();
+    int end();
 
-int mipSetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode mode);
-int mipGetGestureRadarMode(MiP* pMiP, MiPGestureRadarMode* pMode);
+    // Serial is shared between the MiP and the PC on the MiP ProMini Pack.
+    // The following methods switch between the two destinations.
+    // It flushes any outstanding output destined to the current destination before switching to the new one.
+    void switchSerialToMiP()
+    {
+        Serial.flush();
+        digitalWrite(m_serialSelectPin, HIGH);
+    }
+    void switchSerialToPC()
+    {
+        Serial.flush();
+        digitalWrite(m_serialSelectPin, LOW);
+    }
+    bool isSerialGoingToMiP()
+    {
+        return digitalRead(m_serialSelectPin) == HIGH;
+    }
 
-int mipSetChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue);
-int mipFlashChestLED(MiP* pMiP, uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
-int mipGetChestLED(MiP* pMiP, MiPChestLED* pChestLED);
-int mipSetHeadLEDs(MiP* pMiP, MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
-int mipGetHeadLEDs(MiP* pMiP, MiPHeadLEDs* pHeadLEDs);
+    int setGestureRadarMode(MiPGestureRadarMode mode);
+    int getGestureRadarMode(MiPGestureRadarMode* pMode);
+    
+    int setChestLED(uint8_t red, uint8_t green, uint8_t blue);
+    int flashChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
+    int getChestLED(MiPChestLED* pChestLED);
+    int setHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
+    int getHeadLEDs(MiPHeadLEDs* pHeadLEDs);
+    
+    int continuousDrive(int8_t velocity, int8_t turnRate);
+    int distanceDrive(MiPDriveDirection driveDirection, uint8_t cm,
+                                    MiPTurnDirection turnDirection, uint16_t degrees);
+    int turnLeft(uint16_t degrees, uint8_t speed);
+    int turnRight(uint16_t degrees, uint8_t speed);
+    int driveForward(uint8_t speed, uint16_t time);
+    int driveBackward(uint8_t speed, uint16_t time);
+    int stop();
+    int fallDown(MiPFallDirection direction);
+    int getUp(MiPGetUp getup);
+    
+    int playSound(const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount);
+    int setVolume(uint8_t volume);
+    int getVolume(uint8_t* pVolume);
+    
+    int readOdometer(float* pDistanceInCm);
+    int resetOdometer();
+    
+    int getStatus(MiPStatus* pStatus);
+    
+    int getWeight(MiPWeight* pWeight);
+    
+    int getClapSettings(MiPClapSettings* pSettings);
+    int enableClap(MiPClapEnabled enabled);
+    int setClapDelay(uint16_t delay);
+    
+    int getLatestRadarNotification(MiPRadarNotification* pNotification);
+    int getLatestGestureNotification(MiPGestureNotification* pNotification);
+    int getLatestStatusNotification(MiPStatus* pStatus);
+    int getLatestShakeNotification();
+    int getLatestWeightNotification(MiPWeight* pWeight);
+    int getLatestClapNotification(MiPClap* pClap);
+    
+    int getSoftwareVersion(MiPSoftwareVersion* pSoftware);
+    int getHardwareInfo(MiPHardwareInfo* pHardware);
+    
+    int rawSend(const uint8_t* pRequest, size_t requestLength);
+    int rawReceive(const uint8_t* pRequest, size_t requestLength,
+                   uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
+    int rawReceiveNotification(uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength);
 
-int mipContinuousDrive(MiP* pMiP, int8_t velocity, int8_t turnRate);
-int mipDistanceDrive(MiP* pMiP, MiPDriveDirection driveDirection, uint8_t cm,
-                                MiPTurnDirection turnDirection, uint16_t degrees);
-int mipTurnLeft(MiP* pMiP, uint16_t degrees, uint8_t speed);
-int mipTurnRight(MiP* pMiP, uint16_t degrees, uint8_t speed);
-int mipDriveForward(MiP* pMiP, uint8_t speed, uint16_t time);
-int mipDriveBackward(MiP* pMiP, uint8_t speed, uint16_t time);
-int mipStop(MiP* pMiP);
-int mipFallDown(MiP* pMiP, MiPFallDirection direction);
-int mipGetUp(MiP* pMiP, MiPGetUp getup);
+protected:
+    int  isValidHeadLED(MiPHeadLED led);
+    int  parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength);
+    int  parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
+    void readNotifications();
 
-int mipPlaySound(MiP* pMiP, const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount);
-int mipSetVolume(MiP* pMiP, uint8_t volume);
-int mipGetVolume(MiP* pMiP, uint8_t* pVolume);
-
-int mipReadOdometer(MiP* pMiP, float* pDistanceInCm);
-int mipResetOdometer(MiP* pMiP);
-
-int mipGetStatus(MiP* pMiP, MiPStatus* pStatus);
-
-int mipGetWeight(MiP* pMiP, MiPWeight* pWeight);
-
-int mipGetClapSettings(MiP* pMiP, MiPClapSettings* pSettings);
-int mipEnableClap(MiP* pMiP, MiPClapEnabled enabled);
-int mipSetClapDelay(MiP* pMiP, uint16_t delay);
-
-int mipGetLatestRadarNotification(MiP* pMiP, MiPRadarNotification* pNotification);
-int mipGetLatestGestureNotification(MiP* pMiP, MiPGestureNotification* pNotification);
-int mipGetLatestStatusNotification(MiP* pMiP, MiPStatus* pStatus);
-int mipGetLatestShakeNotification(MiP* pMiP);
-int mipGetLatestWeightNotification(MiP* pMiP, MiPWeight* pWeight);
-int mipGetLatestClapNotification(MiP* pMiP, MiPClap* pClap);
-
-int mipGetSoftwareVersion(MiP* pMiP, MiPSoftwareVersion* pSoftware);
-int mipGetHardwareInfo(MiP* pMiP, MiPHardwareInfo* pHardware);
-
-int mipRawSend(MiP* pMiP, const uint8_t* pRequest, size_t requestLength);
-int mipRawReceive(MiP* pMiP, const uint8_t* pRequest, size_t requestLength,
-                             uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
-int mipRawReceiveNotification(MiP* pMiP, uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength);
-
+    MiPTransport*             m_pTransport;
+    MiPRadarNotification      m_lastRadar;
+    MiPGestureNotification    m_lastGesture;
+    MiPStatus                 m_lastStatus;
+    MiPWeight                 m_lastWeight;
+    MiPClap                   m_lastClap;
+    uint8_t                   m_flags;
+    int8_t                    m_serialSelectPin;
+};
 
 #endif // MIP_H_

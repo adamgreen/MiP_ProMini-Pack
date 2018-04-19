@@ -13,38 +13,31 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetWeight()
-    mipGetLatestWeightNotification()
+    getWeight()
+    getLatestWeightNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("Weight.ino - Use weight update functions.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("Weight.ino - Use weight update functions."));
 
     MiPWeight weight;
-    result = mipGetWeight(g_pMiP, &weight);
-    PRINT("weight = ");
+    int result = mip.getWeight(&weight);
+    PRINT(F("weight = "));
         PRINTLN(weight.weight);
-    PRINTLN("Waiting for next weight update.");
-    while (MIP_ERROR_NONE != mipGetLatestWeightNotification(g_pMiP, &weight))
+    PRINTLN(F("Waiting for next weight update."));
+    while (MIP_ERROR_NONE != mip.getLatestWeightNotification(&weight))
     {
     }
-    PRINT("weight = ");
+    PRINT(F("weight = "));
         PRINTLN(weight.weight);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

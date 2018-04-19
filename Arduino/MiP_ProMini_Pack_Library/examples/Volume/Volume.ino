@@ -13,35 +13,28 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipSetVolume()
-    mipGetVolume()
+    setVolume()
+    getVolume()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int     result = -1;
+    mip.begin();
+
+    PRINTLN(F("Volume.ino - Use set/getVolume().\n"
+              "Set volume level to 1 and read out afterwards."));
+
     uint8_t volume = 0;
+    int result = mip.setVolume(1);
+    result = mip.getVolume(&volume);
 
-    g_pMiP = mipInit(NULL);
+    PRINT(F("Volume = "));
+      PRINTLN(volume);
 
-    Serial.begin(115200);
-    Serial.print("Volume.ino - Use mipSet/GetVolume().\n"
-                 "Set volume level to 1 and read out afterwards.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipSetVolume(g_pMiP, 1);
-    result = mipGetVolume(g_pMiP, &volume);
-
-    Serial.print("Volume = ");
-      Serial.println(volume);
-
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

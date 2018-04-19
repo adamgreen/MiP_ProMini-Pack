@@ -13,46 +13,39 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetSoftwareVersion()
-    mipGetHardwareInfo()
+    getSoftwareVersion()
+    getHardwareInfo()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                result = -1;
+    mip.begin();
+
+    PRINTLN(F("GetSoftwareHardwareVersion.ino - Use getSoftwareVersion() & getHardwareInfo() functions."));
+
     MiPSoftwareVersion softwareVersion;
-    MiPHardwareInfo    hardwareInfo;
+    int result = mip.getSoftwareVersion(&softwareVersion);
+    PRINT(F("software version: "));
+        PRINT(softwareVersion.year);
+        PRINT('-');
+        PRINT(softwareVersion.month);
+        PRINT('-');
+        PRINT(softwareVersion.day);
+        PRINT('.');
+        PRINTLN(softwareVersion.uniqueVersion);
 
-    g_pMiP = mipInit(NULL);
+    MiPHardwareInfo hardwareInfo;
+    result = mip.getHardwareInfo(&hardwareInfo);
+    PRINTLN(F("hardware info"));
+    PRINT(F("  voice chip version: "));
+        PRINTLN(hardwareInfo.voiceChip);
+    PRINT(F("  hardware version: "));
+        PRINTLN(hardwareInfo.hardware);
 
-    Serial.begin(115200);
-    Serial.print("GetSoftwareHardwareVersion.ino - Use mipGetSoftwareVersion() & mipGetHardwareInfo() functions.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipGetSoftwareVersion(g_pMiP, &softwareVersion);
-    Serial.print("software version: ");
-        Serial.print(softwareVersion.year);
-        Serial.print('-');
-        Serial.print(softwareVersion.month);
-        Serial.print('-');
-        Serial.print(softwareVersion.day);
-        Serial.print('.');
-        Serial.println(softwareVersion.uniqueVersion);
-
-    result = mipGetHardwareInfo(g_pMiP, &hardwareInfo);
-    Serial.println("hardware info");
-    Serial.print("  voice chip version: ");
-        Serial.println(hardwareInfo.voiceChip);
-    Serial.print("  hardware version: ");
-        Serial.println(hardwareInfo.hardware);
-
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

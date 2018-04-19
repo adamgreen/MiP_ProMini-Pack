@@ -13,33 +13,26 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipGetUp()
+    getUp()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                 result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
+    PRINTLN(F("GetUp.ino - Use getUp().\n"
+              "Attempt to get up from a front fall."));
 
-    Serial.begin(115200);
-    Serial.print("GetUp.ino - Use mipGetUp().\n"
-                 "Attempt to get up from a front fall.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipFallDown(g_pMiP, MIP_FALL_FACE_DOWN);
+    int result = mip.fallDown(MIP_FALL_FACE_DOWN);
     delay(3000);
 
-    result = mipGetUp(g_pMiP, MIP_GETUP_FROM_FRONT);
+    result = mip.getUp(MIP_GETUP_FROM_FRONT);
     delay(3000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

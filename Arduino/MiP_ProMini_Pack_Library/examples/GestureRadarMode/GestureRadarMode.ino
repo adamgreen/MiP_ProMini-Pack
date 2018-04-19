@@ -13,38 +13,31 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipSetGestureRadarMode()
-    mipGetGestureRadarMode()
+    setGestureRadarMode()
+    getGestureRadarMode()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int                 result = -1;
-    MiPGestureRadarMode mode = MIP_GESTURE_RADAR_DISABLED;
+    mip.begin();
+    
+    PRINTLN(F("GestureRadarMode.ino - Use set/getGestureRadarMode() functions.\n"
+              "Should switch into radar mode."));
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("GestureRadarMode.ino - Use mipSet/GetGestureRadarMode() functions.\n"
-                 "Should switch into radar mode.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    Serial.println("Enable radar mode");
+    MiPGestureRadarMode mode;
+    PRINTLN(F("Enable radar mode"));
     do
     {
         // Keep trying until it goes through.
-        result = mipGetGestureRadarMode(g_pMiP, &mode);
-        result = mipSetGestureRadarMode(g_pMiP, MIP_RADAR);
+        int result = mip.setGestureRadarMode(MIP_RADAR);
+        result = mip.getGestureRadarMode(&mode);
     } while (mode != MIP_RADAR);
-    Serial.println("Radar mode enabled");
+    PRINTLN(F("Radar mode enabled"));
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()

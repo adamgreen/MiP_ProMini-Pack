@@ -13,53 +13,46 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipEnableClap()
-    mipSetClapDelay()
-    mipGetClapSettings()
-    mipGetLatestClapNotification()
+    enableClap()
+    setClapDelay()
+    getClapSettings()
+    getLatestClapNotification()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
-
-    Serial.begin(115200);
-    Serial.print("Clap.ino - Use clap related functions.\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
+    PRINTLN(F("Clap.ino - Use clap related functions."));
 
     MiPClapSettings settings;
-    result = mipGetClapSettings(g_pMiP, &settings);
-    PRINTLN("Initial clap settings.");
+    int result = mip.getClapSettings(&settings);
+    PRINTLN(F("Initial clap settings."));
     printClapSettings(&settings);
 
     // Modify clap settings.
     // NOTE: Need some delay between settings or second one will be dropped.
-    result = mipEnableClap(g_pMiP, MIP_CLAP_ENABLED);
+    result = mip.enableClap(MIP_CLAP_ENABLED);
     delay(1000);
-    result = mipSetClapDelay(g_pMiP, 501);
+    result = mip.setClapDelay(501);
 
-    result = mipGetClapSettings(g_pMiP, &settings);
-    PRINTLN("Updated clap settings.");
+    result = mip.getClapSettings(&settings);
+    PRINTLN(F("Updated clap settings."));
     printClapSettings(&settings);
 
-    PRINTLN("Waiting for user to clap.");
+    PRINTLN(F("Waiting for user to clap."));
     MiPClap clap;
-    while (MIP_ERROR_NONE != mipGetLatestClapNotification(g_pMiP, &clap))
+    while (MIP_ERROR_NONE != mip.getLatestClapNotification(&clap))
     {
     }
-    PRINT("Detected ");
+    PRINT(F("Detected "));
         PRINT(clap.count);
-        PRINTLN(" claps");
+        PRINTLN(F(" claps"));
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()
@@ -68,8 +61,8 @@ void loop()
 
 static void printClapSettings(const MiPClapSettings* pSettings)
 {
-    PRINT("  Enabled = ");
-        PRINTLN(pSettings->enabled ? "ON" : "OFF");
-    PRINT("    Delay = ");
+    PRINT(F("  Enabled = "));
+        PRINTLN(pSettings->enabled ? F("ON") : F("OFF"));
+    PRINT(F("    Delay = "));
         PRINTLN(pSettings->delay);
 }

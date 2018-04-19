@@ -13,32 +13,25 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    mipStop()
+    stop()
 */
 #include <mip.h>
 
-static MiP* g_pMiP = NULL;
+MiP     mip;
 
 void setup()
 {
-    int result = -1;
+    mip.begin();
 
-    g_pMiP = mipInit(NULL);
+    PRINTLN(F("Stop.ino - Use stop() function.\n"
+              "Interrupt a 360 degree turn with stop()."));
 
-    Serial.begin(115200);
-    Serial.print("Stop.ino - Use mipStop() function.\n"
-                 "Interrupt a 360 degree turn with mipStop().\n");
-    Serial.end();
-
-    // Connect to first MiP robot discovered.
-    result = mipConnectToRobot(g_pMiP, NULL);
-
-    result = mipTurnLeft(g_pMiP, 360, 6);
+    int result = mip.turnLeft(360, 6);
     delay(1000);
-    result = mipStop(g_pMiP);
+    result = mip.stop();
     delay(1000);
 
-    mipUninit(g_pMiP);
+    mip.end();
 }
 
 void loop()
