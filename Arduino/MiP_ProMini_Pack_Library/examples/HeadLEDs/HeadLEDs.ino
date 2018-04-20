@@ -22,8 +22,17 @@ MiP     mip;
 
 void setup()
 {
-    mip.begin();
-    
+    int connectResult = mip.begin();
+    if (connectResult != 0)
+    {
+        Serial.begin(115200);
+        Serial.print(F("Failed connecting to MiP! Error="));
+            Serial.println(connectResult);
+        return;
+    }
+
+    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
+    // sent to the PC and not to the MiP by mistake.
     PRINTLN(F("HeadLEDs.ino - Use head LED functions.\n"
               "Should set each head LED to different state."));
     int result = mip.setHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);

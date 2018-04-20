@@ -21,15 +21,15 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <stdlib.h>
-// UNDONE:
-#include "mip-transport.h"
 
-// Pin used by the TS3USB221A switch to connect the AVR UART to the MiP or PC.
-// Set to HIGH, it selects the MiP.
-// Set to LOW, it selects the PC.
+// Default pin used by the TS3USB221A switch to connect Serial to the MiP or PC.
+//   Set to HIGH, it selects the MiP.
+//   Set to LOW, it selects the PC.
 #define MIP_UART_SELECT_PIN 2
 
-// Macro which will release the TS3USB221A switch to connect the AVR UART to PC and then print data out to it.
+// Wait for any queued Serial data destined for the MiP to be transmitted, switch Serial output to the PC, send
+// desired print/println output to the PC, and then switch Serial output back to the MiP (if that is where it was
+// switched before.)
 #define PRINT(...) \
     do { \
         bool needToRestore = MiP::isInstanceSerialGoingToMiP(); \
@@ -50,12 +50,11 @@
 #define MIP_ERROR_NONE          0 // Success
 #define MIP_ERROR_CONNECT       1 // Connection to MiP failed.
 #define MIP_ERROR_PARAM         2 // Invalid parameter passed to API.
-#define MIP_ERROR_MEMORY        3 // Out of memory.
-#define MIP_ERROR_NOT_CONNECTED 4 // No MiP robot connected.
-#define MIP_ERROR_NO_REQUEST    5 // Not waiting for a response from a request.
-#define MIP_ERROR_TIMEOUT       6 // Timed out waiting for response.
-#define MIP_ERROR_EMPTY         7 // The queue was empty.
-#define MIP_ERROR_BAD_RESPONSE  8 // Unexpected response from MiP.
+#define MIP_ERROR_NOT_CONNECTED 3 // No MiP robot connected.
+#define MIP_ERROR_NO_REQUEST    4 // Not waiting for a response from a request.
+#define MIP_ERROR_TIMEOUT       5 // Timed out waiting for response.
+#define MIP_ERROR_EMPTY         6 // The queue was empty.
+#define MIP_ERROR_BAD_RESPONSE  7 // Unexpected response from MiP.
 
 // Maximum length of MiP request and response buffer lengths.
 #define MIP_REQUEST_MAX_LEN     (17 + 1)    // Longest request is MPI_CMD_PLAY_SOUND.
@@ -329,17 +328,34 @@ typedef struct MiPClapSettings
 } MiPClapSettings;
 
 
+// UNDONE: Can probably get rid of this later.
+// Size of out of band response queue.  The queue will overwrite the oldest item once this size is hit.
+#define MIP_OOB_RESPONSE_QUEUE_SIZE 10
+struct OobResponse
+{
+    uint8_t buffer[MIP_RESPONSE_MAX_LEN];
+    uint8_t length;
+};
+
+
+
 
 class MiP
 {
 public:
     // Constructor/Destructors.
-    MiP(int8_t serialSelectPin = MIP_UART_SELECT_PIN, bool releaseSerialToPc = true);
+    // UNDONE: Switch releaseSerialToPC back to true if possible.
+    MiP(int8_t serialSelectPin = MIP_UART_SELECT_PIN, bool releaseSerialToPc = false);
     ~MiP();
 
-    // UNDONE: Will probably make these void. Serial & SoftwareSerial do.
-    int begin();
-    int end();
+    int  begin();
+    void end();
+
+    // Will return false if begin() wasn't successful in connecting to the MiP.
+    bool isInitialized()
+    {
+        return (m_flags & MRI_FLAGS_INITIALIZED);
+    }
 
     // Serial is shared between the MiP and the PC on the MiP ProMini Pack.
     // The following methods switch between the two destinations.
@@ -435,12 +451,39 @@ public:
     int rawReceiveNotification(uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength);
 
 protected:
-    int  isValidHeadLED(MiPHeadLED led);
-    int  parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength);
-    int  parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
-    void readNotifications();
+    void clear();
+    bool shouldReleaseSerialBeforeReturning()
+    {
+        return (m_flags & MIP_FLAG_RELEASE_SERIAL);
+    }
+    int     isValidHeadLED(MiPHeadLED led);
+    int     parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength);
+    int     parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
+    void    readNotifications();
+    int     transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
+    int     transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
+    bool    processAllResponseData();
+    void    copyHexTextToBinary(uint8_t* pDest, uint8_t* pSrc, uint8_t length);
+    uint8_t parseHexDigit(uint8_t digit);
+    void    processOobResponseData(uint8_t commandByte);
+    uint8_t discardUnexpectedSerialData();
+    void    advanceOobQueueWriteIndex();
+    void    advanceOobQueueReadIndex();
+    int     transportGetOutOfBandResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
 
-    MiPTransport*           m_pTransport;
+    // Bits that can be set in m_flags bitfield.
+    enum FlagBits
+    {
+        MIP_FLAG_RADAR_VALID     = (1 << 0),
+        MIP_FLAG_STATUS_VALID    = (1 << 1),
+        MIP_FLAG_GESTURE_VALID   = (1 << 2),
+        MIP_FLAG_SHAKE_VALID     = (1 << 3),
+        MIP_FLAG_WEIGHT_VALID    = (1 << 4),
+        MIP_FLAG_CLAP_VALID      = (1 << 5),
+        MIP_FLAG_RELEASE_SERIAL  = (1 << 6),
+        MRI_FLAGS_INITIALIZED    = (1 << 7)
+    };
+    
     MiPRadarNotification    m_lastRadar;
     MiPGestureNotification  m_lastGesture;
     MiPStatus               m_lastStatus;
@@ -448,6 +491,14 @@ protected:
     MiPClap                 m_lastClap;
     uint8_t                 m_flags;
     int8_t                  m_serialSelectPin;
+
+    uint8_t                 m_responseBuffer[MIP_RESPONSE_MAX_LEN];
+    uint8_t                 m_expectedResponseCommand;
+    uint8_t                 m_expectedResponseSize;
+    uint8_t                 m_oobQueueRead;
+    uint8_t                 m_oobQueueWrite;
+    uint8_t                 m_oobQueueCount;
+    OobResponse             m_oobQueue[MIP_OOB_RESPONSE_QUEUE_SIZE];
 
     static MiP*             s_pInstance;
 };

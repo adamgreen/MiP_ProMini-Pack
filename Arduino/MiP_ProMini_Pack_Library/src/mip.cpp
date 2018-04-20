@@ -15,8 +15,16 @@
 /* Implementation of MiP C API. */
 #include <assert.h>
 #include "mip.h"
-#include "mip-transport.h"
 
+
+// Number of times that begin() method should try to initialize the MiP.
+#define MIP_MAX_INIT_RETRIES 2
+
+// Should timeout if expected response doesn't arrive back in this amount of time (in milliseconds).
+#define MIP_RESPONSE_TIMEOUT 1000
+
+// Delay between requests sent to MiP (in milliseconds). The MiP will sometimes ignore requests sent faster than this.
+#define MIP_REQUEST_DELAY 4
 
 // MiP Protocol Commands.
 // These command codes are placed in the first byte of requests sent to the MiP and responses sent back from the MiP.
@@ -54,58 +62,122 @@
 #define MIP_CMD_SET_HEAD_LEDS           0x8A
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
 
+// expectResponse parameter values for transportSendRequest() parameter.
+#define MIP_EXPECT_NO_RESPONSE 0
+#define MIP_EXPECT_RESPONSE    1
 
-// MiP::m_flags bits
-#define MIP_FLAG_RADAR_VALID    (1 << 0)
-#define MIP_FLAG_STATUS_VALID   (1 << 1)
-#define MIP_FLAG_GESTURE_VALID  (1 << 2)
-#define MIP_FLAG_SHAKE_VALID    (1 << 3)
-#define MIP_FLAG_WEIGHT_VALID   (1 << 4)
-#define MIP_FLAG_CLAP_VALID     (1 << 5)
-#define MIP_FLAG_RELEASE_SERIAL (1 << 6)
 
 
 MiP* MiP::s_pInstance = NULL;
 
 
-MiP::MiP(int8_t serialSelectPin /* = MIP_UART_SELECT_PIN*/ , bool releaseSerialToPc /* = true */)
+MiP::MiP(int8_t serialSelectPin /* = MIP_UART_SELECT_PIN*/ , bool releaseSerialToPc /* = false */)
 {
-    m_pTransport = NULL;
+    m_serialSelectPin = serialSelectPin;
+    m_flags = 0;
+    if (releaseSerialToPc)
+    {
+        m_flags |= MIP_FLAG_RELEASE_SERIAL;
+    }
+
+    clear();
+
+    // Track this instance in class specific global so that PRINT/PRINTLN macros can find it.
+    s_pInstance = this;
+}
+
+MiP::~MiP()
+{
+    end();
+    s_pInstance = NULL;
+}
+
+void MiP::clear()
+{
+    // Clear all flags but don't forget the releaseSerialToPc parameter sent to the constructor.
+    m_flags &= ~MIP_FLAG_RELEASE_SERIAL;
+    
     // UNDONE: If these are turned into classes then we don't need to memset them (constructors will do it for us).
     memset(&m_lastRadar, 0, sizeof(m_lastRadar));
     memset(&m_lastGesture, 0, sizeof(m_lastGesture));
     memset(&m_lastStatus, 0, sizeof(m_lastStatus));
     memset(&m_lastWeight, 0, sizeof(m_lastWeight));
     memset(&m_lastClap, 0, sizeof(m_lastClap));
-    m_flags = 0;
 
-    m_serialSelectPin = serialSelectPin;
-    if (releaseSerialToPc)
-    {
-        m_flags |= MIP_FLAG_RELEASE_SERIAL;
-    }
-
-    // UNDONE: Doesn't really do much anyway.
-    m_pTransport = mipTransportInit(NULL);
-
-    s_pInstance = this;
+    memset(m_responseBuffer, 0, sizeof(m_responseBuffer));
+    m_expectedResponseCommand = 0;
+    m_expectedResponseSize = 0;
+    m_oobQueueRead = 0;
+    m_oobQueueWrite = 0;
+    m_oobQueueCount = 0;
+    memset(m_oobQueue, 0, sizeof(m_oobQueue));
 }
-
-MiP::~MiP()
-{
-    mipTransportUninit(m_pTransport);
-    s_pInstance = NULL;
-}
-
 
 int MiP::begin()
 {
-    return mipTransportConnectToRobot(m_pTransport, NULL);
+    // Configure the pin used to select the UART destination between the MiP and PC.
+    pinMode(m_serialSelectPin, OUTPUT);
+    digitalWrite(m_serialSelectPin, LOW);
+
+    // The MiP requires the UART to communicate at 115200-N-8-1.
+    Serial.begin(115200);
+    Serial.setTimeout(MIP_RESPONSE_TIMEOUT);
+
+    clear();
+
+    // Assume that the connection to the MiP will be successfully initialized. Will clear the flag if a connection
+    // error is detected. If this wasn't done then the calls to rawSend() & getStatus() below would fail.
+    m_flags |= MRI_FLAGS_INITIALIZED;
+
+    // Sometimes the init fails. It seem to happen when the MiP is busy at power on doing other things like
+    // attempting to start balancing.
+    int8_t retry;
+    for (retry = 0 ; retry < MIP_MAX_INIT_RETRIES ; retry++)
+    {
+        // Send 0xFF to the MiP via UART to enable the UART communication channel in the MiP.
+        const uint8_t initMipCommand[] = { 0xFF };
+        int result = rawSend(initMipCommand, sizeof(initMipCommand));
+        if (result != MIP_ERROR_NONE)
+        {
+            // Retry on error.
+            continue;
+        }
+
+        // Issue GetStatus command to see if we have successfully connected or not.
+        MiPStatus status;
+        result = getStatus(&status);
+        if (result == MIP_ERROR_NONE)
+        {
+            // Connection must be successful since this request was successful.
+            break;
+        }
+    }
+    if (retry == MIP_MAX_INIT_RETRIES)
+    {
+        m_flags &= ~MRI_FLAGS_INITIALIZED;
+        end();
+        return MIP_ERROR_CONNECT;
+    }
+
+    // The MiP UART documentation indicates that this delay is required after sending 0xFF.
+    delay(30);
+
+    return MIP_ERROR_NONE;
 }
 
-int MiP::end()
+void MiP::end()
 {
-    return mipTransportDisconnectFromRobot(m_pTransport);
+    if (isInitialized())
+    {
+        // Send 0xFA to the MiP via UART to put the MiP to sleep.
+        const uint8_t sleepMipCommand[] = { 0xFA };
+        rawSend(sleepMipCommand, sizeof(sleepMipCommand));
+    }
+
+    clear();
+
+    Serial.end();
+    pinMode(m_serialSelectPin, INPUT);
 }
 
 
@@ -690,10 +762,10 @@ void MiP::readNotifications()
             }
             break;
         default:
-            PRINT(F("mip: Bad notification: "));
+            PRINT(F("MiP: Bad notification: "));
             for (int i = 0 ; i < responseLength ; i++)
             {
-                PRINT(response[i]);
+                PRINT(response[i], HEX);
                 if (i != responseLength - 1)
                 {
                     PRINT(',');
@@ -836,7 +908,7 @@ int MiP::getHardwareInfo(MiPHardwareInfo* pHardware)
 
 int MiP::rawSend(const uint8_t* pRequest, size_t requestLength)
 {
-    return mipTransportSendRequest(m_pTransport, pRequest, requestLength, MIP_EXPECT_NO_RESPONSE);
+    return transportSendRequest(pRequest, requestLength, MIP_EXPECT_NO_RESPONSE);
 }
 
 int MiP::rawReceive(const uint8_t* pRequest, size_t requestLength,
@@ -844,15 +916,332 @@ int MiP::rawReceive(const uint8_t* pRequest, size_t requestLength,
 {
     int result = -1;
 
-    result = mipTransportSendRequest(m_pTransport, pRequest, requestLength, MIP_EXPECT_RESPONSE);
+    result = transportSendRequest(pRequest, requestLength, MIP_EXPECT_RESPONSE);
     if (result)
     {
         return result;
     }
-    return mipTransportGetResponse(m_pTransport, pResponseBuffer, responseBufferSize, pResponseLength);
+    return transportGetResponse(pResponseBuffer, responseBufferSize, pResponseLength);
 }
 
 int MiP::rawReceiveNotification(uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength)
 {
-    return mipTransportGetOutOfBandResponse(m_pTransport, pNotifyBuffer, notifyBufferSize, pNotifyLength);
+    return transportGetOutOfBandResponse(pNotifyBuffer, notifyBufferSize, pNotifyLength);
+}
+
+
+
+
+int MiP::transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse)
+{
+    // Must call begin() successfully before calling this function.
+    if (!isInitialized())
+    {
+        return MIP_ERROR_NOT_CONNECTED;
+    }
+
+    switchSerialToMiP();
+
+    // Remember the command byte (first byte) if expecting a response to this request since the response should start
+    // with the same byte.
+    if (expectResponse)
+    {
+        m_expectedResponseCommand = pRequest[0];
+    }
+    else
+    {
+        m_expectedResponseCommand = 0;
+    }
+    m_expectedResponseSize = 0;
+    m_responseBuffer[0] = 0;
+
+    // Send the specified bytes to the MiP via the UART.
+    while (requestLength-- > 0)
+    {
+        Serial.write(*pRequest++);
+    }
+
+    // If expecting a response then rawReceive() will immediately call transportGetResponse() after this call returns
+    // so don't bother to release Serial back to the PC.
+    if (!expectResponse && shouldReleaseSerialBeforeReturning())
+    {
+        switchSerialToPC();
+    }
+
+    // UNDONE: Might be better to record time here and spin at top if calling again too soon.
+    //         That frees up CPU to do other things while waiting.
+    // Let the MiP process the request before letting another request be issued.
+    delay(MIP_REQUEST_DELAY);
+    
+    return MIP_ERROR_NONE;
+}
+
+int MiP::transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength)
+{
+    int result = MIP_ERROR_NONE;
+    
+    // Must call begin() successfully before calling this function.
+    if (!isInitialized())
+    {
+        return MIP_ERROR_NOT_CONNECTED;
+    }
+    if (m_expectedResponseCommand == 0)
+    {
+        return MIP_ERROR_NO_REQUEST;
+    }
+    if (responseBufferSize > MIP_RESPONSE_MAX_LEN)
+    {
+        return MIP_ERROR_PARAM;
+    }
+
+    switchSerialToMiP();
+
+    // Process all received bytes (which might include out of band notifications) until we find the response to the
+    // last request made. Will timeout after a second.
+    m_expectedResponseSize = (uint8_t)responseBufferSize;
+    uint32_t startTime = millis();
+    bool responseFound = false;
+    do
+    {
+        responseFound = processAllResponseData();
+    } while (!responseFound && (uint32_t)millis() - startTime < MIP_RESPONSE_TIMEOUT);
+    if (!responseFound)
+    {
+        // Never received the expected response within the timeout window.
+        result = MIP_ERROR_TIMEOUT;
+        goto Cleanup;
+    }
+
+    // Copy reponse data into caller provided buffer and clear state in transport about the expected response.
+    memcpy(pResponseBuffer, m_responseBuffer, m_expectedResponseSize);
+    *pResponseLength = m_expectedResponseSize;
+    m_expectedResponseCommand = 0;
+    m_expectedResponseSize = 0;
+    m_responseBuffer[0] = 0;
+
+Cleanup:
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        switchSerialToPC();
+    }
+
+    return result;
+}
+
+bool MiP::processAllResponseData()
+{
+    bool    responseFound = false;
+    uint8_t buffer[(MIP_RESPONSE_MAX_LEN - 1) * 2];
+    size_t  bytesToRead;
+    size_t  bytesRead;
+
+    while (Serial.available() >= 2)
+    {
+        uint8_t highNibble = Serial.read();
+        uint8_t lowNibble = Serial.read();
+        uint8_t commandByte = (parseHexDigit(highNibble) << 4) | parseHexDigit(lowNibble);
+
+        if (m_expectedResponseCommand != 0 && commandByte == m_expectedResponseCommand)
+        {
+            // Store away the command byte that we just read into response buffer so that it isn't lost.
+            m_responseBuffer[0] = commandByte;
+
+            // Already read the command byte into element 0 of the response buffer earlier so just need to read in the 
+            // rest of the expected response bytes now.
+            bytesToRead = m_expectedResponseSize - 1;
+            bytesRead = Serial.readBytes(buffer, bytesToRead * 2);
+            if (bytesRead == bytesToRead * 2)
+            {
+                copyHexTextToBinary(&m_responseBuffer[1], buffer, bytesToRead);
+                responseFound = true;
+                break;
+            }
+            else
+            {
+                // Timed out waiting for all of the response data.
+                m_expectedResponseCommand = 0;
+                m_expectedResponseSize = 0;
+                m_responseBuffer[0] = 0;
+                PRINT(F("MiP: Response too short: "));
+                    PRINT(bytesRead);
+                    PRINT(','); 
+                    PRINTLN(bytesToRead * 2);
+                break;
+            }
+        }
+        else
+        {
+            processOobResponseData(commandByte);
+        }
+    }
+
+    return responseFound;
+}
+
+void MiP::copyHexTextToBinary(uint8_t* pDest, uint8_t* pSrc, uint8_t length)
+{
+    while (length-- > 0)
+    {
+        *pDest = (parseHexDigit(pSrc[0]) << 4) | parseHexDigit(pSrc[1]);
+        pDest++;
+        pSrc+=2;
+    }
+}
+
+uint8_t MiP::parseHexDigit(uint8_t digit)
+{
+    if (digit >= '0' && digit <= '9')
+    {
+        return digit - '0';
+    }
+    else if (digit >= 'a' && digit <= 'f')
+    {
+        return digit - 'a' + 10;
+    }
+    else if (digit >= 'A' && digit <= 'F')
+    {
+        return digit - 'A' + 10;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void MiP::processOobResponseData(uint8_t commandByte)
+{
+    size_t length = 0;
+
+    // The number of additional bytes to read depends on which notification has been found in serial buffer.
+    switch (commandByte)
+    {
+    case MIP_CMD_GET_RADAR_RESPONSE:
+    case MIP_CMD_GET_GESTURE_RESPONSE:
+    case MIP_CMD_CLAP_RESPONSE:
+    case MIP_CMD_GET_WEIGHT:
+        length = 1;
+        break;
+    case MIP_CMD_SHAKE_RESPONSE:
+        length = 0;
+        break;
+    case MIP_CMD_GET_STATUS:
+        length = 2;
+        break;
+    default:
+        uint8_t discardedBytes = discardUnexpectedSerialData();
+        PRINT(F("MiP: Bad OOB command byte: "));
+            PRINT(commandByte, HEX);
+            PRINT(F(" (discarded "));
+            PRINT(discardedBytes);
+            PRINTLN(F(" bytes)"));
+        return;
+    }
+
+    uint8_t buffer[2 * 2];
+    size_t  bytesRead = Serial.readBytes(buffer, length * 2);
+    if (bytesRead != length * 2)
+    {
+        PRINT(F("MiP: OOB too short: "));
+            PRINT(bytesRead);
+            PRINT(','); 
+            PRINTLN(length * 2);
+        return;
+    }
+
+    // Add this response to the Out Of Band circular queue. It's okay to overwrite oldest item in queue if full.
+    OobResponse* pResponse = &m_oobQueue[m_oobQueueWrite];
+    pResponse->buffer[0] = commandByte;
+    copyHexTextToBinary(&pResponse->buffer[1], buffer, length);
+    pResponse->length = (uint8_t)length + 1;
+
+    advanceOobQueueWriteIndex();
+    if (m_oobQueueCount < MIP_OOB_RESPONSE_QUEUE_SIZE)
+    {
+        m_oobQueueCount++;
+    }
+    else
+    {
+        // Queue was full so oldest response was overwritten. Increment read index to discard oldest.
+        advanceOobQueueReadIndex();
+    }
+}
+
+uint8_t MiP::discardUnexpectedSerialData()
+{
+    uint8_t discardedBytes = 0;
+    
+    // Unexpected response data encountered. Throw away all data in serial buffer since it is hard to tell
+    // where next response begins.
+    while (Serial.available() > 0)
+    {
+        discardedBytes++;
+        Serial.read();
+        // Delay long enough for next serial byte to be received if MiP is still actively sending at 115200 baud.
+        delayMicroseconds(100);
+    }
+    return discardedBytes;
+}
+
+void MiP::advanceOobQueueWriteIndex()
+{
+    if (m_oobQueueWrite == MIP_OOB_RESPONSE_QUEUE_SIZE - 1)
+    {
+        // Wrap around to beginning of circular queue.
+        m_oobQueueWrite = 0;
+    }
+    else
+    {
+        m_oobQueueWrite++;
+    }
+}
+
+void MiP::advanceOobQueueReadIndex()
+{
+    if (m_oobQueueRead == MIP_OOB_RESPONSE_QUEUE_SIZE - 1)
+    {
+        // Wrap around to beginning of circular queue.
+        m_oobQueueRead = 0;
+    }
+    else
+    {
+        m_oobQueueRead++;
+    }
+}
+
+int MiP::transportGetOutOfBandResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength)
+{
+    // Must call begin() successfully before calling this function.
+    if (!isInitialized())
+    {
+        return MIP_ERROR_NOT_CONNECTED;
+    }
+
+    switchSerialToMiP();
+
+    processAllResponseData();
+
+    if (m_oobQueueCount == 0)
+    {
+        return MIP_ERROR_EMPTY;
+    }
+
+    // Pop the oldest out of band response from the circular queue.
+    OobResponse* pResponse = &m_oobQueue[m_oobQueueRead];
+    uint8_t length = pResponse->length;
+    if (length > responseBufferSize)
+    {
+        length = responseBufferSize;
+    }
+    memcpy(pResponseBuffer, pResponse->buffer, length);
+    *pResponseLength = length;
+    pResponse->length = 0;
+    advanceOobQueueReadIndex();
+    m_oobQueueCount--;
+
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        switchSerialToPC();
+    }
+
+    return MIP_ERROR_NONE;
 }

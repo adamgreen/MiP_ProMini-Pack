@@ -22,8 +22,17 @@ MiP     mip;
 
 void setup()
 {
-    mip.begin();
-    
+    int connectResult = mip.begin();
+    if (connectResult != 0)
+    {
+        Serial.begin(115200);
+        Serial.print(F("Failed connecting to MiP! Error="));
+            Serial.println(connectResult);
+        return;
+    }
+
+    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
+    // sent to the PC and not to the MiP by mistake.
     PRINTLN(F("GestureRadarMode.ino - Use set/getGestureRadarMode() functions.\n"
               "Should switch into radar mode."));
 
