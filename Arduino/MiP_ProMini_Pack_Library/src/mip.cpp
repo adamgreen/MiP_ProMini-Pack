@@ -969,7 +969,9 @@ bool MiP::processAllResponseData()
             {
                 copyHexTextToBinary(&m_responseBuffer[1], buffer, bytesToRead);
                 responseFound = true;
-                break;
+                // Continue to process any other bytes in the recieve buffer.
+                // This would allow something like a getStatus() call to receive the actual data returned for this
+                // request and not an older OOB perioidic status notification.
             }
             else
             {
