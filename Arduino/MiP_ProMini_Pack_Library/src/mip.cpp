@@ -200,6 +200,7 @@ int MiP::getGestureRadarMode(MiPGestureRadarMode& mode)
     size_t        responseLength;
     int           result;
 
+    mode = MIP_GESTURE_RADAR_DISABLED;
     result = rawReceive(getGestureRadarMode, sizeof(getGestureRadarMode), response, sizeof(response), responseLength);
     if (result)
     {
@@ -253,6 +254,7 @@ int MiP::getChestLED(MiPChestLED& chestLED)
     size_t        responseLength;
     int           result;
 
+    chestLED.clear();
     result = rawReceive(getChestLED, sizeof(getChestLED), response, sizeof(response), responseLength);
     if (result)
     {
@@ -292,6 +294,7 @@ int MiP::getHeadLEDs(MiPHeadLEDs& headLEDs)
     size_t        responseLength;
     int           result;
 
+    headLEDs.clear();
     result = rawReceive(getHeadLEDs, sizeof(getHeadLEDs), response, sizeof(response), responseLength);
     if (result)
     {
@@ -512,6 +515,7 @@ int MiP::getVolume(uint8_t& volume)
     size_t        responseLength;
     int           result;
 
+    volume = 0;
     result = rawReceive(getVolume, sizeof(getVolume), response, sizeof(response), responseLength);
     if (result)
     {
@@ -536,6 +540,7 @@ int MiP::readOdometer(float& distanceInCm)
     uint32_t      ticks;
     int           result;
 
+    distanceInCm = 0.0f;
     result = rawReceive(readOdometer, sizeof(readOdometer), response, sizeof(response), responseLength);
     if (result)
     {
@@ -570,6 +575,7 @@ int MiP::getStatus(MiPStatus& status)
     size_t        responseLength;
     int           result;
 
+    status.clear();
     result = rawReceive(getStatus, sizeof(getStatus), response, sizeof(response), responseLength);
     if (result)
     {
@@ -601,6 +607,7 @@ int MiP::getWeight(MiPWeight& weight)
     size_t        responseLength;
     int           result;
 
+    weight.clear();
     result = rawReceive(getWeight, sizeof(getWeight), response, sizeof(response), responseLength);
     if (result)
     {
@@ -629,6 +636,7 @@ int MiP::getClapSettings(MiPClapSettings& settings)
     size_t        responseLength;
     int           result;
 
+    settings.clear();
     result = rawReceive(getClapSettings, sizeof(getClapSettings), response, sizeof(response), responseLength);
     if (result)
     {
@@ -671,6 +679,8 @@ int MiP::getLatestRadarNotification(MiPRadarNotification& notification)
 {
     MiPRadar radar;
 
+    notification.clear();
+    
     // Must set releaseSerialToPC to false in MiP constructor to use notifications.
     if (shouldReleaseSerialBeforeReturning())
     {
@@ -697,6 +707,8 @@ int MiP::getLatestGestureNotification(MiPGestureNotification& notification)
 {
     MiPGesture gesture;
 
+    notification.clear();
+
     // Must set releaseSerialToPC to false in MiP constructor to use notifications.
     if (shouldReleaseSerialBeforeReturning())
     {
@@ -721,6 +733,8 @@ int MiP::getLatestGestureNotification(MiPGestureNotification& notification)
 
 int MiP::getLatestStatusNotification(MiPStatus& status)
 {
+    status.clear();
+    
     // Must set releaseSerialToPC to false in MiP constructor to use notifications.
     if (shouldReleaseSerialBeforeReturning())
     {
@@ -758,6 +772,8 @@ int MiP::getLatestShakeNotification()
 
 int MiP::getLatestWeightNotification(MiPWeight& weight)
 {
+    weight.clear();
+    
     // Must set releaseSerialToPC to false in MiP constructor to use notifications.
     if (shouldReleaseSerialBeforeReturning())
     {
@@ -777,6 +793,8 @@ int MiP::getLatestWeightNotification(MiPWeight& weight)
 
 int MiP::getLatestClapNotification(MiPClap& clap)
 {
+    clap.clear();
+    
     // Must set releaseSerialToPC to false in MiP constructor to use notifications.
     if (shouldReleaseSerialBeforeReturning())
     {
@@ -801,6 +819,7 @@ int MiP::getSoftwareVersion(MiPSoftwareVersion& software)
     size_t        responseLength;
     int           result;
 
+    software.clear();
     result = rawReceive(getSoftwareVersion, sizeof(getSoftwareVersion), response, sizeof(response), responseLength);
     if (result)
     {
@@ -825,6 +844,7 @@ int MiP::getHardwareInfo(MiPHardwareInfo& hardware)
     size_t        responseLength;
     int           result;
 
+    hardware.clear();
     result = rawReceive(getHardwareInfo, sizeof(getHardwareInfo), response, sizeof(response), responseLength);
     if (result)
     {
