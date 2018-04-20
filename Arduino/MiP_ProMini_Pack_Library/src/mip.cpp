@@ -107,10 +107,6 @@ void MiP::clear()
     memset(m_responseBuffer, 0, sizeof(m_responseBuffer));
     m_expectedResponseCommand = 0;
     m_expectedResponseSize = 0;
-    m_oobQueueRead = 0;
-    m_oobQueueWrite = 0;
-    m_oobQueueCount = 0;
-    memset(m_oobQueue, 0, sizeof(m_oobQueue));
 }
 
 int MiP::begin()
@@ -686,7 +682,7 @@ int MiP::getLatestRadarNotification(MiPRadarNotification* pNotification)
 {
     MiPRadar radar;
 
-    readNotifications();
+    processAllResponseData();
 
     if ((m_flags & MIP_FLAG_RADAR_VALID) == 0)
     {
@@ -702,88 +698,13 @@ int MiP::getLatestRadarNotification(MiPRadarNotification* pNotification)
     return MIP_ERROR_NONE;
 }
 
-void MiP::readNotifications()
-{
-    int     result = -1;
-    size_t  responseLength = 0;
-    uint8_t response[MIP_RESPONSE_MAX_LEN];
-
-    while (MIP_ERROR_NONE == rawReceiveNotification(response, sizeof(response), &responseLength))
-    {
-        // Must have at least one byte to indicate which response is being given.
-        if (responseLength < 1)
-        {
-            continue;
-        }
-        switch (response[0])
-        {
-        case MIP_CMD_GET_RADAR_RESPONSE:
-            if (responseLength == 2)
-            {
-                m_lastRadar.millisec = millis();
-                m_lastRadar.radar = response[1];
-                m_flags |= MIP_FLAG_RADAR_VALID;
-            }
-            break;
-        case MIP_CMD_GET_GESTURE_RESPONSE:
-            if (responseLength == 2)
-            {
-                m_lastGesture.millisec = millis();
-                m_lastGesture.gesture = response[1];
-                m_flags |= MIP_FLAG_GESTURE_VALID;
-            }
-            break;
-        case MIP_CMD_SHAKE_RESPONSE:
-            if (responseLength == 1)
-            {
-                m_flags |= MIP_FLAG_SHAKE_VALID;
-            }
-            break;
-        case MIP_CMD_GET_STATUS:
-            result = parseStatus(&m_lastStatus, response, responseLength);
-            if (result == MIP_ERROR_NONE)
-            {
-                m_flags |= MIP_FLAG_STATUS_VALID;
-            }
-            break;
-        case MIP_CMD_GET_WEIGHT:
-            result = parseWeight(&m_lastWeight, response, responseLength);
-            if (result == MIP_ERROR_NONE)
-            {
-                m_flags |= MIP_FLAG_WEIGHT_VALID;
-            }
-            break;
-        case MIP_CMD_CLAP_RESPONSE:
-            if (responseLength == 2)
-            {
-                m_lastClap.millisec = millis();
-                m_lastClap.count = response[1];
-                m_flags |= MIP_FLAG_CLAP_VALID;
-            }
-            break;
-        default:
-            PRINT(F("MiP: Bad notification: "));
-            for (int i = 0 ; i < responseLength ; i++)
-            {
-                PRINT(response[i], HEX);
-                if (i != responseLength - 1)
-                {
-                    PRINT(',');
-                }
-            }
-            PRINTLN();
-            break;
-        }
-    }
-}
-
 int MiP::getLatestGestureNotification(MiPGestureNotification* pNotification)
 {
     MiPGesture gesture;
 
     assert ( pNotification );
     
-    readNotifications();
+    processAllResponseData();
 
     if ((m_flags & MIP_FLAG_GESTURE_VALID) == 0)
     {
@@ -803,7 +724,7 @@ int MiP::getLatestStatusNotification(MiPStatus* pStatus)
 {
     assert ( pStatus );
     
-    readNotifications();
+    processAllResponseData();
 
     if ((m_flags & MIP_FLAG_STATUS_VALID) == 0)
     {
@@ -816,7 +737,7 @@ int MiP::getLatestStatusNotification(MiPStatus* pStatus)
 
 int MiP::getLatestShakeNotification()
 {
-    readNotifications();
+    processAllResponseData();
 
     if ((m_flags & MIP_FLAG_SHAKE_VALID) == 0)
     {
@@ -830,7 +751,7 @@ int MiP::getLatestWeightNotification(MiPWeight* pWeight)
 {
     assert ( pWeight );
     
-    readNotifications();
+    processAllResponseData();
 
     if ((m_flags & MIP_FLAG_WEIGHT_VALID) == 0)
     {
@@ -845,7 +766,7 @@ int MiP::getLatestClapNotification(MiPClap* pClap)
 {
     assert ( pClap );
     
-    readNotifications();
+    processAllResponseData();
 
     if ((m_flags & MIP_FLAG_CLAP_VALID) == 0)
     {
@@ -923,12 +844,6 @@ int MiP::rawReceive(const uint8_t* pRequest, size_t requestLength,
     }
     return transportGetResponse(pResponseBuffer, responseBufferSize, pResponseLength);
 }
-
-int MiP::rawReceiveNotification(uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength)
-{
-    return transportGetOutOfBandResponse(pNotifyBuffer, notifyBufferSize, pNotifyLength);
-}
-
 
 
 
@@ -1137,6 +1052,7 @@ void MiP::processOobResponseData(uint8_t commandByte)
         return;
     }
 
+    // Read in the additional bytes of the notification.
     uint8_t buffer[2 * 2];
     size_t  bytesRead = Serial.readBytes(buffer, length * 2);
     if (bytesRead != length * 2)
@@ -1148,21 +1064,51 @@ void MiP::processOobResponseData(uint8_t commandByte)
         return;
     }
 
-    // Add this response to the Out Of Band circular queue. It's okay to overwrite oldest item in queue if full.
-    OobResponse* pResponse = &m_oobQueue[m_oobQueueWrite];
-    pResponse->buffer[0] = commandByte;
-    copyHexTextToBinary(&pResponse->buffer[1], buffer, length);
-    pResponse->length = (uint8_t)length + 1;
+    // Convert the hex data to a binary response.
+    int     result;
+    uint8_t response[MIP_RESPONSE_MAX_LEN];
+    response[0] = commandByte;
+    copyHexTextToBinary(&response[1], buffer, length);
 
-    advanceOobQueueWriteIndex();
-    if (m_oobQueueCount < MIP_OOB_RESPONSE_QUEUE_SIZE)
+    // Process the response just received.
+    switch (commandByte)
     {
-        m_oobQueueCount++;
-    }
-    else
-    {
-        // Queue was full so oldest response was overwritten. Increment read index to discard oldest.
-        advanceOobQueueReadIndex();
+    case MIP_CMD_GET_RADAR_RESPONSE:
+        m_lastRadar.millisec = millis();
+        m_lastRadar.radar = response[1];
+        m_flags |= MIP_FLAG_RADAR_VALID;
+        break;
+    case MIP_CMD_GET_GESTURE_RESPONSE:
+        m_lastGesture.millisec = millis();
+        m_lastGesture.gesture = response[1];
+        m_flags |= MIP_FLAG_GESTURE_VALID;
+        break;
+    case MIP_CMD_SHAKE_RESPONSE:
+        m_flags |= MIP_FLAG_SHAKE_VALID;
+        break;
+    case MIP_CMD_GET_STATUS:
+        result = parseStatus(&m_lastStatus, response, length + 1);
+        if (result == MIP_ERROR_NONE)
+        {
+            m_flags |= MIP_FLAG_STATUS_VALID;
+        }
+        break;
+    case MIP_CMD_GET_WEIGHT:
+        result = parseWeight(&m_lastWeight, response, length + 1);
+        if (result == MIP_ERROR_NONE)
+        {
+            m_flags |= MIP_FLAG_WEIGHT_VALID;
+        }
+        break;
+    case MIP_CMD_CLAP_RESPONSE:
+        m_lastClap.millisec = millis();
+        m_lastClap.count = response[1];
+        m_flags |= MIP_FLAG_CLAP_VALID;
+        break;
+    default:
+        // Invalid notification command bytes were already handled in the previous switch so should never get here.
+        assert ( 0 );
+        break;
     }
 }
 
@@ -1180,68 +1126,4 @@ uint8_t MiP::discardUnexpectedSerialData()
         delayMicroseconds(100);
     }
     return discardedBytes;
-}
-
-void MiP::advanceOobQueueWriteIndex()
-{
-    if (m_oobQueueWrite == MIP_OOB_RESPONSE_QUEUE_SIZE - 1)
-    {
-        // Wrap around to beginning of circular queue.
-        m_oobQueueWrite = 0;
-    }
-    else
-    {
-        m_oobQueueWrite++;
-    }
-}
-
-void MiP::advanceOobQueueReadIndex()
-{
-    if (m_oobQueueRead == MIP_OOB_RESPONSE_QUEUE_SIZE - 1)
-    {
-        // Wrap around to beginning of circular queue.
-        m_oobQueueRead = 0;
-    }
-    else
-    {
-        m_oobQueueRead++;
-    }
-}
-
-int MiP::transportGetOutOfBandResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength)
-{
-    // Must call begin() successfully before calling this function.
-    if (!isInitialized())
-    {
-        return MIP_ERROR_NOT_CONNECTED;
-    }
-
-    switchSerialToMiP();
-
-    processAllResponseData();
-
-    if (m_oobQueueCount == 0)
-    {
-        return MIP_ERROR_EMPTY;
-    }
-
-    // Pop the oldest out of band response from the circular queue.
-    OobResponse* pResponse = &m_oobQueue[m_oobQueueRead];
-    uint8_t length = pResponse->length;
-    if (length > responseBufferSize)
-    {
-        length = responseBufferSize;
-    }
-    memcpy(pResponseBuffer, pResponse->buffer, length);
-    *pResponseLength = length;
-    pResponse->length = 0;
-    advanceOobQueueReadIndex();
-    m_oobQueueCount--;
-
-    if (shouldReleaseSerialBeforeReturning())
-    {
-        switchSerialToPC();
-    }
-
-    return MIP_ERROR_NONE;
 }

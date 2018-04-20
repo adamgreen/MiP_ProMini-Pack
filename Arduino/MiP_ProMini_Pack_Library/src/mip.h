@@ -328,17 +328,6 @@ typedef struct MiPClapSettings
 } MiPClapSettings;
 
 
-// UNDONE: Can probably get rid of this later.
-// Size of out of band response queue.  The queue will overwrite the oldest item once this size is hit.
-#define MIP_OOB_RESPONSE_QUEUE_SIZE 10
-struct OobResponse
-{
-    uint8_t buffer[MIP_RESPONSE_MAX_LEN];
-    uint8_t length;
-};
-
-
-
 
 class MiP
 {
@@ -448,7 +437,6 @@ public:
     int rawSend(const uint8_t* pRequest, size_t requestLength);
     int rawReceive(const uint8_t* pRequest, size_t requestLength,
                    uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
-    int rawReceiveNotification(uint8_t* pNotifyBuffer, size_t notifyBufferSize, size_t* pNotifyLength);
 
 protected:
     void clear();
@@ -459,7 +447,6 @@ protected:
     int     isValidHeadLED(MiPHeadLED led);
     int     parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength);
     int     parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
-    void    readNotifications();
     int     transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int     transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
     bool    processAllResponseData();
@@ -467,9 +454,6 @@ protected:
     uint8_t parseHexDigit(uint8_t digit);
     void    processOobResponseData(uint8_t commandByte);
     uint8_t discardUnexpectedSerialData();
-    void    advanceOobQueueWriteIndex();
-    void    advanceOobQueueReadIndex();
-    int     transportGetOutOfBandResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
 
     // Bits that can be set in m_flags bitfield.
     enum FlagBits
@@ -491,14 +475,9 @@ protected:
     MiPClap                 m_lastClap;
     uint8_t                 m_flags;
     int8_t                  m_serialSelectPin;
-
     uint8_t                 m_responseBuffer[MIP_RESPONSE_MAX_LEN];
     uint8_t                 m_expectedResponseCommand;
     uint8_t                 m_expectedResponseSize;
-    uint8_t                 m_oobQueueRead;
-    uint8_t                 m_oobQueueWrite;
-    uint8_t                 m_oobQueueCount;
-    OobResponse             m_oobQueue[MIP_OOB_RESPONSE_QUEUE_SIZE];
 
     static MiP*             s_pInstance;
 };
