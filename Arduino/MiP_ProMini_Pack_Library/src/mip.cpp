@@ -71,11 +71,11 @@
 MiP* MiP::s_pInstance = NULL;
 
 
-MiP::MiP(int8_t serialSelectPin /* = MIP_UART_SELECT_PIN*/ , bool releaseSerialToPc /* = false */)
+MiP::MiP(bool releaseSerialToPC /* = true */, int8_t serialSelectPin /* = MIP_UART_SELECT_PIN */)
 {
     m_serialSelectPin = serialSelectPin;
     m_flags = 0;
-    if (releaseSerialToPc)
+    if (releaseSerialToPC)
     {
         m_flags |= MIP_FLAG_RELEASE_SERIAL;
     }
@@ -140,9 +140,13 @@ int MiP::begin()
             continue;
         }
 
+        // Flush any outstanding junk data in receive buffer.
+        delay(16);
+        discardUnexpectedSerialData();
+
         // Issue GetStatus command to see if we have successfully connected or not.
         MiPStatus status;
-        result = getStatus(&status);
+        result = getStatus(status);
         if (result == MIP_ERROR_NONE)
         {
             // Connection must be successful since this request was successful.
@@ -189,16 +193,14 @@ int MiP::setGestureRadarMode(MiPGestureRadarMode mode)
     return rawSend(command, sizeof(command));
 }
 
-int MiP::getGestureRadarMode(MiPGestureRadarMode* pMode)
+int MiP::getGestureRadarMode(MiPGestureRadarMode& mode)
 {
     const uint8_t getGestureRadarMode[1] = { MIP_CMD_GET_GESTURE_RADAR_MODE };
     uint8_t       response[1+1];
     size_t        responseLength;
     int           result;
 
-    assert ( pMode );
-    
-    result = rawReceive(getGestureRadarMode, sizeof(getGestureRadarMode), response, sizeof(response), &responseLength);
+    result = rawReceive(getGestureRadarMode, sizeof(getGestureRadarMode), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -212,7 +214,7 @@ int MiP::getGestureRadarMode(MiPGestureRadarMode* pMode)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    *pMode = response[1];
+    mode = response[1];
     return result;
 }
 
@@ -244,16 +246,14 @@ int MiP::flashChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime
     return rawSend(command, sizeof(command));
 }
 
-int MiP::getChestLED(MiPChestLED* pChestLED)
+int MiP::getChestLED(MiPChestLED& chestLED)
 {
     const uint8_t getChestLED[1] = { MIP_CMD_GET_CHEST_LED };
     uint8_t       response[1+5];
     size_t        responseLength;
     int           result;
 
-    assert( pChestLED );
-
-    result = rawReceive(getChestLED, sizeof(getChestLED), response, sizeof(response), &responseLength);
+    result = rawReceive(getChestLED, sizeof(getChestLED), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -263,12 +263,12 @@ int MiP::getChestLED(MiPChestLED* pChestLED)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pChestLED->red = response[1];
-    pChestLED->green = response[2];
-    pChestLED->blue = response[3];
+    chestLED.red = response[1];
+    chestLED.green = response[2];
+    chestLED.blue = response[3];
     // on/off time are in units of 20 msecs.
-    pChestLED->onTime = (uint16_t)response[4] * 20;
-    pChestLED->offTime = (uint16_t)response[5] * 20;
+    chestLED.onTime = (uint16_t)response[4] * 20;
+    chestLED.offTime = (uint16_t)response[5] * 20;
     return result;
 }
 
@@ -285,16 +285,14 @@ int MiP::setHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadL
     return rawSend(command, sizeof(command));
 }
 
-int MiP::getHeadLEDs(MiPHeadLEDs* pHeadLEDs)
+int MiP::getHeadLEDs(MiPHeadLEDs& headLEDs)
 {
     const uint8_t getHeadLEDs[1] = { MIP_CMD_GET_HEAD_LEDS };
     uint8_t       response[1+4];
     size_t        responseLength;
     int           result;
 
-    assert( pHeadLEDs );
-
-    result = rawReceive(getHeadLEDs, sizeof(getHeadLEDs), response, sizeof(response), &responseLength);
+    result = rawReceive(getHeadLEDs, sizeof(getHeadLEDs), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -309,10 +307,10 @@ int MiP::getHeadLEDs(MiPHeadLEDs* pHeadLEDs)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pHeadLEDs->led1 = response[1];
-    pHeadLEDs->led2 = response[2];
-    pHeadLEDs->led3 = response[3];
-    pHeadLEDs->led4 = response[4];
+    headLEDs.led1 = response[1];
+    headLEDs.led2 = response[2];
+    headLEDs.led3 = response[3];
+    headLEDs.led4 = response[4];
     return result;
 }
 
@@ -466,12 +464,12 @@ int MiP::getUp(MiPGetUp getup)
     return rawSend(command, sizeof(command));
 }
 
-int MiP::playSound(const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount)
+int MiP::playSound(const MiPSound sounds[], size_t soundCount, uint8_t repeatCount)
 {
     size_t  i;
     uint8_t command[1+17];
 
-    assert( pSounds );
+    assert( sounds );
     assert( soundCount <= 8 );
 
     command[0] = MIP_CMD_PLAY_SOUND;
@@ -480,9 +478,9 @@ int MiP::playSound(const MiPSound* pSounds, size_t soundCount, uint8_t repeatCou
         if (i < soundCount)
         {
             // Delay is in units of 30 msecs.
-            assert( pSounds[i].delay <= 255 * 30 );
-            command[1 + i*2] = pSounds[i].sound;
-            command[1 + i*2 +1 ] = pSounds[i].delay / 30;
+            assert( sounds[i].delay <= 255 * 30 );
+            command[1 + i*2] = sounds[i].sound;
+            command[1 + i*2 +1 ] = sounds[i].delay / 30;
         }
         else
         {
@@ -507,16 +505,14 @@ int MiP::setVolume(uint8_t volume)
     return rawSend(command, sizeof(command));
 }
 
-int MiP::getVolume(uint8_t* pVolume)
+int MiP::getVolume(uint8_t& volume)
 {
     const uint8_t getVolume[1] = { MIP_CMD_GET_VOLUME };
     uint8_t       response[1+1];
     size_t        responseLength;
     int           result;
 
-    assert( pVolume );
-
-    result = rawReceive(getVolume, sizeof(getVolume), response, sizeof(response), &responseLength);
+    result = rawReceive(getVolume, sizeof(getVolume), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -528,21 +524,19 @@ int MiP::getVolume(uint8_t* pVolume)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    *pVolume = response[1];
+    volume = response[1];
     return result;
 }
 
-int MiP::readOdometer(float* pDistanceInCm)
+int MiP::readOdometer(float& distanceInCm)
 {
- const uint8_t readOdometer[1] = { MIP_CMD_READ_ODOMETER };
-    uint8_t    response[1+4];
-    size_t     responseLength;
-    uint32_t   ticks;
-    int        result;
+    const uint8_t readOdometer[1] = { MIP_CMD_READ_ODOMETER };
+    uint8_t       response[1+4];
+    size_t        responseLength;
+    uint32_t      ticks;
+    int           result;
 
-    assert( pDistanceInCm );
-
-    result = rawReceive(readOdometer, sizeof(readOdometer), response, sizeof(response), &responseLength);
+    result = rawReceive(readOdometer, sizeof(readOdometer), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -556,7 +550,7 @@ int MiP::readOdometer(float* pDistanceInCm)
     // Tick count is store as big-endian in response buffer.
     ticks = response[1] << 24 | response[2] << 16 | response[3] << 8 | response[4];
     // Odometer has 48.5 ticks / cm.
-    *pDistanceInCm = (float)((double)ticks / 48.5);
+    distanceInCm = (float)((double)ticks / 48.5);
     return result;
 }
 
@@ -569,79 +563,73 @@ int MiP::resetOdometer()
     return rawSend(command, sizeof(command));
 }
 
-int MiP::getStatus(MiPStatus* pStatus)
+int MiP::getStatus(MiPStatus& status)
 {
     const uint8_t getStatus[1] = { MIP_CMD_GET_STATUS };
     uint8_t       response[1+2];
     size_t        responseLength;
     int           result;
 
-    assert( pStatus );
-
-    result = rawReceive(getStatus, sizeof(getStatus), response, sizeof(response), &responseLength);
+    result = rawReceive(getStatus, sizeof(getStatus), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
     }
-    return parseStatus(pStatus, response, responseLength);
+    return parseStatus(status, response, responseLength);
 }
 
-int MiP::parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength)
+int MiP::parseStatus(MiPStatus& status, const uint8_t response[], size_t responseLength)
 {
     if (responseLength != 3 ||
-        pResponse[0] != MIP_CMD_GET_STATUS ||
-        pResponse[2] > MIP_POSITION_ON_BACK_WITH_KICKSTAND)
+        response[0] != MIP_CMD_GET_STATUS ||
+        response[2] > MIP_POSITION_ON_BACK_WITH_KICKSTAND)
     {
         return MIP_ERROR_BAD_RESPONSE;
     }
 
     // Convert battery integer value to floating point voltage value.
-    pStatus->millisec = millis();
-    pStatus->battery = (float)(((pResponse[1] - 0x4D) / (float)(0x7C - 0x4D)) * (6.4f - 4.0f)) + 4.0f;
-    pStatus->position = pResponse[2];
+    status.millisec = millis();
+    status.battery = (float)(((response[1] - 0x4D) / (float)(0x7C - 0x4D)) * (6.4f - 4.0f)) + 4.0f;
+    status.position = response[2];
     return MIP_ERROR_NONE;
 }
 
-int MiP::getWeight(MiPWeight* pWeight)
+int MiP::getWeight(MiPWeight& weight)
 {
     const uint8_t getWeight[1] = { MIP_CMD_GET_WEIGHT };
     uint8_t       response[1+1];
     size_t        responseLength;
     int           result;
 
-    assert( pWeight );
-
-    result = rawReceive(getWeight, sizeof(getWeight), response, sizeof(response), &responseLength);
+    result = rawReceive(getWeight, sizeof(getWeight), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
     }
-    return parseWeight(pWeight, response, responseLength);
+    return parseWeight(weight, response, responseLength);
 }
 
-int MiP::parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength)
+int MiP::parseWeight(MiPWeight& weight, const uint8_t response[], size_t responseLength)
 {
     if (responseLength != 2 ||
-        pResponse[0] != MIP_CMD_GET_WEIGHT)
+        response[0] != MIP_CMD_GET_WEIGHT)
     {
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pWeight->millisec = millis();
-    pWeight->weight = pResponse[1];
+    weight.millisec = millis();
+    weight.weight = response[1];
     return MIP_ERROR_NONE;
 }
 
-int MiP::getClapSettings(MiPClapSettings* pSettings)
+int MiP::getClapSettings(MiPClapSettings& settings)
 {
     const uint8_t getClapSettings[1] = { MIP_CMD_GET_CLAP_SETTINGS };
     uint8_t       response[1+3];
     size_t        responseLength;
     int           result;
 
-    assert( pSettings );
-
-    result = rawReceive(getClapSettings, sizeof(getClapSettings), response, sizeof(response), &responseLength);
+    result = rawReceive(getClapSettings, sizeof(getClapSettings), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -653,8 +641,8 @@ int MiP::getClapSettings(MiPClapSettings* pSettings)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pSettings->enabled = response[1];
-    pSettings->delay = response[2] << 8 | response[3];
+    settings.enabled = response[1];
+    settings.delay = response[2] << 8 | response[3];
     return MIP_ERROR_NONE;
 }
 
@@ -679,10 +667,16 @@ int MiP::setClapDelay(uint16_t delay)
     return rawSend(command, sizeof(command));
 }
 
-int MiP::getLatestRadarNotification(MiPRadarNotification* pNotification)
+int MiP::getLatestRadarNotification(MiPRadarNotification& notification)
 {
     MiPRadar radar;
 
+    // Must set releaseSerialToPC to false in MiP constructor to use notifications.
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        return MIP_NO_NOTIFICATIONS;
+    }
+    
     processAllResponseData();
 
     if ((m_flags & MIP_FLAG_RADAR_VALID) == 0)
@@ -695,15 +689,19 @@ int MiP::getLatestRadarNotification(MiPRadarNotification* pNotification)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    *pNotification = m_lastRadar;
+    notification = m_lastRadar;
     return MIP_ERROR_NONE;
 }
 
-int MiP::getLatestGestureNotification(MiPGestureNotification* pNotification)
+int MiP::getLatestGestureNotification(MiPGestureNotification& notification)
 {
     MiPGesture gesture;
 
-    assert ( pNotification );
+    // Must set releaseSerialToPC to false in MiP constructor to use notifications.
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        return MIP_NO_NOTIFICATIONS;
+    }
     
     processAllResponseData();
 
@@ -717,13 +715,17 @@ int MiP::getLatestGestureNotification(MiPGestureNotification* pNotification)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    *pNotification = m_lastGesture;
+    notification = m_lastGesture;
     return MIP_ERROR_NONE;
 }
 
-int MiP::getLatestStatusNotification(MiPStatus* pStatus)
+int MiP::getLatestStatusNotification(MiPStatus& status)
 {
-    assert ( pStatus );
+    // Must set releaseSerialToPC to false in MiP constructor to use notifications.
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        return MIP_NO_NOTIFICATIONS;
+    }
     
     processAllResponseData();
 
@@ -732,12 +734,18 @@ int MiP::getLatestStatusNotification(MiPStatus* pStatus)
         return MIP_ERROR_EMPTY;
     }
 
-    *pStatus = m_lastStatus;
+    status = m_lastStatus;
     return MIP_ERROR_NONE;
 }
 
 int MiP::getLatestShakeNotification()
 {
+    // Must set releaseSerialToPC to false in MiP constructor to use notifications.
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        return MIP_NO_NOTIFICATIONS;
+    }
+    
     processAllResponseData();
 
     if ((m_flags & MIP_FLAG_SHAKE_VALID) == 0)
@@ -748,9 +756,13 @@ int MiP::getLatestShakeNotification()
     return MIP_ERROR_NONE;
 }
 
-int MiP::getLatestWeightNotification(MiPWeight* pWeight)
+int MiP::getLatestWeightNotification(MiPWeight& weight)
 {
-    assert ( pWeight );
+    // Must set releaseSerialToPC to false in MiP constructor to use notifications.
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        return MIP_NO_NOTIFICATIONS;
+    }
     
     processAllResponseData();
 
@@ -759,13 +771,17 @@ int MiP::getLatestWeightNotification(MiPWeight* pWeight)
         return MIP_ERROR_EMPTY;
     }
 
-    *pWeight = m_lastWeight;
+    weight = m_lastWeight;
     return MIP_ERROR_NONE;
 }
 
-int MiP::getLatestClapNotification(MiPClap* pClap)
+int MiP::getLatestClapNotification(MiPClap& clap)
 {
-    assert ( pClap );
+    // Must set releaseSerialToPC to false in MiP constructor to use notifications.
+    if (shouldReleaseSerialBeforeReturning())
+    {
+        return MIP_NO_NOTIFICATIONS;
+    }
     
     processAllResponseData();
 
@@ -774,20 +790,18 @@ int MiP::getLatestClapNotification(MiPClap* pClap)
         return MIP_ERROR_EMPTY;
     }
 
-    *pClap = m_lastClap;
+    clap = m_lastClap;
     return MIP_ERROR_NONE;
 }
 
-int MiP::getSoftwareVersion(MiPSoftwareVersion* pSoftware)
+int MiP::getSoftwareVersion(MiPSoftwareVersion& software)
 {
     const uint8_t getSoftwareVersion[1] = { MIP_CMD_GET_SOFTWARE_VERSION };
     uint8_t       response[1+4];
     size_t        responseLength;
     int           result;
 
-    assert( pSoftware );
-
-    result = rawReceive(getSoftwareVersion, sizeof(getSoftwareVersion), response, sizeof(response), &responseLength);
+    result = rawReceive(getSoftwareVersion, sizeof(getSoftwareVersion), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -797,23 +811,21 @@ int MiP::getSoftwareVersion(MiPSoftwareVersion* pSoftware)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pSoftware->year = 2000 + response[1];
-    pSoftware->month = response[2];
-    pSoftware->day = response[3];
-    pSoftware->uniqueVersion = response[4];
+    software.year = 2000 + response[1];
+    software.month = response[2];
+    software.day = response[3];
+    software.uniqueVersion = response[4];
     return result;
 }
 
-int MiP::getHardwareInfo(MiPHardwareInfo* pHardware)
+int MiP::getHardwareInfo(MiPHardwareInfo& hardware)
 {
     const uint8_t getHardwareInfo[1] = { MIP_CMD_GET_HARDWARE_INFO };
     uint8_t       response[1+2];
     size_t        responseLength;
     int           result;
 
-    assert( pHardware );
-
-    result = rawReceive(getHardwareInfo, sizeof(getHardwareInfo), response, sizeof(response), &responseLength);
+    result = rawReceive(getHardwareInfo, sizeof(getHardwareInfo), response, sizeof(response), responseLength);
     if (result)
     {
         return result;
@@ -823,27 +835,27 @@ int MiP::getHardwareInfo(MiPHardwareInfo* pHardware)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    pHardware->voiceChip = response[1];
-    pHardware->hardware = response[2];
+    hardware.voiceChip = response[1];
+    hardware.hardware = response[2];
     return result;
 }
 
-int MiP::rawSend(const uint8_t* pRequest, size_t requestLength)
+int MiP::rawSend(const uint8_t request[], size_t requestLength)
 {
-    return transportSendRequest(pRequest, requestLength, MIP_EXPECT_NO_RESPONSE);
+    return transportSendRequest(request, requestLength, MIP_EXPECT_NO_RESPONSE);
 }
 
-int MiP::rawReceive(const uint8_t* pRequest, size_t requestLength,
-                          uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength)
+int MiP::rawReceive(const uint8_t request[], size_t requestLength,
+                          uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength)
 {
     int result = -1;
 
-    result = transportSendRequest(pRequest, requestLength, MIP_EXPECT_RESPONSE);
+    result = transportSendRequest(request, requestLength, MIP_EXPECT_RESPONSE);
     if (result)
     {
         return result;
     }
-    return transportGetResponse(pResponseBuffer, responseBufferSize, pResponseLength);
+    return transportGetResponse(responseBuffer, responseBufferSize, &responseLength);
 }
 
 
@@ -926,6 +938,7 @@ int MiP::transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSiz
     if (!responseFound)
     {
         // Never received the expected response within the timeout window.
+        PRINTLN(F("MiP: Response timeout"));
         result = MIP_ERROR_TIMEOUT;
         goto Cleanup;
     }
@@ -1092,14 +1105,14 @@ void MiP::processOobResponseData(uint8_t commandByte)
         m_flags |= MIP_FLAG_SHAKE_VALID;
         break;
     case MIP_CMD_GET_STATUS:
-        result = parseStatus(&m_lastStatus, response, length + 1);
+        result = parseStatus(m_lastStatus, response, length + 1);
         if (result == MIP_ERROR_NONE)
         {
             m_flags |= MIP_FLAG_STATUS_VALID;
         }
         break;
     case MIP_CMD_GET_WEIGHT:
-        result = parseWeight(&m_lastWeight, response, length + 1);
+        result = parseWeight(m_lastWeight, response, length + 1);
         if (result == MIP_ERROR_NONE)
         {
             m_flags |= MIP_FLAG_WEIGHT_VALID;

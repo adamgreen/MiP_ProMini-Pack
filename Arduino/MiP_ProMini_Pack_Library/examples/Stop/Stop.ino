@@ -40,7 +40,8 @@ void setup()
     result = mip.stop();
     delay(1000);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

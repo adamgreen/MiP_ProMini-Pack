@@ -41,7 +41,8 @@ void setup()
     result = mip.getUp(MIP_GETUP_FROM_FRONT);
     delay(3000);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

@@ -38,12 +38,13 @@ void setup()
 
     uint8_t volume = 0;
     int result = mip.setVolume(1);
-    result = mip.getVolume(&volume);
+    result = mip.getVolume(volume);
 
     PRINT(F("Volume = "));
       PRINTLN(volume);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

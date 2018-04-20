@@ -46,7 +46,7 @@ void setup()
     delay(4000);
 
     MiPChestLED chestLED;
-    result = mip.getChestLED(&chestLED);
+    result = mip.getChestLED(chestLED);
     
     PRINTLN(F("chestLED"));
     PRINT(F("red: "));
@@ -62,7 +62,8 @@ void setup()
         PRINT(chestLED.offTime);
         PRINTLN(F(" milliseconds"));
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

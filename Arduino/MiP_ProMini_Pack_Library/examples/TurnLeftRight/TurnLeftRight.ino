@@ -41,7 +41,8 @@ void setup()
     result = mip.turnRight(180, 12);
     delay(2000);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

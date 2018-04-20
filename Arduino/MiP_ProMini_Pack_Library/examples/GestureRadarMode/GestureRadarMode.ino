@@ -42,11 +42,12 @@ void setup()
     {
         // Keep trying until it goes through.
         int result = mip.setGestureRadarMode(MIP_RADAR);
-        result = mip.getGestureRadarMode(&mode);
+        result = mip.getGestureRadarMode(mode);
     } while (mode != MIP_RADAR);
     PRINTLN(F("Radar mode enabled"));
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

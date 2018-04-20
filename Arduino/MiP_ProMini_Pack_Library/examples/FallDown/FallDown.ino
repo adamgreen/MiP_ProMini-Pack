@@ -37,7 +37,8 @@ void setup()
     int result = mip.fallDown(MIP_FALL_FACE_DOWN);
     delay(2000);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

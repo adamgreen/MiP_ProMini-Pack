@@ -18,7 +18,8 @@
 */
 #include <mip.h>
 
-MiP     mip;
+// Pass false into MiP contructor to enable notifications.
+MiP     mip(false);
 
 void setup()
 {
@@ -36,17 +37,18 @@ void setup()
     PRINTLN(F("Weight.ino - Use weight update functions."));
 
     MiPWeight weight;
-    int result = mip.getWeight(&weight);
+    int result = mip.getWeight(weight);
     PRINT(F("weight = "));
         PRINTLN(weight.weight);
     PRINTLN(F("Waiting for next weight update."));
-    while (MIP_ERROR_NONE != mip.getLatestWeightNotification(&weight))
+    while (MIP_ERROR_NONE != mip.getLatestWeightNotification(weight))
     {
     }
     PRINT(F("weight = "));
         PRINTLN(weight.weight);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

@@ -20,7 +20,8 @@
 */
 #include <mip.h>
 
-MiP     mip;
+// Pass false into MiP contructor to enable notifications.
+MiP     mip(false);
 
 void setup()
 {
@@ -38,7 +39,7 @@ void setup()
     PRINTLN(F("Clap.ino - Use clap related functions."));
 
     MiPClapSettings settings;
-    int result = mip.getClapSettings(&settings);
+    int result = mip.getClapSettings(settings);
     PRINTLN(F("Initial clap settings."));
     printClapSettings(&settings);
 
@@ -48,20 +49,21 @@ void setup()
     delay(1000);
     result = mip.setClapDelay(501);
 
-    result = mip.getClapSettings(&settings);
+    result = mip.getClapSettings(settings);
     PRINTLN(F("Updated clap settings."));
     printClapSettings(&settings);
 
     PRINTLN(F("Waiting for user to clap."));
     MiPClap clap;
-    while (MIP_ERROR_NONE != mip.getLatestClapNotification(&clap))
+    while (MIP_ERROR_NONE != mip.getLatestClapNotification(clap))
     {
     }
     PRINT(F("Detected "));
         PRINT(clap.count);
         PRINTLN(F(" claps"));
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

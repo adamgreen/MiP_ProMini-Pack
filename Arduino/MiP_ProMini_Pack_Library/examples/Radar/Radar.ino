@@ -17,7 +17,8 @@
 */
 #include <mip.h>
 
-MiP     mip;
+// Pass false into MiP contructor to enable notifications.
+MiP     mip(false);
 
 void setup()
 {
@@ -39,11 +40,12 @@ void setup()
     int result = mip.setGestureRadarMode(MIP_RADAR);
     do
     {
-        result = mip.getLatestRadarNotification(&radar);
+        result = mip.getLatestRadarNotification(radar);
     } while (radar.radar != MIP_RADAR_0CM_10CM);
     PRINTLN(F("Hand detected. Shutting down."));
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

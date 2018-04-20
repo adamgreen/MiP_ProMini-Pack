@@ -40,7 +40,7 @@ void setup()
     delay(4000);
 
     MiPHeadLEDs headLEDs;
-    result = mip.getHeadLEDs(&headLEDs);
+    result = mip.getHeadLEDs(headLEDs);
     PRINTLN(F("Head LEDs"));
     PRINT(F("led1: "));
         printLEDString(headLEDs.led1);
@@ -51,7 +51,8 @@ void setup()
     PRINT(F("led4: "));
         printLEDString(headLEDs.led4);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 static void printLEDString(MiPHeadLED led)

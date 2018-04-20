@@ -55,26 +55,27 @@
 #define MIP_ERROR_TIMEOUT       5 // Timed out waiting for response.
 #define MIP_ERROR_EMPTY         6 // The queue was empty.
 #define MIP_ERROR_BAD_RESPONSE  7 // Unexpected response from MiP.
+#define MIP_NO_NOTIFICATIONS    8 // releaseSerialToPC must be set to false in MiP constructor.
 
 // Maximum length of MiP request and response buffer lengths.
 #define MIP_REQUEST_MAX_LEN     (17 + 1)    // Longest request is MPI_CMD_PLAY_SOUND.
 #define MIP_RESPONSE_MAX_LEN    (5 + 1)     // Longest response is MPI_CMD_REQUEST_CHEST_LED.
 
-typedef enum MiPGestureRadarMode
+enum MiPGestureRadarMode
 {
     MIP_GESTURE_RADAR_DISABLED = 0x00,
     MIP_GESTURE                = 0x02,
     MIP_RADAR                  = 0x04
-} MiPGestureRadarMode;
+};
 
-typedef enum MiPRadar
+enum MiPRadar
 {
     MIP_RADAR_NONE      = 0x01,
     MIP_RADAR_10CM_30CM = 0x02,
     MIP_RADAR_0CM_10CM  = 0x03
-} MiPRadar;
+};
 
-typedef enum MiPGesture
+enum MiPGesture
 {
     MIP_GESTURE_LEFT               = 0x0A,
     MIP_GESTURE_RIGHT              = 0x0B,
@@ -83,35 +84,35 @@ typedef enum MiPGesture
     MIP_GESTURE_CENTER_HOLD        = 0x0E,
     MIP_GESTURE_FORWARD            = 0x0F,
     MIP_GESTURE_BACKWARD           = 0x10
-} MiPGesture;
+};
 
-typedef enum MiPHeadLED
+enum MiPHeadLED
 {
     MIP_HEAD_LED_OFF        = 0,
     MIP_HEAD_LED_ON         = 1,
     MIP_HEAD_LED_BLINK_SLOW = 2,
     MIP_HEAD_LED_BLINK_FAST = 3
-} MiPHeadLED;
+};
 
-typedef enum MiPDriveDirection
+enum MiPDriveDirection
 {
     MIP_DRIVE_FORWARD  = 0x00,
     MIP_DRIVE_BACKWARD = 0x01
-} MiPDriveDirection;
+};
 
-typedef enum MiPTurnDirection
+enum MiPTurnDirection
 {
     MIP_TURN_LEFT  = 0x00,
     MIP_TURN_RIGHT = 0x01
-} MiPTurnDirection;
+};
 
-typedef enum MiPFallDirection
+enum MiPFallDirection
 {
     MIP_FALL_ON_BACK   = 0x00,
     MIP_FALL_FACE_DOWN = 0x01
-} MiPFallDirection;
+};
 
-typedef enum MiPPosition
+enum MiPPosition
 {
     MIP_POSITION_ON_BACK                = 0x00,
     MIP_POSITION_FACE_DOWN              = 0x01,
@@ -120,16 +121,16 @@ typedef enum MiPPosition
     MIP_POSITION_HAND_STAND             = 0x04,
     MIP_POSITION_FACE_DOWN_ON_TRAY      = 0x05,
     MIP_POSITION_ON_BACK_WITH_KICKSTAND = 0x06
-} MiPPosition;
+};
 
-typedef enum MiPGetUp
+enum MiPGetUp
 {
     MIP_GETUP_FROM_FRONT  = 0x00,
     MIP_GETUP_FROM_BACK   = 0x01,
     MIP_GETUP_FROM_EITHER = 0x02
-} MiPGetUp;
+};
 
-typedef enum MiPSoundIndex
+enum MiPSoundIndex
 {
     MIP_SOUND_ONEKHZ_500MS_8K16BIT = 1,
     MIP_SOUND_ACTION_BURPING,
@@ -245,87 +246,216 @@ typedef enum MiPSoundIndex
     MIP_SOUND_VOLUME_5   = 0xFC,
     MIP_SOUND_VOLUME_6   = 0xFD,
     MIP_SOUND_VOLUME_7   = 0xFE
-} MiPSoundIndex;
+};
 
-typedef enum MiPClapEnabled
+enum MiPClapEnabled
 {
     MIP_CLAP_DISABLED = 0x00,
     MIP_CLAP_ENABLED  = 0x01
-} MiPClapEnabled;
+};
 
-typedef struct MiPRadarNotification
+
+
+class MiPRadarNotification
 {
+public:
+    MiPRadarNotification()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        millisec = 0;
+        radar = MIP_RADAR_NONE;
+    }
+
     uint32_t millisec;
     MiPRadar radar;
-} MiPRadarNotification;
+};
 
-typedef struct MiPGestureNotification
+class MiPGestureNotification
 {
+public:
+    MiPGestureNotification()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        millisec = 0;
+        gesture = 0;
+    }
     uint32_t   millisec;
     MiPGesture gesture;
-} MiPGestureNotification;
+};
 
-typedef struct MiPStatus
+class MiPStatus
 {
+public:
+    MiPStatus()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        millisec = 0;
+        battery = 0.0f;
+        position = 0;
+    }
+    
     uint32_t    millisec;
     float       battery;
     MiPPosition position;
-} MiPStatus;
+};
 
-typedef struct MiPWeight
+class MiPWeight
 {
+public:
+    MiPWeight()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        millisec = 0;
+        weight = 0;
+    }
+    
     uint32_t millisec;
     int8_t   weight;
-} MiPWeight;
+};
 
-typedef struct MiPClap
+class MiPClap
 {
+public:
+    MiPClap()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        millisec = 0;
+        count = 0;
+    }
+    
     uint32_t millisec;
     uint8_t  count;
-} MiPClap;
+};
 
-typedef struct MiPChestLED
+class MiPChestLED
 {
+public:
+    MiPChestLED()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        onTime = 0;
+        offTime = 0;
+        red = 0;
+        green = 0;
+        blue = 0;
+    }
+    
     uint16_t onTime;
     uint16_t offTime;
     uint8_t  red;
     uint8_t  green;
     uint8_t  blue;
-} MiPChestLED;
+};
 
-typedef struct MiPHeadLEDs
+class MiPHeadLEDs
 {
+public:
+    MiPHeadLEDs()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        led1 = MIP_HEAD_LED_OFF;
+        led2 = MIP_HEAD_LED_OFF;
+        led3 = MIP_HEAD_LED_OFF;
+        led4 = MIP_HEAD_LED_OFF;
+    }
+    
     MiPHeadLED led1;
     MiPHeadLED led2;
     MiPHeadLED led3;
     MiPHeadLED led4;
-} MiPHeadLEDs;
+};
 
-typedef struct MiPSoftwareVersion
+class MiPSoftwareVersion
 {
+public:
+    MiPSoftwareVersion()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        year = 0;
+        month = 0;
+        day = 0;
+        uniqueVersion = 0;
+    }
+    
     uint16_t year;
     uint8_t  month;
     uint8_t  day;
     uint8_t  uniqueVersion;
-} MiPSoftwareVersion;
+};
 
-typedef struct MiPHardwareInfo
+class MiPHardwareInfo
 {
+public:
+    MiPHardwareInfo()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        voiceChip = 0;
+        hardware = 0;
+    }
+    
     uint8_t voiceChip;
     uint8_t hardware;
-} MiPHardwareInfo;
+};
 
-typedef struct MiPSound
+struct MiPSound
 {
     MiPSoundIndex sound;
     uint16_t      delay;
-} MiPSound;
+};
 
-typedef struct MiPClapSettings
+class MiPClapSettings
 {
+public:
+    MiPClapSettings()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        enabled = MIP_CLAP_DISABLED;
+        delay = 0;
+    }
+    
     MiPClapEnabled enabled;
     uint16_t       delay;
-} MiPClapSettings;
+};
 
 
 
@@ -333,8 +463,7 @@ class MiP
 {
 public:
     // Constructor/Destructors.
-    // UNDONE: Switch releaseSerialToPC back to true if possible.
-    MiP(int8_t serialSelectPin = MIP_UART_SELECT_PIN, bool releaseSerialToPc = false);
+    MiP(bool releaseSerialToPC = true, int8_t serialSelectPin = MIP_UART_SELECT_PIN);
     ~MiP();
 
     int  begin();
@@ -390,17 +519,16 @@ public:
     }
 
     int setGestureRadarMode(MiPGestureRadarMode mode);
-    int getGestureRadarMode(MiPGestureRadarMode* pMode);
+    int getGestureRadarMode(MiPGestureRadarMode& mode);
     
     int setChestLED(uint8_t red, uint8_t green, uint8_t blue);
     int flashChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
-    int getChestLED(MiPChestLED* pChestLED);
+    int getChestLED(MiPChestLED& chestLED);
     int setHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
-    int getHeadLEDs(MiPHeadLEDs* pHeadLEDs);
+    int getHeadLEDs(MiPHeadLEDs& headLEDs);
     
     int continuousDrive(int8_t velocity, int8_t turnRate);
-    int distanceDrive(MiPDriveDirection driveDirection, uint8_t cm,
-                                    MiPTurnDirection turnDirection, uint16_t degrees);
+    int distanceDrive(MiPDriveDirection driveDirection, uint8_t cm, MiPTurnDirection turnDirection, uint16_t degrees);
     int turnLeft(uint16_t degrees, uint8_t speed);
     int turnRight(uint16_t degrees, uint8_t speed);
     int driveForward(uint8_t speed, uint16_t time);
@@ -409,34 +537,34 @@ public:
     int fallDown(MiPFallDirection direction);
     int getUp(MiPGetUp getup);
     
-    int playSound(const MiPSound* pSounds, size_t soundCount, uint8_t repeatCount);
+    int playSound(const MiPSound sounds[], size_t soundCount, uint8_t repeatCount);
     int setVolume(uint8_t volume);
-    int getVolume(uint8_t* pVolume);
+    int getVolume(uint8_t& volume);
     
-    int readOdometer(float* pDistanceInCm);
+    int readOdometer(float& distanceInCm);
     int resetOdometer();
     
-    int getStatus(MiPStatus* pStatus);
+    int getStatus(MiPStatus& status);
     
-    int getWeight(MiPWeight* pWeight);
+    int getWeight(MiPWeight& weight);
     
-    int getClapSettings(MiPClapSettings* pSettings);
+    int getClapSettings(MiPClapSettings& settings);
     int enableClap(MiPClapEnabled enabled);
     int setClapDelay(uint16_t delay);
     
-    int getLatestRadarNotification(MiPRadarNotification* pNotification);
-    int getLatestGestureNotification(MiPGestureNotification* pNotification);
-    int getLatestStatusNotification(MiPStatus* pStatus);
+    int getLatestRadarNotification(MiPRadarNotification& notification);
+    int getLatestGestureNotification(MiPGestureNotification& notification);
+    int getLatestStatusNotification(MiPStatus& status);
     int getLatestShakeNotification();
-    int getLatestWeightNotification(MiPWeight* pWeight);
-    int getLatestClapNotification(MiPClap* pClap);
+    int getLatestWeightNotification(MiPWeight& weight);
+    int getLatestClapNotification(MiPClap& clap);
     
-    int getSoftwareVersion(MiPSoftwareVersion* pSoftware);
-    int getHardwareInfo(MiPHardwareInfo* pHardware);
+    int getSoftwareVersion(MiPSoftwareVersion& software);
+    int getHardwareInfo(MiPHardwareInfo& hardware);
     
-    int rawSend(const uint8_t* pRequest, size_t requestLength);
-    int rawReceive(const uint8_t* pRequest, size_t requestLength,
-                   uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
+    int rawSend(const uint8_t request[], size_t requestLength);
+    int rawReceive(const uint8_t request[], size_t requestLength,
+                   uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
 
 protected:
     void clear();
@@ -445,8 +573,8 @@ protected:
         return (m_flags & MIP_FLAG_RELEASE_SERIAL);
     }
     int     isValidHeadLED(MiPHeadLED led);
-    int     parseStatus(MiPStatus* pStatus, const uint8_t* pResponse, size_t responseLength);
-    int     parseWeight(MiPWeight* pWeight, const uint8_t* pResponse, size_t responseLength);
+    int     parseStatus(MiPStatus& status, const uint8_t response[], size_t responseLength);
+    int     parseWeight(MiPWeight& weight, const uint8_t response[], size_t responseLength);
     int     transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int     transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
     bool    processAllResponseData();

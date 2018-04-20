@@ -17,7 +17,8 @@
 */
 #include <mip.h>
 
-MiP     mip;
+// Pass false into MiP contructor to enable notifications.
+MiP     mip(false);
 
 void setup()
 {
@@ -37,12 +38,13 @@ void setup()
 
     MiPGestureNotification gesture;
     int result = mip.setGestureRadarMode(MIP_GESTURE);
-    while (MIP_ERROR_NONE != mip.getLatestGestureNotification(&gesture))
+    while (MIP_ERROR_NONE != mip.getLatestGestureNotification(gesture))
     {
     }
     PRINT(F("Gesture = ")); PRINTLN(gesture.gesture);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

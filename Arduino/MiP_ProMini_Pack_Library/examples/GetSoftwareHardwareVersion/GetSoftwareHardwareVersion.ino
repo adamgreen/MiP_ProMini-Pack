@@ -36,7 +36,7 @@ void setup()
     PRINTLN(F("GetSoftwareHardwareVersion.ino - Use getSoftwareVersion() & getHardwareInfo() functions."));
 
     MiPSoftwareVersion softwareVersion;
-    int result = mip.getSoftwareVersion(&softwareVersion);
+    int result = mip.getSoftwareVersion(softwareVersion);
     PRINT(F("software version: "));
         PRINT(softwareVersion.year);
         PRINT('-');
@@ -47,14 +47,15 @@ void setup()
         PRINTLN(softwareVersion.uniqueVersion);
 
     MiPHardwareInfo hardwareInfo;
-    result = mip.getHardwareInfo(&hardwareInfo);
+    result = mip.getHardwareInfo(hardwareInfo);
     PRINTLN(F("hardware info"));
     PRINT(F("  voice chip version: "));
         PRINTLN(hardwareInfo.voiceChip);
     PRINT(F("  hardware version: "));
         PRINTLN(hardwareInfo.hardware);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

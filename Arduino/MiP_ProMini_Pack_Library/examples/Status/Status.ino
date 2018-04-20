@@ -18,7 +18,8 @@
 */
 #include <mip.h>
 
-MiP     mip;
+// Pass false into MiP contructor to enable notifications.
+MiP     mip(false);
 
 void setup()
 {
@@ -37,26 +38,27 @@ void setup()
 
     MiPStatus status;
     PRINTLN(F("Call mipGetStatus()"));
-    int result = mip.getStatus(&status);
-    printStatus(&status);
+    int result = mip.getStatus(status);
+    printStatus(status);
 
     PRINTLN(F("Waiting for next MiP status notification."));
-    while (MIP_ERROR_NONE != mip.getLatestStatusNotification(&status))
+    while (MIP_ERROR_NONE != mip.getLatestStatusNotification(status))
     {
     }
-    printStatus(&status);
+    printStatus(status);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()
 {
 }
 
-static void printStatus(const MiPStatus* pStatus)
+static void printStatus(const MiPStatus& status)
 {
     PRINT(F("Battery voltage: "));
-        PRINTLN(pStatus->battery);
+        PRINTLN(status.battery);
     PRINT(F("Position: "));
-        PRINTLN(pStatus->position);
+        PRINTLN(status.position);
 }

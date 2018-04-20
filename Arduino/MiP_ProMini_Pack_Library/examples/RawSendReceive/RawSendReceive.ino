@@ -45,7 +45,7 @@ void setup()
     size_t  responseLength = 0;
     uint8_t response[5];
     result = mip.rawReceive(getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion)-1,
-                            response, sizeof(response), &responseLength);
+                            response, sizeof(response), responseLength);
     if (result == MIP_ERROR_NONE && responseLength == 5 && response[0] == 0x14)
     {
         PRINT(F("MiP Software Version: "));
@@ -59,7 +59,8 @@ void setup()
             PRINT(')');
     }
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

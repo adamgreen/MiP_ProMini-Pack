@@ -37,7 +37,7 @@ void setup()
               "Read out current odometer reading and reset."));
 
     float cm;
-    int result = mip.readOdometer(&cm);
+    int result = mip.readOdometer(cm);
     PRINT(F("MiP has travelled "));
         PRINT(cm);
         PRINTLN(F(" cm since the last reset."));
@@ -45,7 +45,8 @@ void setup()
     result = mip.resetOdometer();
     delay(1000);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()
