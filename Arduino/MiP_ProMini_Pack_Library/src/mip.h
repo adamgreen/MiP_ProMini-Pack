@@ -467,7 +467,8 @@ protected:
         MIP_FLAG_RELEASE_SERIAL  = (1 << 6),
         MRI_FLAGS_INITIALIZED    = (1 << 7)
     };
-    
+
+    uint32_t                m_lastRequestTime;
     MiPRadarNotification    m_lastRadar;
     MiPGestureNotification  m_lastGesture;
     MiPStatus               m_lastStatus;

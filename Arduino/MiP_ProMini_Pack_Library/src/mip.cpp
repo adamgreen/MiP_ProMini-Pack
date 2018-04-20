@@ -120,6 +120,7 @@ int MiP::begin()
     Serial.setTimeout(MIP_RESPONSE_TIMEOUT);
 
     clear();
+    m_lastRequestTime = millis() - MIP_REQUEST_DELAY;
 
     // Assume that the connection to the MiP will be successfully initialized. Will clear the flag if a connection
     // error is detected. If this wasn't done then the calls to rawSend() & getStatus() below would fail.
@@ -857,6 +858,11 @@ int MiP::transportSendRequest(const uint8_t* pRequest, size_t requestLength, int
 
     switchSerialToMiP();
 
+    // Let the MiP process the last request before letting another request be issued.
+    while (millis() - m_lastRequestTime < MIP_REQUEST_DELAY)
+    {
+    }
+    
     // Remember the command byte (first byte) if expecting a response to this request since the response should start
     // with the same byte.
     if (expectResponse)
@@ -883,10 +889,7 @@ int MiP::transportSendRequest(const uint8_t* pRequest, size_t requestLength, int
         switchSerialToPC();
     }
 
-    // UNDONE: Might be better to record time here and spin at top if calling again too soon.
-    //         That frees up CPU to do other things while waiting.
-    // Let the MiP process the request before letting another request be issued.
-    delay(MIP_REQUEST_DELAY);
+    m_lastRequestTime = millis();
     
     return MIP_ERROR_NONE;
 }
