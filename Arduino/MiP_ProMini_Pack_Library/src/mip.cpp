@@ -140,8 +140,9 @@ int MiP::begin()
             continue;
         }
 
+        // The MiP UART documentation indicates that this delay is required after sending 0xFF.
+        delay(30);
         // Flush any outstanding junk data in receive buffer.
-        delay(16);
         discardUnexpectedSerialData();
 
         // Issue GetStatus command to see if we have successfully connected or not.
@@ -160,8 +161,6 @@ int MiP::begin()
         return MIP_ERROR_CONNECT;
     }
 
-    // The MiP UART documentation indicates that this delay is required after sending 0xFF.
-    delay(30);
 
     return MIP_ERROR_NONE;
 }
@@ -200,7 +199,7 @@ int MiP::getGestureRadarMode(MiPGestureRadarMode& mode)
     size_t        responseLength;
     int           result;
 
-    mode = MIP_GESTURE_RADAR_DISABLED;
+    mode = MIP_INVALID_MODE;
     result = rawReceive(getGestureRadarMode, sizeof(getGestureRadarMode), response, sizeof(response), responseLength);
     if (result)
     {
@@ -215,7 +214,7 @@ int MiP::getGestureRadarMode(MiPGestureRadarMode& mode)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    mode = response[1];
+    mode = (MiPGestureRadarMode)response[1];
     return result;
 }
 
@@ -301,7 +300,7 @@ int MiP::getHeadLEDs(MiPHeadLEDs& headLEDs)
         return result;
     }
     if (responseLength != sizeof(response) ||
-        response[0] != MIP_CMD_GET_HEAD_LEDS ||
+        response[0] != (uint8_t)MIP_CMD_GET_HEAD_LEDS ||
         !isValidHeadLED(response[1]) ||
         !isValidHeadLED(response[2]) ||
         !isValidHeadLED(response[3]) ||
@@ -310,16 +309,16 @@ int MiP::getHeadLEDs(MiPHeadLEDs& headLEDs)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    headLEDs.led1 = response[1];
-    headLEDs.led2 = response[2];
-    headLEDs.led3 = response[3];
-    headLEDs.led4 = response[4];
+    headLEDs.led1 = (MiPHeadLED)response[1];
+    headLEDs.led2 = (MiPHeadLED)response[2];
+    headLEDs.led3 = (MiPHeadLED)response[3];
+    headLEDs.led4 = (MiPHeadLED)response[4];
     return result;
 }
 
-int MiP::isValidHeadLED(MiPHeadLED led)
+int MiP::isValidHeadLED(uint8_t led)
 {
-    return led >= MIP_HEAD_LED_OFF && led <= MIP_HEAD_LED_BLINK_FAST;
+    return led <= MIP_HEAD_LED_BLINK_FAST;
 }
 
 int MiP::continuousDrive(int8_t velocity, int8_t turnRate)
@@ -553,7 +552,7 @@ int MiP::readOdometer(float& distanceInCm)
     }
 
     // Tick count is store as big-endian in response buffer.
-    ticks = response[1] << 24 | response[2] << 16 | response[3] << 8 | response[4];
+    ticks = (uint32_t)response[1] << 24 | (uint32_t)response[2] << 16 | (uint32_t)response[3] << 8 | response[4];
     // Odometer has 48.5 ticks / cm.
     distanceInCm = (float)((double)ticks / 48.5);
     return result;
@@ -596,7 +595,7 @@ int MiP::parseStatus(MiPStatus& status, const uint8_t response[], size_t respons
     // Convert battery integer value to floating point voltage value.
     status.millisec = millis();
     status.battery = (float)(((response[1] - 0x4D) / (float)(0x7C - 0x4D)) * (6.4f - 4.0f)) + 4.0f;
-    status.position = response[2];
+    status.position = (MiPPosition)response[2];
     return MIP_ERROR_NONE;
 }
 
@@ -649,8 +648,8 @@ int MiP::getClapSettings(MiPClapSettings& settings)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    settings.enabled = response[1];
-    settings.delay = response[2] << 8 | response[3];
+    settings.enabled = (MiPClapEnabled)response[1];
+    settings.delay = (uint16_t)response[2] << 8 | response[3];
     return MIP_ERROR_NONE;
 }
 
@@ -1113,12 +1112,12 @@ void MiP::processOobResponseData(uint8_t commandByte)
     {
     case MIP_CMD_GET_RADAR_RESPONSE:
         m_lastRadar.millisec = millis();
-        m_lastRadar.radar = response[1];
+        m_lastRadar.radar = (MiPRadar)response[1];
         m_flags |= MIP_FLAG_RADAR_VALID;
         break;
     case MIP_CMD_GET_GESTURE_RESPONSE:
         m_lastGesture.millisec = millis();
-        m_lastGesture.gesture = response[1];
+        m_lastGesture.gesture = (MiPGesture)response[1];
         m_flags |= MIP_FLAG_GESTURE_VALID;
         break;
     case MIP_CMD_SHAKE_RESPONSE:

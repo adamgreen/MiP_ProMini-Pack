@@ -37,6 +37,7 @@ void setup()
     // Play 1 sound.
     const MiPSound sounds1[] = {{MIP_SOUND_ONEKHZ_500MS_8K16BIT, 0}};
     int result = mip.playSound(sounds1, sizeof(sounds1)/sizeof(sounds1[0]), 0);
+    MIP_PRINT_ERRORS(result);
 
     delay(2000);
 
@@ -48,6 +49,7 @@ void setup()
                                 {MIP_SOUND_ACTION_BURPING, 0},
                                 {MIP_SOUND_VOLUME_1, 0}};           // Finish by setting volume low.
     result = mip.playSound(sounds2, sizeof(sounds2)/sizeof(sounds2[0]), 1);
+    MIP_PRINT_ERRORS(result);
 
     delay(7000);
 

@@ -35,6 +35,7 @@ void setup()
     PRINTLN(F("FallDown.ino - Use fallDown().\n"
                "Fall forward.\n"));
     int result = mip.fallDown(MIP_FALL_FACE_DOWN);
+    MIP_PRINT_ERRORS(result);
     delay(2000);
 
     PRINTLN();

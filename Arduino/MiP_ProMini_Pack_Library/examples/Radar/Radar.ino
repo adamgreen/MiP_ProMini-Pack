@@ -38,10 +38,11 @@ void setup()
 
     MiPRadarNotification radar;
     int result = mip.setGestureRadarMode(MIP_RADAR);
+    MIP_PRINT_ERRORS(result);
     do
     {
         result = mip.getLatestRadarNotification(radar);
-    } while (radar.radar != MIP_RADAR_0CM_10CM);
+    } while (result != MIP_ERROR_NONE || radar.radar != MIP_RADAR_0CM_10CM);
     PRINTLN(F("Hand detected. Shutting down."));
 
     PRINTLN();

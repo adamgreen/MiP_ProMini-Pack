@@ -46,10 +46,13 @@ void setup()
     // Modify clap settings.
     // NOTE: Need some delay between settings or second one will be dropped.
     result = mip.enableClap(MIP_CLAP_ENABLED);
+    MIP_PRINT_ERRORS(result);
     delay(1000);
     result = mip.setClapDelay(501);
+    MIP_PRINT_ERRORS(result);
 
     result = mip.getClapSettings(settings);
+    MIP_PRINT_ERRORS(result);
     PRINTLN(F("Updated clap settings."));
     printClapSettings(&settings);
 

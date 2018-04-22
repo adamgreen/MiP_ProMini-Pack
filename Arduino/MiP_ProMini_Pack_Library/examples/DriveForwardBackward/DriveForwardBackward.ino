@@ -37,11 +37,14 @@ void setup()
               "Drive ahead and back, 1 second in each direction."));
 
     int result = mip.driveForward(15, 1000);
+    MIP_PRINT_ERRORS(result);
     delay(2000);
     result = mip.driveBackward(15, 1000);
+    MIP_PRINT_ERRORS(result);
     delay(2000);
 
-    mip.end();
+    PRINTLN();
+    PRINTLN(F("Sample done."));
 }
 
 void loop()

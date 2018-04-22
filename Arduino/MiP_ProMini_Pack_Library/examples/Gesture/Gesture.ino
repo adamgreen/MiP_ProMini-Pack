@@ -38,6 +38,7 @@ void setup()
 
     MiPGestureNotification gesture;
     int result = mip.setGestureRadarMode(MIP_GESTURE);
+    MIP_PRINT_ERRORS(result);
     while (MIP_ERROR_NONE != mip.getLatestGestureNotification(gesture))
     {
     }

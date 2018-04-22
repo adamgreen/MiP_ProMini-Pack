@@ -40,6 +40,7 @@ void setup()
     PRINTLN(F("Call mipGetStatus()"));
     int result = mip.getStatus(status);
     printStatus(status);
+    MIP_PRINT_ERRORS(result);
 
     PRINTLN(F("Waiting for next MiP status notification."));
     while (MIP_ERROR_NONE != mip.getLatestStatusNotification(status))

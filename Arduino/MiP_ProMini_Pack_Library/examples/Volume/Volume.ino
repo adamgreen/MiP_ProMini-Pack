@@ -38,7 +38,10 @@ void setup()
 
     uint8_t volume = 0;
     int result = mip.setVolume(1);
+    MIP_PRINT_ERRORS(result);
+    delay(50);
     result = mip.getVolume(volume);
+    MIP_PRINT_ERRORS(result);
 
     PRINT(F("Volume = "));
       PRINTLN(volume);

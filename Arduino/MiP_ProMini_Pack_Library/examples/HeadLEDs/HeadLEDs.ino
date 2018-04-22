@@ -36,11 +36,13 @@ void setup()
     PRINTLN(F("HeadLEDs.ino - Use head LED functions.\n"
               "Should set each head LED to different state."));
     int result = mip.setHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+    MIP_PRINT_ERRORS(result);
 
     delay(4000);
 
     MiPHeadLEDs headLEDs;
     result = mip.getHeadLEDs(headLEDs);
+    MIP_PRINT_ERRORS(result);
     PRINTLN(F("Head LEDs"));
     PRINT(F("led1: "));
         printLEDString(headLEDs.led1);

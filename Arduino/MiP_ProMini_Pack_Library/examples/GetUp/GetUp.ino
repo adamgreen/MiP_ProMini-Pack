@@ -36,9 +36,11 @@ void setup()
               "Attempt to get up from a front fall."));
 
     int result = mip.fallDown(MIP_FALL_FACE_DOWN);
+    MIP_PRINT_ERRORS(result);
     delay(3000);
 
     result = mip.getUp(MIP_GETUP_FROM_FRONT);
+    MIP_PRINT_ERRORS(result);
     delay(3000);
 
     PRINTLN();

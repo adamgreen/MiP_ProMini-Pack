@@ -37,13 +37,17 @@ void setup()
 
     // Queue up multiple commands to run in sequence.
     int result = mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+    MIP_PRINT_ERRORS(result);
     // Don't queue up multiple commands too fast.
     delay(500);
     result = mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
+    MIP_PRINT_ERRORS(result);
     delay(500);
     result = mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
+    MIP_PRINT_ERRORS(result);
     delay(500);
     result = mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
+    MIP_PRINT_ERRORS(result);
     delay(500);
 
     PRINTLN();

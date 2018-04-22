@@ -36,8 +36,10 @@ void setup()
               "Interrupt a 360 degree turn with stop()."));
 
     int result = mip.turnLeft(360, 6);
+    MIP_PRINT_ERRORS(result);
     delay(1000);
     result = mip.stop();
+    MIP_PRINT_ERRORS(result);
     delay(1000);
 
     PRINTLN();

@@ -39,6 +39,7 @@ void setup()
     const uint8_t green = 0x00;
     const uint8_t blue = 0xff;
     int result = mip.setChestLED(red, green, blue);
+    MIP_PRINT_ERRORS(result);
 
     delay(3000);
 

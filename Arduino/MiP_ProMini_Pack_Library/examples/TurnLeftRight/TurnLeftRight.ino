@@ -37,8 +37,10 @@ void setup()
               "Turn 180 degrees to left and then 180 degrees to right."));
 
     int result = mip.turnLeft(180, 12);
+    MIP_PRINT_ERRORS(result);
     delay(2000);
     result = mip.turnRight(180, 12);
+    MIP_PRINT_ERRORS(result);
     delay(2000);
 
     PRINTLN();

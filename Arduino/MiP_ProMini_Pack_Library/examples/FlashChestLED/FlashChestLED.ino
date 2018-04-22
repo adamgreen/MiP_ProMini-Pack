@@ -42,11 +42,13 @@ void setup()
     const uint16_t onTime = 1000;    // 1000 msecs / sec
     const uint16_t offTime = 1000;   // 1000 msecs / sec
     int result = mip.flashChestLED(red, green, blue, onTime, offTime);
+    MIP_PRINT_ERRORS(result);
 
     delay(4000);
 
     MiPChestLED chestLED;
     result = mip.getChestLED(chestLED);
+    MIP_PRINT_ERRORS(result);
     
     PRINTLN(F("chestLED"));
     PRINT(F("red: "));

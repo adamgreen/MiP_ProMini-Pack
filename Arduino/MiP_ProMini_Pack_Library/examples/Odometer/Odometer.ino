@@ -38,11 +38,13 @@ void setup()
 
     float cm;
     int result = mip.readOdometer(cm);
+    MIP_PRINT_ERRORS(result);
     PRINT(F("MiP has travelled "));
         PRINT(cm);
         PRINTLN(F(" cm since the last reset."));
 
     result = mip.resetOdometer();
+    MIP_PRINT_ERRORS(result);
     delay(1000);
 
     PRINTLN();

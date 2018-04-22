@@ -39,6 +39,7 @@ void setup()
     {
         // Drive forward at half-speed and turn right at quarter rate.
         int result = mip.continuousDrive(16, 8);
+        MIP_PRINT_ERRORS(result);
         // Pace out the continuous drive commands by 50 msec.
         delay(50);
     }
@@ -46,6 +47,7 @@ void setup()
     {
         // Drive backward at half-speed and turn left at quarter rate.
         int result = mip.continuousDrive(-16, -8);
+        MIP_PRINT_ERRORS(result);
         // Pace out the continuous drive commands by 50 msec.
         delay(50);
     }

@@ -38,6 +38,7 @@ void setup()
 
     MiPWeight weight;
     int result = mip.getWeight(weight);
+    MIP_PRINT_ERRORS(result);
     PRINT(F("weight = "));
         PRINTLN(weight.weight);
     PRINTLN(F("Waiting for next weight update."));
