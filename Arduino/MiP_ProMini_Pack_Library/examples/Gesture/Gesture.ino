@@ -13,41 +13,64 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    getLatestGestureNotification()
+    availableGestureEvents()
+    readGestureEvent()
 */
 #include <mip.h>
 
-// Pass false into MiP contructor to enable notifications.
-MiP     mip(false);
+MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Gesture.ino - Use getLatestGestureNotification() function.\n"
-              "Swipe your hand in front of MiP to create gesture."));
+    Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
 
-    MiPGestureNotification gesture;
-    int result = mip.setGestureRadarMode(MIP_GESTURE);
-    MIP_PRINT_ERRORS(result);
-    while (MIP_ERROR_NONE != mip.getLatestGestureNotification(gesture))
+    Serial.println(F("Waiting for robot to be standing upright."));
+    while (!mip.isUpright())
     {
     }
-    PRINT(F("Gesture = ")); PRINTLN(gesture.gesture);
-
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    mip.enableGestureMode();
 }
 
 void loop()
 {
+    while (mip.availableGestureEvents() > 0)
+    {
+        MiPGesture gesture = mip.readGestureEvent();
+        Serial.print(F("Detected "));
+        switch (gesture)
+        {
+        case MIP_GESTURE_LEFT:
+            Serial.println(F("Left gesture!"));
+            break;
+        case MIP_GESTURE_RIGHT:
+            Serial.println(F("Right gesture!"));
+            break;
+        case MIP_GESTURE_CENTER_SWEEP_LEFT:
+            Serial.println(F("Center Sweep Left gesture!"));
+            break;
+        case MIP_GESTURE_CENTER_SWEEP_RIGHT:
+            Serial.println(F("Center Sweep Right gesture!"));
+            break;
+        case MIP_GESTURE_CENTER_HOLD:
+            Serial.println(F("Center Hold gesture!"));
+            break;
+        case MIP_GESTURE_FORWARD:
+            Serial.println(F("Forward gesture!"));
+            break;
+        case MIP_GESTURE_BACKWARD:
+            Serial.println(F("Backward gesture!"));
+            break;
+        case MIP_GESTURE_INVALID:
+            // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
+            Serial.println(F("INVALID gesture!"));
+            break;
+        }
+    }
 }

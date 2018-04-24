@@ -13,45 +13,33 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    getWeight()
-    getLatestWeightNotification()
+    readWeight()
 */
 #include <mip.h>
 
-// Pass false into MiP contructor to enable notifications.
-MiP     mip(false);
+MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Weight.ino - Use weight update functions."));
-
-    MiPWeight weight;
-    int result = mip.getWeight(weight);
-    MIP_PRINT_ERRORS(result);
-    PRINT(F("weight = "));
-        PRINTLN(weight.weight);
-    PRINTLN(F("Waiting for next weight update."));
-    while (MIP_ERROR_NONE != mip.getLatestWeightNotification(weight))
-    {
-    }
-    PRINT(F("weight = "));
-        PRINTLN(weight.weight);
-
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println(F("Weight.ino - Use weight update functions."));
 }
 
 void loop()
 {
+    static int8_t lastWeight = -128;
+    int8_t currentWeight = mip.readWeight();
+
+    if (currentWeight != lastWeight)
+    {
+        Serial.print(F("Weight = "));
+          Serial.println(currentWeight);
+        lastWeight = currentWeight;
+    }
 }

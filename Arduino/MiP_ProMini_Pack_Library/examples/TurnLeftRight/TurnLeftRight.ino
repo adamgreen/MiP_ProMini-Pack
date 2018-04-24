@@ -22,29 +22,22 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions.\n"
-              "Turn 180 degrees to left and then 180 degrees to right."));
+    Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
 
-    int result = mip.turnLeft(180, 12);
-    MIP_PRINT_ERRORS(result);
+    mip.turnLeft(180, 12);
     delay(2000);
-    result = mip.turnRight(180, 12);
-    MIP_PRINT_ERRORS(result);
+    mip.turnRight(180, 12);
     delay(2000);
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()

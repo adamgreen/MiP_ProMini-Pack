@@ -21,58 +21,20 @@
 #include <Arduino.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "queue.h"
 
 // Default pin used by the TS3USB221A switch to connect Serial to the MiP or PC.
 //   Set to HIGH, it selects the MiP.
 //   Set to LOW, it selects the PC.
 #define MIP_UART_SELECT_PIN 2
 
-// Wait for any queued Serial data destined for the MiP to be transmitted, switch Serial output to the PC, send
-// desired print/println output to the PC, and then switch Serial output back to the MiP (if that is where it was
-// switched before.)
-#define PRINT(...) \
-    do { \
-        bool needToRestore = MiP::isInstanceSerialGoingToMiP(); \
-        MiP::switchInstanceSerialToPC(); \
-        Serial.print(__VA_ARGS__); \
-        if (needToRestore) MiP::switchInstanceSerialToMiP(); \
-    } while(0);
 
-#define PRINTLN(...) \
-    do { \
-        bool needToRestore = MiP::isInstanceSerialGoingToMiP(); \
-        MiP::switchInstanceSerialToPC(); \
-        Serial.println(__VA_ARGS__); \
-        if (needToRestore) MiP::switchInstanceSerialToMiP(); \
-    } while(0);
-
-// Macro to display message if error has been returned from MiP API.
-#define MIP_PRINT_ERRORS(RESULT) \
-    if ((RESULT) != MIP_ERROR_NONE) { \
-        PRINT(F("MiP API returned ")); \
-        switch (RESULT) { \
-            case MIP_ERROR_CONNECT: PRINTLN(F("MIP_ERROR_CONNECT (Connection to MiP failed)")); break; \
-            case MIP_ERROR_PARAM: PRINTLN(F("MIP_ERROR_PARAM (Invalid parameter passed to API)")); break; \
-            case MIP_ERROR_NOT_CONNECTED: PRINTLN(F("MIP_ERROR_NOT_CONNECTED (Not connected to MiP robot)")); break; \
-            case MIP_ERROR_NO_REQUEST: PRINTLN(F("MIP_ERROR_NO_REQUEST (Not waiting for a response from a request)")); break; \
-            case MIP_ERROR_TIMEOUT: PRINTLN(F("MIP_ERROR_TIMEOUT (Timed out waiting for response)")); break; \
-            case MIP_ERROR_EMPTY: PRINTLN(F("MIP_ERROR_EMPTY (The queue was empty)")); break; \
-            case MIP_ERROR_BAD_RESPONSE: PRINTLN(F("MIP_ERROR_BAD_RESPONSE (Unexpected response from MiP)")); break; \
-            case MIP_NO_NOTIFICATIONS: PRINTLN(F("MIP_NO_NOTIFICATIONS (releaseSerialToPC must be set to false in MiP constructor)")); break; \
-            default: PRINTLN(F("unknown error")); break; \
-        } \
-    }
-
-// Integer error codes that can be returned from most of these MiP API functions.
+// Integer error codes that can be encountered by MiP API functions.
 #define MIP_ERROR_NONE          0 // Success
-#define MIP_ERROR_CONNECT       1 // Connection to MiP failed.
-#define MIP_ERROR_PARAM         2 // Invalid parameter passed to API.
-#define MIP_ERROR_NOT_CONNECTED 3 // Not connected to MiP robot.
-#define MIP_ERROR_NO_REQUEST    4 // Not waiting for a response from a request.
-#define MIP_ERROR_TIMEOUT       5 // Timed out waiting for response.
-#define MIP_ERROR_EMPTY         6 // The queue was empty.
-#define MIP_ERROR_BAD_RESPONSE  7 // Unexpected response from MiP.
-#define MIP_NO_NOTIFICATIONS    8 // releaseSerialToPC must be set to false in MiP constructor.
+#define MIP_ERROR_TIMEOUT       1 // Timed out waiting for response.
+#define MIP_ERROR_NO_EVENT      2 // No event has arrived from MiP yet.
+#define MIP_ERROR_BAD_RESPONSE  3 // Unexpected response from MiP.
+#define MIP_ERROR_MAX_RETRIES   4 // Exceeded maximum number of retries to get this operation to succeed.
 
 // Maximum length of MiP request and response buffer lengths.
 #define MIP_REQUEST_MAX_LEN     (17 + 1)    // Longest request is MPI_CMD_PLAY_SOUND.
@@ -83,7 +45,6 @@ enum MiPGestureRadarMode
     MIP_GESTURE_RADAR_DISABLED = 0x00,
     MIP_GESTURE                = 0x02,
     MIP_RADAR                  = 0x04,
-    MIP_INVALID_MODE           = 0xFF   // Is set to this value on error.
 };
 
 enum MiPRadar
@@ -91,7 +52,7 @@ enum MiPRadar
     MIP_RADAR_NONE      = 0x01,
     MIP_RADAR_10CM_30CM = 0x02,
     MIP_RADAR_0CM_10CM  = 0x03,
-    MIP_RADAR_INVALID   = 0xFF          // Is set to this value on error.
+    MIP_RADAR_INVALID   = 0xFF          // Is set to this value when there are no current radar events.
 };
 
 enum MiPGesture
@@ -103,7 +64,7 @@ enum MiPGesture
     MIP_GESTURE_CENTER_HOLD        = 0x0E,
     MIP_GESTURE_FORWARD            = 0x0F,
     MIP_GESTURE_BACKWARD           = 0x10,
-    MIP_GESTURE_INVALID            = 0xFF   // Is set to this value on error.
+    MIP_GESTURE_INVALID            = 0xFF   // Is set to this value when there are no current gesture events.
 };
 
 enum MiPHeadLED
@@ -112,14 +73,12 @@ enum MiPHeadLED
     MIP_HEAD_LED_ON         = 1,
     MIP_HEAD_LED_BLINK_SLOW = 2,
     MIP_HEAD_LED_BLINK_FAST = 3,
-    MIP_HEAD_LED_INVALID    = 0xFF          // Is set to this value on error.
 };
 
 enum MiPDriveDirection
 {
     MIP_DRIVE_FORWARD  = 0x00,
     MIP_DRIVE_BACKWARD = 0x01,
-    MIP_DRIVE_INVALID  = 0xFF
 };
 
 enum MiPTurnDirection
@@ -143,7 +102,6 @@ enum MiPPosition
     MIP_POSITION_HAND_STAND             = 0x04,
     MIP_POSITION_FACE_DOWN_ON_TRAY      = 0x05,
     MIP_POSITION_ON_BACK_WITH_KICKSTAND = 0x06,
-    MIP_POSITION_INVALID                = 0xFF      // Is set to this value on error.
 };
 
 enum MiPGetUp
@@ -275,45 +233,9 @@ enum MiPClapEnabled
 {
     MIP_CLAP_DISABLED = 0x00,
     MIP_CLAP_ENABLED  = 0x01,
-    MIP_CLAP_INVALID                // Is set to this value on error.
 };
 
 
-
-class MiPRadarNotification
-{
-public:
-    MiPRadarNotification()
-    {
-        clear();
-    }
-
-    void clear()
-    {
-        millisec = 0;
-        radar = MIP_RADAR_NONE;
-    }
-
-    uint32_t millisec;
-    MiPRadar radar;
-};
-
-class MiPGestureNotification
-{
-public:
-    MiPGestureNotification()
-    {
-        clear();
-    }
-
-    void clear()
-    {
-        millisec = 0;
-        gesture = MIP_GESTURE_INVALID;
-    }
-    uint32_t   millisec;
-    MiPGesture gesture;
-};
 
 class MiPStatus
 {
@@ -325,50 +247,12 @@ public:
 
     void clear()
     {
-        millisec = 0;
         battery = 0.0f;
-        position = MIP_POSITION_INVALID;
+        position = MIP_POSITION_ON_BACK_WITH_KICKSTAND;
     }
     
-    uint32_t    millisec;
     float       battery;
     MiPPosition position;
-};
-
-class MiPWeight
-{
-public:
-    MiPWeight()
-    {
-        clear();
-    }
-
-    void clear()
-    {
-        millisec = 0;
-        weight = 0;
-    }
-    
-    uint32_t millisec;
-    int8_t   weight;
-};
-
-class MiPClap
-{
-public:
-    MiPClap()
-    {
-        clear();
-    }
-
-    void clear()
-    {
-        millisec = 0;
-        count = 0;
-    }
-    
-    uint32_t millisec;
-    uint8_t  count;
 };
 
 class MiPChestLED
@@ -405,10 +289,10 @@ public:
 
     void clear()
     {
-        led1 = MIP_HEAD_LED_INVALID;
-        led2 = MIP_HEAD_LED_INVALID;
-        led3 = MIP_HEAD_LED_INVALID;
-        led4 = MIP_HEAD_LED_INVALID;
+        led1 = MIP_HEAD_LED_OFF;
+        led2 = MIP_HEAD_LED_OFF;
+        led3 = MIP_HEAD_LED_OFF;
+        led4 = MIP_HEAD_LED_OFF;
     }
     
     MiPHeadLED led1;
@@ -457,12 +341,6 @@ public:
     uint8_t hardware;
 };
 
-struct MiPSound
-{
-    MiPSoundIndex sound;
-    uint16_t      delay;
-};
-
 class MiPClapSettings
 {
 public:
@@ -487,21 +365,105 @@ class MiP
 {
 public:
     // Constructor/Destructors.
-    MiP(bool releaseSerialToPC = true, int8_t serialSelectPin = MIP_UART_SELECT_PIN);
+    MiP(int8_t serialSelectPin = MIP_UART_SELECT_PIN);
     ~MiP();
 
-    int  begin();
+    bool begin();
     void end();
 
     // Will return false if begin() wasn't successful in connecting to the MiP.
     bool isInitialized()
     {
-        return (m_flags & MRI_FLAGS_INITIALIZED);
+        return (m_flags & MRI_FLAG_INITIALIZED);
     }
 
+    // When calling the public functions listed below, the MiP library will try its best to handle any errors 
+    // encountered by retrying the read/write operations behind the scenes. If the worst happens and it just can't 
+    // recover from a communication issue with the MiP, it will provide details about the cause of the problem through
+    // the following functions.
+    int8_t lastCallResult()
+    {
+        return m_lastError;
+    }
+    bool didLastCallFail()
+    {
+        return m_lastError != MIP_ERROR_NONE;
+    }
+    void printLastCallResult();
+
+    void enableRadarMode();
+    void disableRadarMode();
+    void enableGestureMode();
+    void disableGestureMode();
+    bool isRadarModeEnabled();
+    bool isGestureModeEnabled();
+    bool areGestureAndRadarModesDisabled();
+    MiPRadar readRadar();
+    uint8_t availableGestureEvents();
+    MiPGesture readGestureEvent();
+
+    void writeChestLED(uint8_t red, uint8_t green, uint8_t blue);
+    void writeChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
+    void writeChestLED(const MiPChestLED& chestLED);
+    void readChestLED(MiPChestLED& chestLED);
+
+    void writeHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
+    void writeHeadLEDs(const MiPHeadLEDs& headLEDs);
+    void readHeadLEDs(MiPHeadLEDs& headLEDs);
+
+    void continuousDrive(int8_t velocity, int8_t turnRate);
+    void distanceDrive(MiPDriveDirection driveDirection, uint8_t cm, MiPTurnDirection turnDirection, uint16_t degrees);
+    void turnLeft(uint16_t degrees, uint8_t speed);
+    void turnRight(uint16_t degrees, uint8_t speed);
+    void driveForward(uint8_t speed, uint16_t time);
+    void driveBackward(uint8_t speed, uint16_t time);
+    void stop();
+    void fallForward();
+    void fallBackward();
+    void getUp(MiPGetUp getup = MIP_GETUP_FROM_EITHER);
+
+    void beginSoundList();
+    void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay);
+    void playSoundList(uint8_t repeatCount);
+
+    void writeVolume(uint8_t volume);
+    uint8_t readVolume();
+
+    float readDistanceTravelled();
+    void  resetDistanceTravelled();
+
+    float readBatteryVoltage();
+    MiPPosition readPosition();
+    bool  isOnBack();
+    bool  isFaceDown();
+    bool  isUpright();
+    bool  isPickedUp();
+    bool  isHandStanding();
+    bool  isFaceDownOnTray();
+    bool  isOnBackWithKickstand();
+
+    int8_t readWeight();
+
+    void     enableClapEvents();
+    void     disableClapEvents();
+    bool     areClapEventsEnabled();
+    void     writeClapDelay(uint16_t delay);
+    uint16_t readClapDelay();
+    uint8_t  availableClapEvents();
+    uint8_t  readClapEvent();
+
+    bool hasBeenShaken();
+
+    void readSoftwareVersion(MiPSoftwareVersion& software);
+    void readHardwareInfo(MiPHardwareInfo& hardware);
+
+    void   rawSend(const uint8_t request[], size_t requestLength);
+    int8_t rawReceive(const uint8_t request[], size_t requestLength,
+                      uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
+
     // Serial is shared between the MiP and the PC on the MiP ProMini Pack.
-    // The following methods switch between the two destinations.
-    // It flushes any outstanding output destined to the current device before switching to the new one.
+    // You shouldn't need to use these function directly as just calling Serial.print() or Serial.println() from your
+    // code will automatically end up calling these functions for you as needed.
     void switchSerialToMiP()
     {
         Serial.flush();
@@ -542,65 +504,46 @@ public:
         }
     }
 
-    int setGestureRadarMode(MiPGestureRadarMode mode);
-    int getGestureRadarMode(MiPGestureRadarMode& mode);
-
-    int setChestLED(uint8_t red, uint8_t green, uint8_t blue);
-    int flashChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
-    int getChestLED(MiPChestLED& chestLED);
-    int setHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
-    int getHeadLEDs(MiPHeadLEDs& headLEDs);
-
-    int continuousDrive(int8_t velocity, int8_t turnRate);
-    int distanceDrive(MiPDriveDirection driveDirection, uint8_t cm, MiPTurnDirection turnDirection, uint16_t degrees);
-    int turnLeft(uint16_t degrees, uint8_t speed);
-    int turnRight(uint16_t degrees, uint8_t speed);
-    int driveForward(uint8_t speed, uint16_t time);
-    int driveBackward(uint8_t speed, uint16_t time);
-    int stop();
-    int fallDown(MiPFallDirection direction);
-    int getUp(MiPGetUp getup);
-
-    int playSound(const MiPSound sounds[], size_t soundCount, uint8_t repeatCount);
-    int setVolume(uint8_t volume);
-    int getVolume(uint8_t& volume);
-
-    int readOdometer(float& distanceInCm);
-    int resetOdometer();
-
-    int getStatus(MiPStatus& status);
-
-    int getWeight(MiPWeight& weight);
-
-    int getClapSettings(MiPClapSettings& settings);
-    int enableClap(MiPClapEnabled enabled);
-    int setClapDelay(uint16_t delay);
-
-    int getLatestRadarNotification(MiPRadarNotification& notification);
-    int getLatestGestureNotification(MiPGestureNotification& notification);
-    int getLatestStatusNotification(MiPStatus& status);
-    int getLatestShakeNotification();
-    int getLatestWeightNotification(MiPWeight& weight);
-    int getLatestClapNotification(MiPClap& clap);
-
-    int getSoftwareVersion(MiPSoftwareVersion& software);
-    int getHardwareInfo(MiPHardwareInfo& hardware);
-
-    int rawSend(const uint8_t request[], size_t requestLength);
-    int rawReceive(const uint8_t request[], size_t requestLength,
-                   uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
-
 protected:
-    bool shouldReleaseSerialBeforeReturning()
-    {
-        return (m_flags & MIP_FLAG_RELEASE_SERIAL);
-    }
     void    clear();
-    int     isValidHeadLED(uint8_t led);
-    int     parseStatus(MiPStatus& status, const uint8_t response[], size_t responseLength);
-    int     parseWeight(MiPWeight& weight, const uint8_t response[], size_t responseLength);
-    int     transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
-    int     transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
+
+    void    verifiedSetGestureRadarMode(MiPGestureRadarMode desiredMode);
+    bool    checkGestureRadarMode(MiPGestureRadarMode expectedMode);
+    void    rawSetGestureRadarMode(MiPGestureRadarMode mode);
+    int8_t  rawGetGestureRadarMode(MiPGestureRadarMode& mode);
+
+    void    rawSetChestLED(uint8_t red, uint8_t green, uint8_t blue);
+    void    rawFlashChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
+    int8_t  rawGetChestLED(MiPChestLED& chestLED);
+
+    void    rawSetHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
+    int8_t  rawGetHeadLEDs(MiPHeadLEDs& headLEDs);
+    bool    isValidHeadLED(uint8_t led);
+
+    void    fallDown(MiPFallDirection direction);
+
+    void    rawSetVolume(uint8_t volume);
+    int8_t  rawGetVolume(uint8_t& volume);
+
+    int8_t  rawReadOdometer(float& distanceInCm);
+
+    int8_t  rawGetStatus(MiPStatus& status);
+    int8_t  parseStatus(MiPStatus& status, const uint8_t response[], size_t responseLength);
+
+    int8_t  rawGetWeight(int8_t& weight);
+    int8_t  parseWeight(int8_t& weight, const uint8_t response[], size_t responseLength);
+
+    void    checkedEnableClapEvents(MiPClapEnabled enabled);
+    int8_t  readClapSettings(MiPClapSettings& settings);
+    void    rawEnableClap(MiPClapEnabled enabled);
+    void    rawSetClapDelay(uint16_t delay);
+    int8_t  rawGetClapSettings(MiPClapSettings& settings);
+
+    int8_t  rawGetSoftwareVersion(MiPSoftwareVersion& software);
+    int8_t  rawGetHardwareInfo(MiPHardwareInfo& hardware);
+
+    void    transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
+    int8_t  transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
     bool    processAllResponseData();
     void    copyHexTextToBinary(uint8_t* pDest, uint8_t* pSrc, uint8_t length);
     uint8_t parseHexDigit(uint8_t digit);
@@ -611,28 +554,69 @@ protected:
     enum FlagBits
     {
         MIP_FLAG_RADAR_VALID     = (1 << 0),
-        MIP_FLAG_STATUS_VALID    = (1 << 1),
-        MIP_FLAG_GESTURE_VALID   = (1 << 2),
-        MIP_FLAG_SHAKE_VALID     = (1 << 3),
-        MIP_FLAG_WEIGHT_VALID    = (1 << 4),
-        MIP_FLAG_CLAP_VALID      = (1 << 5),
-        MIP_FLAG_RELEASE_SERIAL  = (1 << 6),
-        MRI_FLAGS_INITIALIZED    = (1 << 7)
+        MIP_FLAG_SHAKE_DETECTED  = (1 << 1),
+        MIP_FLAG_WEIGHT_VALID    = (1 << 2),
+        MRI_FLAG_INITIALIZED     = (1 << 3)
     };
 
-    uint32_t                m_lastRequestTime;
-    MiPRadarNotification    m_lastRadar;
-    MiPGestureNotification  m_lastGesture;
-    MiPStatus               m_lastStatus;
-    MiPWeight               m_lastWeight;
-    MiPClap                 m_lastClap;
-    uint8_t                 m_flags;
-    int8_t                  m_serialSelectPin;
-    uint8_t                 m_responseBuffer[MIP_RESPONSE_MAX_LEN];
-    uint8_t                 m_expectedResponseCommand;
-    uint8_t                 m_expectedResponseSize;
+    uint32_t                     m_lastRequestTime;
+    uint32_t                     m_lastContinuousDriveTime;
+    uint8_t                      m_flags;
+    int8_t                       m_serialSelectPin;
+    uint8_t                      m_responseBuffer[MIP_RESPONSE_MAX_LEN];
+    uint8_t                      m_expectedResponseCommand;
+    uint8_t                      m_expectedResponseSize;
+    int8_t                       m_lastError;
+    uint8_t                      m_playCommand[1+17];
+    int8_t                       m_soundIndex;
+    MiPRadar                     m_lastRadar;
+    MiPStatus                    m_lastStatus;
+    int8_t                       m_lastWeight;
+    CircularQueue<uint8_t, 8>    m_clapEvents;
+    CircularQueue<MiPGesture, 8> m_gestureEvents;
 
-    static MiP*             s_pInstance;
+    static MiP*                  s_pInstance;
 };
+
+
+
+// This class can be used instead of Serial for sending text to the PC. It makes sure that the MiP ProMini Pack switches
+// the UART signals away from the MiP and to the PC before actually performing the Serial write.
+class MiPStream : public Stream
+{
+public:
+    MiPStream();
+    
+    // Methods that must be implemented for Stream subclasses.
+    virtual int available();
+    virtual int read();
+    virtual int peek();
+
+    // Methods that must be implemented for Print subclasses.
+    virtual size_t write(uint8_t);
+    virtual size_t write(const uint8_t *buffer, size_t size);
+    virtual int    availableForWrite();
+    virtual void   flush();
+
+    // Additional methods defined by HardwareSerial that user might call.
+    void begin(unsigned long baud) { begin(baud, SERIAL_8N1); }
+    void begin(unsigned long, uint8_t);
+    void end();
+    inline size_t write(unsigned long n) { return write((uint8_t)n); }
+    inline size_t write(long n) { return write((uint8_t)n); }
+    inline size_t write(unsigned int n) { return write((uint8_t)n); }
+    inline size_t write(int n) { return write((uint8_t)n); }
+    operator bool() { return true; }
+
+protected:
+    void initIfNeeded();
+    
+    bool m_isInit;
+} extern MiPStream;
+
+// This macro will force user code which does something like: Serial.println("Interesting text")
+// to be redirected to MiPStream which will make sure that it actually gets sent to the PC and not the MiP.
+#define Serial MiPStream
+
 
 #endif // MIP_H_

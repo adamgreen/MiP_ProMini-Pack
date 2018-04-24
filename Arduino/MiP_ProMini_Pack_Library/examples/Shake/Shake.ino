@@ -13,38 +13,28 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    getLatestShakeNotification()
+    hasBeenShaken()
 */
 #include <mip.h>
 
-// Pass false into MiP contructor to enable notifications.
-MiP     mip(false);
+MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Shake.ino - Use getLatestShakeNotification() function."));
-
-    PRINTLN(F("Waiting for user to shake MiP."));
-    while (MIP_ERROR_NONE != mip.getLatestShakeNotification())
-    {
-    }
-    PRINTLN(F("Shake detected."));
-
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println(F("Shake.ino - Detect shakes."));
 }
 
 void loop()
 {
+    if (mip.hasBeenShaken())
+    {
+        Serial.println(F("Shake detected!"));
+    }
 }

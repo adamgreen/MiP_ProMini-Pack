@@ -21,37 +21,29 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("DistanceDrive.ino - Use distanceDrive function.\n"
-              "Drive forward, turn 360 degrees in each direction and backward."));
+    Serial.println(F("DistanceDrive.ino - Use distanceDrive function. Drive forward, turn 360 degrees in each direction and backward."));
 
     // Queue up multiple commands to run in sequence.
-    int result = mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
-    MIP_PRINT_ERRORS(result);
+    mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+
     // Don't queue up multiple commands too fast.
     delay(500);
-    result = mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
-    MIP_PRINT_ERRORS(result);
+    mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
     delay(500);
-    result = mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
-    MIP_PRINT_ERRORS(result);
+    mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
     delay(500);
-    result = mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
-    MIP_PRINT_ERRORS(result);
+    mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
     delay(500);
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()

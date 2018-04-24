@@ -13,70 +13,73 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    enableClap()
-    setClapDelay()
-    getClapSettings()
-    getLatestClapNotification()
+    enableClapEvents()
+    disableClapEvents()
+    areClapEventsEnabled()
+    writeClapDelay(uint16_t delay)
+    readClapDelay()
+    availableClapEvents()
+    readClapEvent()
 */
 #include <mip.h>
 
-// Pass false into MiP contructor to enable notifications.
-MiP     mip(false);
+MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Clap.ino - Use clap related functions."));
+    Serial.println(F("Clap.ino - Use clap related functions."));
 
-    MiPClapSettings settings;
-    int result = mip.getClapSettings(settings);
-    PRINTLN(F("Initial clap settings."));
-    printClapSettings(&settings);
-
-    // Modify clap settings.
-    // NOTE: Need some delay between settings or second one will be dropped.
-    result = mip.enableClap(MIP_CLAP_ENABLED);
-    MIP_PRINT_ERRORS(result);
-    delay(1000);
-    result = mip.setClapDelay(501);
-    MIP_PRINT_ERRORS(result);
-
-    result = mip.getClapSettings(settings);
-    MIP_PRINT_ERRORS(result);
-    PRINTLN(F("Updated clap settings."));
-    printClapSettings(&settings);
-
-    PRINTLN(F("Waiting for user to clap."));
-    MiPClap clap;
-    while (MIP_ERROR_NONE != mip.getLatestClapNotification(clap))
+    Serial.println(F("Calling disableClapEvents()"));
+    mip.disableClapEvents();
+    bool isEnabled = mip.areClapEventsEnabled();
+    Serial.print(F("areClapEventsEnabled() returns "));
+    if (isEnabled)
     {
+        Serial.println(F("true - fail"));
     }
-    PRINT(F("Detected "));
-        PRINT(clap.count);
-        PRINTLN(F(" claps"));
+    else
+    {
+        Serial.println(F("false - pass"));
+    }
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println(F("Calling writeClapDelay(501)"));
+    mip.writeClapDelay(501);
+    uint16_t delay = mip.readClapDelay();
+    Serial.print(F("readClapDelay() returns "));
+    Serial.println(delay);
+        
+    Serial.println(F("Calling enableClapEvents()"));
+    mip.enableClapEvents();
+    isEnabled = mip.areClapEventsEnabled();
+    Serial.print(F("areClapEventsEnabled() returns "));
+    if (isEnabled)
+    {
+        Serial.println(F("true - pass"));
+    }
+    else
+    {
+        Serial.println(F("false - fail"));
+    }
+
+    Serial.println();
+    Serial.println(F("Waiting for clap events!"));
 }
 
 void loop()
 {
+    while (mip.availableClapEvents() > 0)
+    {
+        uint8_t clapCount = mip.readClapEvent();
+        Serial.print(F("Detected "));
+            Serial.print(clapCount);
+            Serial.println(F(" claps"));
+    }
 }
 
-static void printClapSettings(const MiPClapSettings* pSettings)
-{
-    PRINT(F("  Enabled = "));
-        PRINTLN(pSettings->enabled ? F("ON") : F("OFF"));
-    PRINT(F("    Delay = "));
-        PRINTLN(pSettings->delay);
-}

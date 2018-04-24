@@ -13,42 +13,52 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    getLatestRadarNotification()
+    readRadar()
 */
 #include <mip.h>
 
-// Pass false into MiP contructor to enable notifications.
-MiP     mip(false);
+MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Radar.ino - Use getLatestRadarNotification() function.\n"
-              "Program should end once you place your handle <10cm from MiP's face."));
+    Serial.println(F("Radar.ino - Display current radar readings to user."));
 
-    MiPRadarNotification radar;
-    int result = mip.setGestureRadarMode(MIP_RADAR);
-    MIP_PRINT_ERRORS(result);
-    do
+    Serial.println(F("Waiting for robot to be standing upright."));
+    while (!mip.isUpright())
     {
-        result = mip.getLatestRadarNotification(radar);
-    } while (result != MIP_ERROR_NONE || radar.radar != MIP_RADAR_0CM_10CM);
-    PRINTLN(F("Hand detected. Shutting down."));
-
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    }
+    mip.enableRadarMode();
 }
 
 void loop()
 {
+    static MiPRadar lastRadar = MIP_RADAR_INVALID;
+    MiPRadar        currentRadar = mip.readRadar();
+
+    if (currentRadar != MIP_RADAR_INVALID && lastRadar != currentRadar)
+    {
+        Serial.print(F("Radar = "));
+        switch(currentRadar)
+        {
+        case MIP_RADAR_NONE:
+            Serial.println(F("None"));
+            break;
+        case MIP_RADAR_10CM_30CM:
+            Serial.println(F("10cm - 30cm"));
+            break;
+        case MIP_RADAR_0CM_10CM:
+            Serial.println(F("0cm - 10cm"));
+            break;
+        default:
+            break;
+        }
+        lastRadar = currentRadar;
+    }
 }

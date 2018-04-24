@@ -21,29 +21,22 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Stop.ino - Use stop() function.\n"
-              "Interrupt a 360 degree turn with stop()."));
+    Serial.println(F("Stop.ino - Use stop() function. Interrupt a 360 degree turn with stop()."));
 
-    int result = mip.turnLeft(360, 6);
-    MIP_PRINT_ERRORS(result);
+    mip.turnLeft(360, 6);
     delay(1000);
-    result = mip.stop();
-    MIP_PRINT_ERRORS(result);
+    mip.stop();
     delay(1000);
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()

@@ -13,8 +13,8 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    readOdometer()
-    resetOdometer()
+    readDistanceTravelled()
+    resetDistanceTravelled()
 */
 #include <mip.h>
 
@@ -22,33 +22,24 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Odometer.ino - Use readOdometer() and resetOdometer.\n"
-              "Read out current odometer reading and reset."));
+    Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
 
-    float cm;
-    int result = mip.readOdometer(cm);
-    MIP_PRINT_ERRORS(result);
-    PRINT(F("MiP has travelled "));
-        PRINT(cm);
-        PRINTLN(F(" cm since the last reset."));
+    float cm = mip.readDistanceTravelled();
+    Serial.print(F("MiP has travelled "));
+        Serial.print(cm);
+        Serial.println(F(" cm since the last reset."));
 
-    result = mip.resetOdometer();
-    MIP_PRINT_ERRORS(result);
-    delay(1000);
+    mip.resetDistanceTravelled();
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()

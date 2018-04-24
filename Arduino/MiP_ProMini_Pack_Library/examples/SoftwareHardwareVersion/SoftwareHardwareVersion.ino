@@ -13,8 +13,8 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    writeVolume()
-    readVolume()
+    readSoftwareVersion()
+    readHardwareInfo()
 */
 #include <mip.h>
 
@@ -25,18 +25,31 @@ void setup()
     bool connectResult = mip.begin();
     if (!connectResult)
     {
+        Serial.begin(115200);
         Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
+    Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
 
-    mip.writeVolume(1);
+    MiPSoftwareVersion softwareVersion;
+    mip.readSoftwareVersion(softwareVersion);
+    Serial.print(F("software version: "));
+        Serial.print(softwareVersion.year);
+        Serial.print('-');
+        Serial.print(softwareVersion.month);
+        Serial.print('-');
+        Serial.print(softwareVersion.day);
+        Serial.print('.');
+        Serial.println(softwareVersion.uniqueVersion);
 
-    uint8_t volume = mip.readVolume();
-
-    Serial.print(F("Volume = "));
-      Serial.println(volume);
+    MiPHardwareInfo hardwareInfo;
+    mip.readHardwareInfo(hardwareInfo);
+    Serial.println(F("hardware info"));
+    Serial.print(F("  voice chip version: "));
+        Serial.println(hardwareInfo.voiceChip);
+    Serial.print(F("  hardware version: "));
+        Serial.println(hardwareInfo.hardware);
 
     Serial.println();
     Serial.println(F("Sample done."));

@@ -13,7 +13,9 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    playSound()
+    beginSoundList()
+    addSoundToList()
+    playSoundList()
 */
 #include <mip.h>
 
@@ -21,40 +23,27 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("PlaySound.ino - Use playSound()."));
-
-    // Play 1 sound.
-    const MiPSound sounds1[] = {{MIP_SOUND_ONEKHZ_500MS_8K16BIT, 0}};
-    int result = mip.playSound(sounds1, sizeof(sounds1)/sizeof(sounds1[0]), 0);
-    MIP_PRINT_ERRORS(result);
-
-    delay(2000);
+    Serial.println(F("PlaySound.ino - Play a few sounds."));
 
     // Play 2 sounds with 1 second delay between them, repeating them a second time.
     // Play the first at a lower volume than the second.
-    const MiPSound sounds2[] = {{MIP_SOUND_VOLUME_4, 0},            // Play eating sound at half volume.
-                                {MIP_SOUND_ACTION_EATING, 1000},
-                                {MIP_SOUND_VOLUME_7, 0},            // Play burping sound at full volume.
-                                {MIP_SOUND_ACTION_BURPING, 0},
-                                {MIP_SOUND_VOLUME_1, 0}};           // Finish by setting volume low.
-    result = mip.playSound(sounds2, sizeof(sounds2)/sizeof(sounds2[0]), 1);
-    MIP_PRINT_ERRORS(result);
-
-    delay(7000);
-
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    mip.beginSoundList();
+    mip.addEntryToSoundList(MIP_SOUND_VOLUME_4, 0);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000);
+    mip.addEntryToSoundList(MIP_SOUND_VOLUME_7, 0);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
+    mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
+    mip.playSoundList(1);
+    
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()

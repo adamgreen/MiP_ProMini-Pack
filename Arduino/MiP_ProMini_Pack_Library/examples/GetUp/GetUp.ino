@@ -21,30 +21,23 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("GetUp.ino - Use getUp().\n"
-              "Attempt to get up from a front fall."));
+    Serial.println(F("GetUp.ino - Use getUp(). Attempt to get up from a front fall."));
 
-    int result = mip.fallDown(MIP_FALL_FACE_DOWN);
-    MIP_PRINT_ERRORS(result);
+    mip.fallForward();
     delay(3000);
 
-    result = mip.getUp(MIP_GETUP_FROM_FRONT);
-    MIP_PRINT_ERRORS(result);
+    mip.getUp(MIP_GETUP_FROM_FRONT);
     delay(3000);
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()

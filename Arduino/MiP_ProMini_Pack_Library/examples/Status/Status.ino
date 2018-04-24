@@ -13,53 +13,80 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    getStatus()
-    getLatestStatusNotification()
+    readBatteryVoltage();
+    readPosition();
+    isOnBack();
+    isFaceDown();
+    isUpright();
+    isPickedUp();
+    isHandStanding();
+    isFaceDownOnTray();
+    isOnBackWithKickstand();
 */
 #include <mip.h>
 
-// Pass false into MiP contructor to enable notifications.
-MiP     mip(false);
+MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("Status.ino - Use getStatus() and getLatestStatusNotification()."));
-
-    MiPStatus status;
-    PRINTLN(F("Call mipGetStatus()"));
-    int result = mip.getStatus(status);
-    printStatus(status);
-    MIP_PRINT_ERRORS(result);
-
-    PRINTLN(F("Waiting for next MiP status notification."));
-    while (MIP_ERROR_NONE != mip.getLatestStatusNotification(status))
-    {
-    }
-    printStatus(status);
-
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
 void loop()
 {
+    static float       lastBatteryLevel = 0.0f;
+    static MiPPosition lastPosition = (MiPPosition)-1;
+
+    float              currentBatteryLevel = mip.readBatteryVoltage();
+    MiPPosition        currentPosition = mip.readPosition();
+
+    if (currentBatteryLevel != lastBatteryLevel)
+    {
+        Serial.println(F("Battery: "));
+            Serial.print(currentBatteryLevel);
+            Serial.println(F("V"));
+        lastBatteryLevel = currentBatteryLevel;
+    }
+
+    if (currentPosition != lastPosition)
+    {
+        if (mip.isOnBack())
+        {
+            Serial.println(F("Position: On Back"));
+        }
+        if (mip.isFaceDown())
+        {
+            Serial.println(F("Position: Face Down"));
+        }
+        if (mip.isUpright())
+        {
+            Serial.println(F("Position: Upright"));
+        }
+        if (mip.isPickedUp())
+        {
+            Serial.println(F("Position: Picked Up"));
+        }
+        if (mip.isHandStanding())
+        {
+            Serial.println(F("Position: Hand Stand"));
+        }
+        if (mip.isFaceDownOnTray())
+        {
+            Serial.println(F("Position: Face Down on Tray"));
+        }
+        if (mip.isOnBackWithKickstand())
+        {
+            Serial.println(F("Position: On Back With Kickstand"));
+        }
+  
+        lastPosition = currentPosition;
+    }    
 }
 
-static void printStatus(const MiPStatus& status)
-{
-    PRINT(F("Battery voltage: "));
-        PRINTLN(status.battery);
-    PRINT(F("Position: "));
-        PRINTLN(status.position);
-}

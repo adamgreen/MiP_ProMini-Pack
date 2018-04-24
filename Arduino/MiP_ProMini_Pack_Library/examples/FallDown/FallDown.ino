@@ -13,7 +13,8 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    fallDown()
+    fallForward()
+    fallBackward()
 */
 #include <mip.h>
 
@@ -21,27 +22,39 @@ MiP     mip;
 
 void setup()
 {
-    int connectResult = mip.begin();
-    if (connectResult != 0)
+    bool connectResult = mip.begin();
+    if (!connectResult)
     {
-        Serial.begin(115200);
-        Serial.print(F("Failed connecting to MiP! Error="));
-            Serial.println(connectResult);
+        Serial.println(F("Failed connecting to MiP!"));
         return;
     }
 
-    // Use PRINT() & PRINTLN() instead of Serial.print() & Serial.println() so that output will always be
-    // sent to the PC and not to the MiP by mistake.
-    PRINTLN(F("FallDown.ino - Use fallDown().\n"
-               "Fall forward.\n"));
-    int result = mip.fallDown(MIP_FALL_FACE_DOWN);
-    MIP_PRINT_ERRORS(result);
-    delay(2000);
+    Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
 
-    PRINTLN();
-    PRINTLN(F("Sample done."));
+    Serial.println(F("Waiting for robot to be standing upright."));
+    while (!mip.isUpright())
+    {
+    }
+    delay(1000);
+
+    Serial.println(F("Falling forward."));
+    mip.fallForward();
+
+    delay(1000);
+    Serial.println(F("Waiting for robot to be standing upright again."));
+    while (!mip.isUpright())
+    {
+    }
+    delay(1000);
+
+    Serial.println(F("Falling backward."));
+    mip.fallBackward();
+
+    Serial.println();
+    Serial.println(F("Sample done."));
 }
 
 void loop()
 {
 }
+
