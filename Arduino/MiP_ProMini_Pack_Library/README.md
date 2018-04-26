@@ -1616,8 +1616,6 @@ Nothing
 
 #### Notes
 * It is possible to queue up to 20 of these distance drive commands in the MiP's memory.
-* I have found that there should be at least 0.5 seconds between queueing calls or the MiP may drop the command rather
-  than queueing it up.
 * There is no way to specify the speed to be used for driving and/or turning.
 * The distance travelled isn't super accurate.  Usually it travels further than commanded.
 
@@ -2521,6 +2519,7 @@ The current battery voltage in Volts.
 
 #### Notes
 * The MiP robot status updates, which include the battery level, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -2617,6 +2616,7 @@ One of the values from the following table:
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -2704,6 +2704,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -2791,6 +2792,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -2878,6 +2880,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -2965,6 +2968,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -3052,6 +3056,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -3139,6 +3144,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -3226,6 +3232,7 @@ None
 
 #### Notes
 * The MiP robot status updates, which include the position, may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
+* These status updates are usually sent every 30 seconds or earlier if the MiP detects a change in position.
 
 #### Example
 ```c++
@@ -3308,7 +3315,7 @@ Read the MiP robot's current estimate of how much weight it is carrying.
 None
 
 #### Returns
-A signed integer representing whether it is front heavy (positive value) or back heavy (negative value).
+A signed integer representing how much it is tilted to keep its center of mass directly over the wheels. A positive value if it is front heavy and a negative value if it is back heavy.
 
 #### Notes
 * The MiP robot weight updates may be lost if you are spending too much time sending output back to the Arduino IDE's serial monitor. See [Limitations](#limitations) section above.
@@ -3360,7 +3367,6 @@ None
 
 #### Notes
 * The MiP robot defaults to having the clap detection feature disabled after the ProMini Pack attaches.
-* Attempting to set both the clap delay and this enable state too quickly in succession (< 1 second) can cause one of them to be ignored.
 
 #### Example
 ```c++
@@ -3442,7 +3448,6 @@ None
 
 #### Notes
 * The MiP robot defaults to having the clap detection feature disabled after the ProMini Pack attaches.
-* Attempting to set both the clap delay and this enable state too quickly in succession (< 1 second) can cause one of them to be ignored.
 
 #### Example
 ```c++
@@ -3604,7 +3609,6 @@ Nothing
 #### Notes
 * *I don't know what the units are for this setting.  Maybe milliseconds?*
 * The MiP defaults to having the clap delay set to 500 after the application first connects.
-* Attempting to set both the clap delay and the clap enable state too quickly in succession (< 1 second) can cause one of them to be ignored.
 
 #### Example
 ```c++
@@ -3981,7 +3985,7 @@ public:
 #### Returns
 Nothing
 
-**Example:**
+#### Example
 ```c++
 #include <mip.h>
 
