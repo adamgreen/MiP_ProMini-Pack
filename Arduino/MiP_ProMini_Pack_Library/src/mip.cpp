@@ -1948,12 +1948,25 @@ void MiPStream::flush()
 
 void MiPStream::begin(unsigned long baud, uint8_t mode)
 {
+    if (m_isInit)
+    {
+        // Ignore redundant begin() calls.
+        return;
+    }
     m_isInit = true;
-    Serial.begin(baud, mode);
+
+    // Fix the baud rate / mode at 115200-8-N-1 since that is required by the MiP.
+    Serial.begin(115200, SERIAL_8N1);
 }
 
 void MiPStream::end()
 {
+    if (!m_isInit)
+    {
+        // Ignore end() if no begin() call has been made.
+        return;
+    }
+    
     Serial.end();
     m_isInit = false;
 }
