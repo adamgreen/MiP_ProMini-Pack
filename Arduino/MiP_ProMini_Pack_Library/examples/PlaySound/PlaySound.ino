@@ -41,6 +41,10 @@ void setup()
     mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
     mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
     mip.playSoundList(1);
+
+    // Play the sound list again after waiting for the previous play to complete.
+    delay(10000);
+    mip.playSoundList(0);
     
     Serial.println();
     Serial.println(F("Sample done."));

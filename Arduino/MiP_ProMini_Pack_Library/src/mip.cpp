@@ -934,7 +934,7 @@ void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)
 void MiP::playSoundList(uint8_t repeatCount)
 {
     // Must call beginSoundList() and addSoundToList() before calling this function.
-    MIP_ASSERT ( m_soundIndex != -1 );
+    MIP_ASSERT ( m_soundIndex >= 1 );
 
     m_playCommand[0] = MIP_CMD_PLAY_SOUND;
 
@@ -951,8 +951,8 @@ void MiP::playSoundList(uint8_t repeatCount)
     // Send this command blindly with no error checking since there is no way to determine if it has failed.
     rawSend(m_playCommand, sizeof(m_playCommand));
 
-    // Set the index to -1 to flag that there is no sound list in process of being setup.
-    m_soundIndex = -1;
+    // Set the index to 8 to flag that no more items can be added to the sound list but you can still play it again.
+    m_soundIndex = 8;
     
     m_lastError = MIP_ERROR_NONE;
 }
@@ -1948,6 +1948,10 @@ void MiPStream::flush()
 
 void MiPStream::begin(unsigned long baud, uint8_t mode)
 {
+    // Silence compiler warnings about unused parameters.
+    (void)baud;
+    (void)mode;
+    
     if (m_isInit)
     {
         // Ignore redundant begin() calls.
