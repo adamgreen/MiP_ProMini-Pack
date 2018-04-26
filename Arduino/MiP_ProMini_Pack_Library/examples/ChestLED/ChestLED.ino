@@ -29,7 +29,7 @@ void setup()
         return;
     }
 
-    Serial.println(F("SetChestLED.ino - Set Chest LED to different colors.\n"));
+    Serial.println(F("ChestLED.ino - Set Chest LED to different colors.\n"));
 
     Serial.println(F("Set chest LED to magenta."));
     uint8_t red = 0xff;

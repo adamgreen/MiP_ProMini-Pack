@@ -38,3 +38,4 @@ void loop()
         Serial.println(F("Shake detected!"));
     }
 }
+

@@ -43,3 +43,4 @@ void loop()
         lastWeight = currentWeight;
     }
 }
+
