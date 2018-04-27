@@ -1638,15 +1638,9 @@ void setup()
 
     // Queue up multiple commands to run in sequence.
     mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
-
-    // Don't queue up multiple commands too fast.
-    delay(500);
     mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
-    delay(500);
     mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
-    delay(500);
     mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
-    delay(500);
 
     Serial.println();
     Serial.println(F("Sample done."));
@@ -2084,6 +2078,10 @@ void setup()
     mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
     mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
     mip.playSoundList(1);
+
+    // Play the sound list again after waiting for the previous play to complete.
+    delay(10000);
+    mip.playSoundList(0);
     
     Serial.println();
     Serial.println(F("Sample done."));
@@ -2254,6 +2252,10 @@ void setup()
     mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
     mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
     mip.playSoundList(1);
+
+    // Play the sound list again after waiting for the previous play to complete.
+    delay(10000);
+    mip.playSoundList(0);
     
     Serial.println();
     Serial.println(F("Sample done."));
@@ -2303,6 +2305,10 @@ void setup()
     mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
     mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
     mip.playSoundList(1);
+
+    // Play the sound list again after waiting for the previous play to complete.
+    delay(10000);
+    mip.playSoundList(0);
     
     Serial.println();
     Serial.println(F("Sample done."));
