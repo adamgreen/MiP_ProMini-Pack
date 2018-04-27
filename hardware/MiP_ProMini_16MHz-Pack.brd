@@ -2417,7 +2417,7 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <attribute name="NAME" x="25.146" y="19.812" size="0.6096" layer="25" font="vector" rot="R270"/>
 </element>
 <element name="R9" library="rcl" package="R0805" value="1K" x="31.115" y="8.255" smashed="yes" rot="R90">
-<attribute name="NAME" x="29.845" y="7.62" size="0.6096" layer="25" font="vector" rot="R90"/>
+<attribute name="NAME" x="32.766" y="7.747" size="0.6096" layer="25" font="vector" rot="R90"/>
 </element>
 </elements>
 <signals>
