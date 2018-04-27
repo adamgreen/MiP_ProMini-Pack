@@ -12145,6 +12145,8 @@ Source: AVX .. aphvc.pdf</description>
 <part name="P+14" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
 <part name="P+5" library="SparkFun-Aesthetics" deviceset="3.3V" device="" value="3.3V"/>
 <part name="P+16" library="SparkFun-Aesthetics" deviceset="5V" device="" value="5V"/>
+<part name="R9" library="rcl" deviceset="R-US_" device="R0805" value="1K"/>
+<part name="GND18" library="SparkFun" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -12173,6 +12175,10 @@ MiP &lt;-&gt; Programming Port</text>
 <text x="148.59" y="7.366" size="2.54" layer="94">Original Design by: Casey Kuhns (Sparkfun)</text>
 <text x="36.322" y="169.418" size="1.27" layer="97">Short J1 to power
 board from FTDI.</text>
+<text x="218.44" y="53.34" size="1.778" layer="97" align="top-left">This 1k load is here to 
+make sure that the 3.3V 
+supply has enough load to 
+regulate properly.</text>
 </plain>
 <instances>
 <instance part="R2" gate="G$1" x="142.24" y="165.1" rot="R90"/>
@@ -12281,7 +12287,7 @@ board from FTDI.</text>
 <instance part="C7" gate="G$1" x="152.4" y="50.8"/>
 <instance part="GND16" gate="1" x="160.02" y="40.64"/>
 <instance part="GND17" gate="1" x="152.4" y="40.64"/>
-<instance part="P+9" gate="G$1" x="203.2" y="58.42"/>
+<instance part="P+9" gate="G$1" x="208.28" y="58.42"/>
 <instance part="J1" gate="G$1" x="45.72" y="160.02" rot="R90"/>
 <instance part="P+10" gate="G$1" x="50.8" y="172.72"/>
 <instance part="R12" gate="G$1" x="68.58" y="149.86" rot="R180"/>
@@ -12302,6 +12308,8 @@ board from FTDI.</text>
 <attribute name="VALUE" x="104.648" y="72.136" size="1.778" layer="96"/>
 </instance>
 <instance part="P+16" gate="G$1" x="111.76" y="68.58"/>
+<instance part="R9" gate="G$1" x="213.36" y="48.26" rot="R90"/>
+<instance part="GND18" gate="1" x="213.36" y="40.64"/>
 </instances>
 <busses>
 </busses>
@@ -12506,6 +12514,10 @@ board from FTDI.</text>
 <wire x1="152.4" y1="43.18" x2="152.4" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="C7" gate="G$1" pin="-"/>
 <pinref part="GND17" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="R9" gate="G$1" pin="1"/>
+<pinref part="GND18" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="AREF" class="0">
@@ -13175,20 +13187,6 @@ board from FTDI.</text>
 </net>
 <net name="3.3V" class="0">
 <segment>
-<pinref part="U4" gate="G$1" pin="OUT"/>
-<pinref part="P+9" gate="G$1" pin="3.3V"/>
-<wire x1="182.88" y1="55.88" x2="190.5" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="190.5" y1="55.88" x2="200.66" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="200.66" y1="55.88" x2="203.2" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="203.2" y1="55.88" x2="203.2" y2="58.42" width="0.1524" layer="91"/>
-<pinref part="C6" gate="G$1" pin="+"/>
-<wire x1="190.5" y1="53.34" x2="190.5" y2="55.88" width="0.1524" layer="91"/>
-<junction x="190.5" y="55.88"/>
-<pinref part="C5" gate="G$1" pin="1"/>
-<wire x1="200.66" y1="50.8" x2="200.66" y2="55.88" width="0.1524" layer="91"/>
-<junction x="200.66" y="55.88"/>
-</segment>
-<segment>
 <pinref part="C4" gate="G$1" pin="2"/>
 <pinref part="P+7" gate="G$1" pin="3.3V"/>
 </segment>
@@ -13213,6 +13211,24 @@ board from FTDI.</text>
 <pinref part="SJ2" gate="G$1" pin="3"/>
 <pinref part="P+5" gate="G$1" pin="3.3V"/>
 <wire x1="106.68" y1="68.58" x2="106.68" y2="66.04" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U4" gate="G$1" pin="OUT"/>
+<wire x1="182.88" y1="55.88" x2="190.5" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="190.5" y1="55.88" x2="200.66" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="C6" gate="G$1" pin="+"/>
+<wire x1="190.5" y1="53.34" x2="190.5" y2="55.88" width="0.1524" layer="91"/>
+<junction x="190.5" y="55.88"/>
+<pinref part="C5" gate="G$1" pin="1"/>
+<wire x1="200.66" y1="50.8" x2="200.66" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="R9" gate="G$1" pin="2"/>
+<wire x1="200.66" y1="55.88" x2="208.28" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="208.28" y1="55.88" x2="213.36" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="213.36" y1="55.88" x2="213.36" y2="53.34" width="0.1524" layer="91"/>
+<junction x="200.66" y="55.88"/>
+<pinref part="P+9" gate="G$1" pin="3.3V"/>
+<wire x1="208.28" y1="58.42" x2="208.28" y2="55.88" width="0.1524" layer="91"/>
+<junction x="208.28" y="55.88"/>
 </segment>
 </net>
 <net name="N$15" class="0">

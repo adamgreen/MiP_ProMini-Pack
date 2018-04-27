@@ -2416,6 +2416,9 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="R10" library="rcl" package="R0805" value="1K" x="23.876" y="18.542" smashed="yes" rot="R270">
 <attribute name="NAME" x="25.146" y="19.812" size="0.6096" layer="25" font="vector" rot="R270"/>
 </element>
+<element name="R9" library="rcl" package="R0805" value="1K" x="31.115" y="8.255" smashed="yes" rot="R90">
+<attribute name="NAME" x="29.845" y="7.62" size="0.6096" layer="25" font="vector" rot="R90"/>
+</element>
 </elements>
 <signals>
 <signal name="GND">
@@ -2487,6 +2490,7 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <via x="27.559" y="34.798" extent="1-16" drill="0.254" diameter="0.508"/>
 <via x="16.129" y="16.002" extent="1-16" drill="0.254" diameter="0.508"/>
 <via x="25.527" y="28.067" extent="1-16" drill="0.254" diameter="0.508"/>
+<contactref element="R9" pad="1"/>
 </signal>
 <signal name="AREF">
 <contactref element="C1" pad="2"/>
@@ -3191,14 +3195,9 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="30.6578" y1="49.722678125" x2="30.6832" y2="49.784" width="0.3048" layer="1" curve="-45"/>
 </signal>
 <signal name="3.3V">
-<contactref element="U4" pad="5"/>
-<contactref element="C6" pad="A"/>
-<contactref element="C5" pad="1"/>
 <contactref element="C4" pad="2"/>
 <contactref element="U3" pad="10"/>
 <contactref element="D1" pad="C"/>
-<wire x1="23.0171" y1="10.729" x2="25.654" y2="12.322" width="0.3048" layer="1"/>
-<wire x1="25.654" y1="12.322" x2="28.956" y2="11.237" width="0.3048" layer="1"/>
 <contactref element="SJ1" pad="3"/>
 <contactref element="SJ2" pad="3"/>
 <wire x1="31.3182" y1="25.908" x2="31.369" y2="24.257" width="0.3048" layer="1"/>
@@ -3216,8 +3215,6 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="34.036" y1="14.732" x2="34.036" y2="13.208" width="0.3048" layer="16"/>
 <via x="34.036" y="13.208" extent="1-16" drill="0.254" diameter="0.508"/>
 <wire x1="34.036" y1="13.208" x2="34.036" y2="11.491" width="0.3048" layer="1"/>
-<wire x1="34.036" y1="11.491" x2="33.782" y2="11.237" width="0.3048" layer="1" curve="-90"/>
-<wire x1="33.782" y1="11.237" x2="28.956" y2="11.237" width="0.3048" layer="1"/>
 <wire x1="21.379" y1="22.86" x2="20.105209375" y2="22.86" width="0.3048" layer="1"/>
 <wire x1="20.105209375" y1="22.86" x2="19.92560625" y2="22.93439375" width="0.3048" layer="1" curve="-44.999502"/>
 <wire x1="19.92560625" y1="22.93439375" x2="19.558" y2="23.302" width="0.3048" layer="1"/>
@@ -3266,6 +3263,17 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="21.59" y1="25.527" x2="19.650159375" y2="25.654" width="0.3048" layer="1"/>
 <wire x1="19.650159375" y1="25.654" x2="19.47055625" y2="25.57960625" width="0.3048" layer="1" curve="44.999502"/>
 <wire x1="19.47055625" y1="25.57960625" x2="19.1232375" y2="25.2322875" width="0.3048" layer="1"/>
+<contactref element="U4" pad="5"/>
+<contactref element="C6" pad="A"/>
+<contactref element="C5" pad="1"/>
+<contactref element="R9" pad="2"/>
+<wire x1="23.0171" y1="10.729" x2="25.654" y2="12.322" width="0.3048" layer="1"/>
+<wire x1="25.654" y1="12.322" x2="28.956" y2="11.237" width="0.3048" layer="1"/>
+<wire x1="28.956" y1="11.237" x2="30.292" y2="11.237" width="0.3048" layer="1"/>
+<wire x1="30.292" y1="11.237" x2="31.115" y2="10.414" width="0.3048" layer="1"/>
+<wire x1="31.115" y1="10.414" x2="31.115" y2="9.205" width="0.3048" layer="1"/>
+<wire x1="34.036" y1="11.491" x2="32.959" y2="10.414" width="0.3048" layer="1"/>
+<wire x1="32.959" y1="10.414" x2="31.115" y2="10.414" width="0.3048" layer="1"/>
 </signal>
 <signal name="N$15">
 <contactref element="JP1" pad="4"/>
@@ -3324,8 +3332,8 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <approved hash="19,1,95c33b4463d209a9"/>
 <approved hash="19,1,590b0aa15777c021"/>
 <approved hash="5,1,0270ef92fc69a0ef"/>
-<approved hash="19,1,bcee1e8559cec742"/>
 <approved hash="19,1,8277c36cb871c58d"/>
+<approved hash="19,1,bcee1e8559cec742"/>
 </errors>
 </board>
 </drawing>
