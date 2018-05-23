@@ -24,7 +24,7 @@ Description | Quantity | Part Number(s)
 [10uF Capacitor - 1206](https://www.digikey.com/products/en?keywords=478-8235-1-ND) | 4 | C6, C7, C13, C19
 [0.1uF Capacitor - 0805](https://www.adafruit.com/product/441) | 6 | C1, C2, C3, C4, C5, C10
 [10kΩ Resistor - 0805](https://www.adafruit.com/product/441) | 3 | R2, R4, R5
-[1kΩ Resistor - 0805](https://www.adafruit.com/product/441) | 5 | R7, R8, R9, R10, R12, R13
+[1kΩ Resistor - 0805](https://www.adafruit.com/product/441) | 6 | R7, R8, R9, R10, R12, R13
 [330Ω Resistor - 0805](https://www.adafruit.com/product/441) | 1 | R6
 [Green LED - 0603](https://www.digikey.com/products/en?keywords=160-1446-1-ND) | 2 | D3, D4
 [PTC Resettable Fuse - 1206](https://www.digikey.com/products/en?keywords=507-1802-1-ND) | 1 | F1
