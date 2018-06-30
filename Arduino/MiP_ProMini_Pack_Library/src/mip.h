@@ -457,6 +457,8 @@ public:
     void readSoftwareVersion(MiPSoftwareVersion& software);
     void readHardwareInfo(MiPHardwareInfo& hardware);
 
+    void disconnectApp();
+    
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);

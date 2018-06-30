@@ -80,6 +80,8 @@
 #define MIP_CMD_FLASH_CHEST_LED         0x89
 #define MIP_CMD_SET_HEAD_LEDS           0x8A
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
+#define MIP_CMD_DISCONNECT_APP          0xFE
+
 
 // expectResponse parameter values for transportSendRequest() parameter.
 #define MIP_EXPECT_NO_RESPONSE 0
@@ -1609,6 +1611,16 @@ int8_t MiP::rawGetHardwareInfo(MiPHardwareInfo& hardware)
     return result;
 }
 
+void MiP::disconnectApp()
+{
+    uint8_t command[1];
+
+    command[0] = MIP_CMD_DISCONNECT_APP;
+
+    // Send this command blindly with no error checking.  If it is successful the app will be disconnected, indicated
+    // by a blue chest LED.
+    rawSend(command, sizeof(command));
+}
 
 void MiP::rawSend(const uint8_t request[], size_t requestLength)
 {
