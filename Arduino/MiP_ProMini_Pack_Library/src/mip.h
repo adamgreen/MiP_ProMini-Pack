@@ -229,6 +229,19 @@ enum MiPSoundIndex
     MIP_SOUND_VOLUME_7   = 0xFE
 };
 
+enum MiPVolume
+{
+    MIP_VOLUME_OFF = 0,
+    MIP_VOLUME_1   = 1,
+    MIP_VOLUME_2   = 2,
+    MIP_VOLUME_3   = 3,
+    MIP_VOLUME_4   = 4,
+    MIP_VOLUME_5   = 5,
+    MIP_VOLUME_6   = 6,
+    MIP_VOLUME_7   = 7,
+    MIP_VOLUME_DEFAULT = 0xFF
+};
+
 enum MiPClapEnabled
 {
     MIP_CLAP_DISABLED = 0x00,
@@ -422,9 +435,11 @@ public:
     void fallBackward();
     void getUp(MiPGetUp getup = MIP_GETUP_FROM_EITHER);
 
+    void playSound(MiPSoundIndex sound, MiPVolume volume = MIP_VOLUME_DEFAULT);
+
     void beginSoundList();
-    void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay);
-    void playSoundList(uint8_t repeatCount);
+    void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay = 0, MiPVolume volume = MIP_VOLUME_DEFAULT);
+    void playSoundList(uint8_t repeatCount = 0);
 
     void writeVolume(uint8_t volume);
     uint8_t readVolume();
@@ -571,6 +586,7 @@ protected:
     int8_t                       m_lastError;
     uint8_t                      m_playCommand[1+17];
     int8_t                       m_soundIndex;
+    uint8_t                      m_playVolume;
     MiPRadar                     m_lastRadar;
     MiPStatus                    m_lastStatus;
     int8_t                       m_lastWeight;

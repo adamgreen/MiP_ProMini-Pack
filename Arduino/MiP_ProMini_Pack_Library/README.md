@@ -91,7 +91,8 @@ Motion          | [continuousDrive()](#continuousdrive)
 <br>            | [fallForward()](#fallforward)
 <br>            | [fallBackward()](#fallbackward)
 <br>            | [getUp()](#getup)
-Sound           | [beginSoundList()](#beginsoundlist)
+Sound           | [playSound()](#playsound)
+<br>            | [beginSoundList()](#beginsoundlist)
 <br>            | [addEntryToSoundList()](#addentrytosoundlist)
 <br>            | [playSoundList()](#playsoundlist)
 <br>            | [writeVolume()](#writevolume)
@@ -2043,67 +2044,14 @@ void loop()
 
 
 ---
-### beginSoundList()
-```void beginSoundList()```
+### playSound()
+```void playSound(MiPSoundIndex sound, MiPVolume volume = MIP_VOLUME_DEFAULT)```
 #### Description
-Begins the process of having the MiP robot play sounds. After calling beginSoundList(), you can call [addEntryToSoundList()](#addentrytosoundlist) to queue up sounds to play and finally have the queued up sounds start to play by calling [playSoundList()](#playsoundlist).
+Start playing a single sound immediately. You can use the [beginSoundList()](#beginsoundlist), [addEntryToSoundList()](#addentrytosoundlist), and [playSoundList()](#playsoundlist) functions instead if you want to queue up multiple sounds instead.
 
 #### Parameters
-None
-
-#### Returns
-Nothing
-
-#### Example
-```c++
-#include <mip.h>
-
-MiP     mip;
-
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
-
-    Serial.println(F("PlaySound.ino - Play a few sounds."));
-
-    // Play 2 sounds with 1 second delay between them, repeating them a second time.
-    // Play the first at a lower volume than the second.
-    mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_4, 0);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000);
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_7, 0);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
-    mip.playSoundList(1);
-
-    // Play the sound list again after waiting for the previous play to complete.
-    delay(10000);
-    mip.playSoundList(0);
-    
-    Serial.println();
-    Serial.println(F("Sample done."));
-}
-
-void loop()
-{
-}
-```
-
-
----
-### addEntryToSoundList()
-```void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)```
-#### Description
-Adds a sound or volume update entry to the sound list. Before calling addEntryToSoundList(), you must first call [beginSoundList()](#beginsoundlist) and the sounds won't start playing until you call [playSoundList()](#playsoundlist). You can add a maximum of 8 entries to the sound list.
-
-#### Parameters
-* **sound** is used to specify the index of the sound or volume control setting to be used for this entry. The MiPSoundIndex enumeration is described below.
-* **delay** is used to specify the delay in milliseconds that the MiP should wait after playing this sound before playing the next sound (if any) in the sound list. The granularity of this delay is 30 milliseconds.
+* **sound** is used to specify the index of the sound to be played. The MiPSoundIndex enumeration is described below.
+* **volume** is an optional parameter used to set the volume level to be used when playing this sound. If not specified, the volume will remain at its current value.
 
 | MiPSoundIndex |
 | ------------- |
@@ -2213,17 +2161,6 @@ Adds a sound or volume update entry to the sound list. Before calling addEntryTo
 | MIP_SOUND_SOUND_ZINGS |
 | MIP_SOUND_SHORT_MUTE_FOR_STOP |
 | MIP_SOUND_FREESTYLE_TRACKING_2 |
-| MIP_SOUND_VOLUME_OFF |
-| MIP_SOUND_VOLUME_1 |
-| MIP_SOUND_VOLUME_2 |
-| MIP_SOUND_VOLUME_3 |
-| MIP_SOUND_VOLUME_4 |
-| MIP_SOUND_VOLUME_5 |
-| MIP_SOUND_VOLUME_6 |
-| MIP_SOUND_VOLUME_7 |
-
-**MIP_SOUND_VOLUME_OFF** to **MIP_SOUND_VOLUME_7** are used as entries in the sound list to change the volume before
-playing subsequent sounds in the list.
 
 #### Returns
 Nothing
@@ -2245,19 +2182,241 @@ void setup()
 
     Serial.println(F("PlaySound.ino - Play a few sounds."));
 
+    // Play a single sound.
+    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+    delay(3000);
+
     // Play 2 sounds with 1 second delay between them, repeating them a second time.
     // Play the first at a lower volume than the second.
     mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_4, 0);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000);
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_7, 0);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
     mip.playSoundList(1);
 
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
-    mip.playSoundList(0);
+    mip.playSoundList();
+    
+    Serial.println();
+    Serial.println(F("Sample done."));
+}
+
+void loop()
+{
+}
+```
+
+
+---
+### beginSoundList()
+```void beginSoundList()```
+#### Description
+Begins the process of having the MiP robot play sounds. After calling beginSoundList(), you can call [addEntryToSoundList()](#addentrytosoundlist) to queue up sounds to play and finally have the queued up sounds start to play by calling [playSoundList()](#playsoundlist).
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP     mip;
+
+void setup()
+{
+    bool connectResult = mip.begin();
+    if (!connectResult)
+    {
+        Serial.println(F("Failed connecting to MiP!"));
+        return;
+    }
+
+    Serial.println(F("PlaySound.ino - Play a few sounds."));
+
+    // Play a single sound.
+    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+    delay(3000);
+
+    // Play 2 sounds with 1 second delay between them, repeating them a second time.
+    // Play the first at a lower volume than the second.
+    mip.beginSoundList();
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
+    mip.playSoundList(1);
+
+    // Play the sound list again after waiting for the previous play to complete.
+    delay(10000);
+    mip.playSoundList();
+    
+    Serial.println();
+    Serial.println(F("Sample done."));
+}
+
+void loop()
+{
+}
+```
+
+
+---
+### addEntryToSoundList()
+```void addEntryToSoundList(MiPSoundIndex sound)```<br>
+```void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)```<br>
+```void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay, MiPVolume volume)```<br>
+#### Description
+Adds a sound or volume update entry to the sound list. Before calling addEntryToSoundList(), you must first call [beginSoundList()](#beginsoundlist) and the sounds won't start playing until you call [playSoundList()](#playsoundlist). You can add a maximum of 8 entries to the sound list. Changing the volume levels will use up additional entries so you may actually get less than 8 sounds in the list.
+
+#### Parameters
+* **sound** is used to specify the index of the sound to be played for this entry. The MiPSoundIndex enumeration is described below.
+* **delay** is an optional parameter used to specify the delay in milliseconds that the MiP should wait after playing this sound before playing the next sound (if any) in the sound list. The granularity of this delay is 30 milliseconds. This parameter defaults to a 0 millisecond delay.
+* **volume** is an optional parameter used to set the volume level to be used when playing this sound. If not specified, the volume will remain the same as it was for the previous sound in the list.
+
+| MiPSoundIndex |
+| ------------- |
+| MIP_SOUND_ONEKHZ_500MS_8K16BIT |
+| MIP_SOUND_ACTION_BURPING |
+| MIP_SOUND_ACTION_DRINKING |
+| MIP_SOUND_ACTION_EATING |
+| MIP_SOUND_ACTION_FARTING_SHORT |
+| MIP_SOUND_ACTION_OUT_OF_BREATH |
+| MIP_SOUND_BOXING_PUNCHCONNECT_1 |
+| MIP_SOUND_BOXING_PUNCHCONNECT_2 |
+| MIP_SOUND_BOXING_PUNCHCONNECT_3 |
+| MIP_SOUND_FREESTYLE_TRACKING_1 |
+| MIP_SOUND_MIP_1 |
+| MIP_SOUND_MIP_2 |
+| MIP_SOUND_MIP_3 |
+| MIP_SOUND_MIP_APP |
+| MIP_SOUND_MIP_AWWW |
+| MIP_SOUND_MIP_BIG_SHOT |
+| MIP_SOUND_MIP_BLEH |
+| MIP_SOUND_MIP_BOOM |
+| MIP_SOUND_MIP_BYE |
+| MIP_SOUND_MIP_CONVERSE_1 |
+| MIP_SOUND_MIP_CONVERSE_2 |
+| MIP_SOUND_MIP_DROP |
+| MIP_SOUND_MIP_DUNNO |
+| MIP_SOUND_MIP_FALL_OVER_1 |
+| MIP_SOUND_MIP_FALL_OVER_2 |
+| MIP_SOUND_MIP_FIGHT |
+| MIP_SOUND_MIP_GAME |
+| MIP_SOUND_MIP_GLOAT |
+| MIP_SOUND_MIP_GO |
+| MIP_SOUND_MIP_GOGOGO |
+| MIP_SOUND_MIP_GRUNT_1 |
+| MIP_SOUND_MIP_GRUNT_2 |
+| MIP_SOUND_MIP_GRUNT_3 |
+| MIP_SOUND_MIP_HAHA_GOT_IT |
+| MIP_SOUND_MIP_HI_CONFIDENT |
+| MIP_SOUND_MIP_HI_NOT_SURE |
+| MIP_SOUND_MIP_HI_SCARED |
+| MIP_SOUND_MIP_HUH |
+| MIP_SOUND_MIP_HUMMING_1 |
+| MIP_SOUND_MIP_HUMMING_2 |
+| MIP_SOUND_MIP_HURT |
+| MIP_SOUND_MIP_HUUURGH |
+| MIP_SOUND_MIP_IN_LOVE |
+| MIP_SOUND_MIP_IT |
+| MIP_SOUND_MIP_JOKE |
+| MIP_SOUND_MIP_K |
+| MIP_SOUND_MIP_LOOP_1 |
+| MIP_SOUND_MIP_LOOP_2 |
+| MIP_SOUND_MIP_LOW_BATTERY |
+| MIP_SOUND_MIP_MIPPEE |
+| MIP_SOUND_MIP_MORE |
+| MIP_SOUND_MIP_MUAH_HA |
+| MIP_SOUND_MIP_MUSIC |
+| MIP_SOUND_MIP_OBSTACLE |
+| MIP_SOUND_MIP_OHOH |
+| MIP_SOUND_MIP_OH_YEAH |
+| MIP_SOUND_MIP_OOPSIE |
+| MIP_SOUND_MIP_OUCH_1 |
+| MIP_SOUND_MIP_OUCH_2 |
+| MIP_SOUND_MIP_PLAY |
+| MIP_SOUND_MIP_PUSH |
+| MIP_SOUND_MIP_RUN |
+| MIP_SOUND_MIP_SHAKE |
+| MIP_SOUND_MIP_SIGH |
+| MIP_SOUND_MIP_SINGING |
+| MIP_SOUND_MIP_SNEEZE |
+| MIP_SOUND_MIP_SNORE |
+| MIP_SOUND_MIP_STACK |
+| MIP_SOUND_MIP_SWIPE_1 |
+| MIP_SOUND_MIP_SWIPE_2 |
+| MIP_SOUND_MIP_TRICKS |
+| MIP_SOUND_MIP_TRIIICK |
+| MIP_SOUND_MIP_TRUMPET |
+| MIP_SOUND_MIP_WAAAAA |
+| MIP_SOUND_MIP_WAKEY |
+| MIP_SOUND_MIP_WHEEE |
+| MIP_SOUND_MIP_WHISTLING |
+| MIP_SOUND_MIP_WHOAH |
+| MIP_SOUND_MIP_WOO |
+| MIP_SOUND_MIP_YEAH |
+| MIP_SOUND_MIP_YEEESSS |
+| MIP_SOUND_MIP_YO |
+| MIP_SOUND_MIP_YUMMY |
+| MIP_SOUND_MOOD_ACTIVATED |
+| MIP_SOUND_MOOD_ANGRY |
+| MIP_SOUND_MOOD_ANXIOUS |
+| MIP_SOUND_MOOD_BORING |
+| MIP_SOUND_MOOD_CRANKY |
+| MIP_SOUND_MOOD_ENERGETIC |
+| MIP_SOUND_MOOD_EXCITED |
+| MIP_SOUND_MOOD_GIDDY |
+| MIP_SOUND_MOOD_GRUMPY |
+| MIP_SOUND_MOOD_HAPPY |
+| MIP_SOUND_MOOD_IDEA |
+| MIP_SOUND_MOOD_IMPATIENT |
+| MIP_SOUND_MOOD_NICE |
+| MIP_SOUND_MOOD_SAD |
+| MIP_SOUND_MOOD_SHORT |
+| MIP_SOUND_MOOD_SLEEPY |
+| MIP_SOUND_MOOD_TIRED |
+| MIP_SOUND_SOUND_BOOST |
+| MIP_SOUND_SOUND_CAGE |
+| MIP_SOUND_SOUND_GUNS |
+| MIP_SOUND_SOUND_ZINGS |
+| MIP_SOUND_SHORT_MUTE_FOR_STOP |
+| MIP_SOUND_FREESTYLE_TRACKING_2 |
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP     mip;
+
+void setup()
+{
+    bool connectResult = mip.begin();
+    if (!connectResult)
+    {
+        Serial.println(F("Failed connecting to MiP!"));
+        return;
+    }
+
+    Serial.println(F("PlaySound.ino - Play a few sounds."));
+
+    // Play a single sound.
+    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+    delay(3000);
+
+    // Play 2 sounds with 1 second delay between them, repeating them a second time.
+    // Play the first at a lower volume than the second.
+    mip.beginSoundList();
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
+    mip.playSoundList(1);
+
+    // Play the sound list again after waiting for the previous play to complete.
+    delay(10000);
+    mip.playSoundList();
     
     Serial.println();
     Serial.println(F("Sample done."));
@@ -2271,12 +2430,12 @@ void loop()
 
 ---
 ### playSoundList()
-```void playSoundList(uint8_t repeatCount)```
+```void playSoundList(uint8_t repeatCount = 0)```
 #### Description
 Starts playing the entries found in the sound list. Before you call playSoundList(), the sound list must have been initialized and populated with calls to [beginSoundList()](#beginsoundlist) and [addEntryToSoundList()](#addentrytosoundlist).
 
 #### Parameters
-* **repeatCount** specifies the number of times that the entries in the sound list should be repeated (0 - 255). A value of 0 means that the sound list will play once and then stop whereas a value of 1 means that it would play the sequence a total of 2 times.
+* **repeatCount** is an optional parameter which specifies the number of times that the entries in the sound list should be repeated (0 - 255). A value of 0 means that the sound list will play once and then stop whereas a value of 1 means that it would play the sequence a total of 2 times. The default value for this parameter is 0 additional repeats.
 
 #### Returns
 Nothing
@@ -2298,19 +2457,20 @@ void setup()
 
     Serial.println(F("PlaySound.ino - Play a few sounds."));
 
+    // Play a single sound.
+    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+    delay(3000);
+
     // Play 2 sounds with 1 second delay between them, repeating them a second time.
     // Play the first at a lower volume than the second.
     mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_4, 0);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000);
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_7, 0);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0);
-    mip.addEntryToSoundList(MIP_SOUND_VOLUME_1, 0);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
     mip.playSoundList(1);
 
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
-    mip.playSoundList(0);
+    mip.playSoundList();
     
     Serial.println();
     Serial.println(F("Sample done."));
