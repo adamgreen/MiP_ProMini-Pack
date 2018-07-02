@@ -37,6 +37,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * [ChestLED](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ChestLED/ChestLED.ino): Take control of the RGB LED in the chest of the MiP.
 * [Clap](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Clap/Clap.ino): Send descriptive messages to the Arduino IDE about each clap event deteced by the MiP robot.
 * [ContinuousDrive](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ContinuousDrive/ContinuousDrive.ino): You want to control the motion of the MiP in real time? This is the example for you.
+* [DisconnectApp](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DisconnectApp/DisconnectApp.ino): Disconnect all apps, including this sketch and any app that may be connected to Bluetooth.
 * [DistanceDrive](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DistanceDrive/DistanceDrive.ino): Tell the MiP robot exactly how far to travel and forget about it.
 * [DriveForwardBackward](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DriveForwardBackward/DriveForwardBackward.ino): Tell the MiP robot how long to drive forward/backward and forget about it.
 * [FallDown](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/FallDown/FallDown.ino): Tired of standing around? Command MiP to fall flat on his face.
@@ -64,6 +65,7 @@ Initialization  | [MiP()](#mip)
 <br>            | [begin()](#begin)
 <br>            | [end()](#end)
 <br>            | [isInitialized()](#isinitialized)
+<br>            | [disconnectApp()](#disconnectapp)
 Radar           | [enableRadarMode()](#enableradarmode)
 <br>            | [disableRadarMode()](#disableradarmode)
 <br>            | [isRadarModeEnabled()](#isradarmodeenabled)
@@ -4104,3 +4106,42 @@ void loop()
 {
 }
 ```
+
+
+---
+### disconnectApp()
+```void disconnectApp()```
+#### Description
+Disconnect all connected apps, including any connected to Bluetooth.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("DisconnectApp.ino - Disconnects all connected apps, including Bluetooth."));
+
+  delay(30000);
+  mip.disconnectApp();
+}
+
+void loop() {
+}
+```
+
