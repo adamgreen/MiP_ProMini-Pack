@@ -275,7 +275,7 @@ public:
         battery = 0.0f;
         position = MIP_POSITION_ON_BACK_WITH_KICKSTAND;
     }
-    
+
     float       battery;
     MiPPosition position;
 };
@@ -296,7 +296,7 @@ public:
         green = 0;
         blue = 0;
     }
-    
+
     uint16_t onTime;
     uint16_t offTime;
     uint8_t  red;
@@ -319,7 +319,7 @@ public:
         led3 = MIP_HEAD_LED_OFF;
         led4 = MIP_HEAD_LED_OFF;
     }
-    
+
     MiPHeadLED led1;
     MiPHeadLED led2;
     MiPHeadLED led3;
@@ -341,7 +341,7 @@ public:
         day = 0;
         uniqueVersion = 0;
     }
-    
+
     uint16_t year;
     uint8_t  month;
     uint8_t  day;
@@ -361,7 +361,7 @@ public:
         voiceChip = 0;
         hardware = 0;
     }
-    
+
     uint8_t voiceChip;
     uint8_t hardware;
 };
@@ -379,7 +379,7 @@ public:
         enabled = MIP_CLAP_DISABLED;
         delay = 0;
     }
-    
+
     MiPClapEnabled enabled;
     uint16_t       delay;
 };
@@ -403,8 +403,8 @@ public:
         return (m_flags & MRI_FLAG_INITIALIZED);
     }
 
-    // When calling the public functions listed below, the MiP library will try its best to handle any errors 
-    // encountered by retrying the read/write operations behind the scenes. If the worst happens and it just can't 
+    // When calling the public functions listed below, the MiP library will try its best to handle any errors
+    // encountered by retrying the read/write operations behind the scenes. If the worst happens and it just can't
     // recover from a communication issue with the MiP, it will provide details about the cause of the problem through
     // the following functions.
     int8_t lastCallResult()
@@ -496,7 +496,7 @@ public:
     bool isDanceModeEnabled();
     bool isStackModeEnabled();
     bool isTrickModeEnabled();
-    bool isRoamModeEnabled();    
+    bool isRoamModeEnabled();
 
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
@@ -633,7 +633,7 @@ class MiPStream : public Stream
 {
 public:
     MiPStream();
-    
+
     // Methods that must be implemented for Stream subclasses.
     virtual int available();
     virtual int read();
@@ -657,7 +657,7 @@ public:
 
 protected:
     void initIfNeeded();
-    
+
     bool m_isInit;
 } extern MiPStream;
 
