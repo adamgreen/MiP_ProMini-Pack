@@ -80,6 +80,9 @@
 #define MIP_CMD_FLASH_CHEST_LED         0x89
 #define MIP_CMD_SET_HEAD_LEDS           0x8A
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
+#define MIP_CMD_SLEEP                   0xFA
+#define MIP_CMD_DISCONNECT_APP          0xFE
+
 
 // expectResponse parameter values for transportSendRequest() parameter.
 #define MIP_EXPECT_NO_RESPONSE 0
@@ -204,15 +207,24 @@ void MiP::end()
 {
     if (isInitialized())
     {
-        // Send 0xFA to the MiP via UART to put the MiP to sleep.
-        const uint8_t sleepMipCommand[] = { 0xFA };
-        rawSend(sleepMipCommand, sizeof(sleepMipCommand));
+        // Send the disconnect command.  If it is successful the app will be disconnected, indicated by a 
+        // blue chest LED.
+        const uint8_t command[] = { MIP_CMD_DISCONNECT_APP };
+        rawSend(command, sizeof(command));
     }
 
     clear();
 
     MiPStream.end();
     pinMode(m_serialSelectPin, INPUT);
+}
+
+void MiP::sleep()
+{
+    // Put the MiP to sleep. 
+    // The MiP will need to be reset before another begin() will succeed.
+    const uint8_t command[] = { MIP_CMD_SLEEP };
+    rawSend(command, sizeof(command));
 }
 
 
@@ -907,23 +919,44 @@ void MiP::getUp(MiPGetUp getup /* = MIP_GETUP_FROM_EITHER */)
 }
 
 
+void MiP::playSound(MiPSoundIndex sound, MiPVolume volume /* = MIP_VOLUME_DEFAULT */)
+{
+    beginSoundList();
+    addEntryToSoundList(sound, 0, volume);
+    playSoundList();
+}
+
 void MiP::beginSoundList()
 {
     m_soundIndex = 0;
+    m_playVolume = 0xFF;
     m_lastError = MIP_ERROR_NONE;
 }
 
-void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)
+void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay /* = 0 */, MiPVolume volume /* = MIP_VOLUME_DEFAULT */)
 {
     // Must call beginSoundList() before calling this function.
     MIP_ASSERT ( m_soundIndex != -1 );
 
-    // The sound list can only hold 8 sound entries.
-    MIP_ASSERT ( m_soundIndex < 8 );
-
     // Delay is in units of 30 msecs and can't exceed 255 * 30.
     MIP_ASSERT( delay <= 255 * 30 );
 
+    // Volume can only be set to values between 0 and 7 or 0xFF (which means keep volume as it was).
+    MIP_ASSERT ( volume <= MIP_VOLUME_7 || volume == MIP_VOLUME_DEFAULT );
+
+    // Need to issue volume command if volume is being changed.
+    if (volume != MIP_VOLUME_DEFAULT && volume != m_playVolume)
+    {
+        // The sound list can only hold 8 sound entries.
+        MIP_ASSERT ( m_soundIndex < 8 );
+        m_playCommand[1 + m_soundIndex * 2] = MIP_SOUND_VOLUME_OFF + volume;
+        m_playCommand[1 + m_soundIndex * 2 + 1] = 0;
+        m_playVolume = volume;
+        m_soundIndex++;
+    }
+    
+    // The sound list can only hold 8 sound entries.
+    MIP_ASSERT ( m_soundIndex < 8 );
     m_playCommand[1 + m_soundIndex * 2] = sound;
     m_playCommand[1 + m_soundIndex * 2 + 1] = delay / 30;
     m_soundIndex++;
@@ -931,7 +964,7 @@ void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)
     m_lastError = MIP_ERROR_NONE;
 }
 
-void MiP::playSoundList(uint8_t repeatCount)
+void MiP::playSoundList(uint8_t repeatCount /* = 0 */)
 {
     // Must call beginSoundList() and addSoundToList() before calling this function.
     MIP_ASSERT ( m_soundIndex >= 1 );
@@ -1608,7 +1641,6 @@ int8_t MiP::rawGetHardwareInfo(MiPHardwareInfo& hardware)
     hardware.hardware = response[2];
     return result;
 }
-
 
 void MiP::rawSend(const uint8_t request[], size_t requestLength)
 {
