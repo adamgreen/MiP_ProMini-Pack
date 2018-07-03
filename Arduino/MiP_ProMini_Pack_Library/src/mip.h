@@ -248,6 +248,18 @@ enum MiPClapEnabled
     MIP_CLAP_ENABLED  = 0x01,
 };
 
+enum MiPGameMode
+{
+    MIP_APP_MODE      = 0x01,
+    MIP_CAGE_MODE     = 0x02,
+    MIP_TRACKING_MODE = 0x03,
+    MIP_DANCE_MODE    = 0x04,
+    MIP_DEFAULT_MODE  = 0x05,
+    MIP_STACK_MODE    = 0x06,
+    MIP_TRICK_MODE    = 0x07,
+    MIP_ROAM_MODE     = 0x08
+};
+
 
 
 class MiPStatus
@@ -473,6 +485,16 @@ public:
     void readSoftwareVersion(MiPSoftwareVersion& software);
     void readHardwareInfo(MiPHardwareInfo& hardware);
 
+    void enableAppMode();
+    void enableCageMode();
+    void enableTrackingMode();
+	void enableDanceMode();
+    void enableDefaultMode();
+    void enableStackMode();
+    void enableTrickMode();
+    void enableRoamMode();
+    MiPGameMode readGameMode();
+	
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
@@ -557,6 +579,11 @@ protected:
 
     int8_t  rawGetSoftwareVersion(MiPSoftwareVersion& software);
     int8_t  rawGetHardwareInfo(MiPHardwareInfo& hardware);
+
+    void    verifiedSetGameMode(MiPGameMode desiredMode);
+    bool    checkGameMode(MiPGameMode expectedMode);
+    void    rawSetGameMode(MiPGameMode mode);
+    int8_t  rawGetGameMode(MiPGameMode& mode);
 
     void    transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int8_t  transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
