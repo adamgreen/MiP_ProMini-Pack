@@ -492,6 +492,11 @@ public:
     void enableTrickMode();
     void enableRoamMode();
     bool isAppModeEnabled();
+    bool isCageModeEnabled();
+    bool isDanceModeEnabled();
+    bool isStackModeEnabled();
+    bool isTrickModeEnabled();
+    bool isRoamModeEnabled();    
 
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,

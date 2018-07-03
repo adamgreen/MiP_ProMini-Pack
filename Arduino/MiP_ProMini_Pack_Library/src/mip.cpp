@@ -1706,6 +1706,7 @@ bool MiP::isRoamModeEnabled()
     return checkGameMode(MIP_ROAM_MODE);
 }
 
+bool MiP::checkGameMode(MiPGameMode expectedMode)
 {
     int8_t result;
     
