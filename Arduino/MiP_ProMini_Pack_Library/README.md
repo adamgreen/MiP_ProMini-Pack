@@ -40,6 +40,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * [DisconnectApp](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DisconnectApp/DisconnectApp.ino): Disconnect all apps, including this sketch and any app that may be connected to Bluetooth.
 * [DistanceDrive](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DistanceDrive/DistanceDrive.ino): Tell the MiP robot exactly how far to travel and forget about it.
 * [DriveForwardBackward](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DriveForwardBackward/DriveForwardBackward.ino): Tell the MiP robot how long to drive forward/backward and forget about it.
+* [EnableGameMode.ino](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/EnableGameMode/EnableGameMode.ino): Cycle through each of the game modes available.
 * [FallDown](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/FallDown/FallDown.ino): Tired of standing around? Command MiP to fall flat on his face.
 * [Gesture](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Gesture/Gesture.ino): Use your hand to make gesture to your MiP robot. Send descriptive messages to the Arduio IDE about each gesture event detected.
 * [GestureRadarMode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/GestureRadarMode/GestureRadarMode.ino): Want to learn more about how to enable/disable IR based gesture and radar measurements? Check out this example.
@@ -119,6 +120,18 @@ Clap            | [enableClapEvents()](#enableclapevents)
 Shake           | [hasBeenShaken()](#hasbeenshaken)
 Version Info    | [readSoftwareVersion()](#readsoftwareversion)
 <br>            | [readHardwareInfo()](#readhardwareinfo)
+Game Modes      | [enableAppMode()](#enableappmode)
+<br>            | [enableCageMode()](#enablecagemode)
+<br>            | [enableDanceMode()](#enabledancemode)
+<br>            | [enableStackMode()](#enablestackmode)
+<br>            | [enableTrickMode()](#enabletrickmode)
+<br>            | [enableRoamMode()](#enableroammode)
+<br>            | [isAppModeEnabled()](#isappmodeenabled)
+<br>            | [isCageModeEnabled()](#iscagemodeenabled)
+<br>            | [isDanceModeEnabled()](#isdancemodeenabled)
+<br>            | [isStackModeEnabled()](#isstackmodeenabled)
+<br>            | [isTrickModeEnabled()](#istrickmodeenabled)
+<br>            | [isRoamModeEnabled()](#isroammodeenabled)
 
 
 ---
@@ -4190,7 +4203,6 @@ void loop()
 Get the version information for the software in the MiP robot.
 
 #### Parameters
-None
 * **software** is a MiPSoftwareVersion object to be filled in with the version information of the MiP robot software.
 ```c++
 class MiPSoftwareVersion
@@ -4319,5 +4331,778 @@ void setup()
 
 void loop()
 {
+}
+```
+
+
+---
+### enableAppMode()
+```void enableAppMode()```
+#### Description
+Place MiP in app mode.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### enableCageMode()
+```void enableCageMode()```
+#### Description
+Place MiP in cage mode.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### enableDanceMode()
+```void enableDanceMode()```
+#### Description
+Place MiP in dance mode.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### enableStackMode()
+```void enableStackMode()```
+#### Description
+Place MiP in stack mode.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### enableTrickMode()
+```void enableTrickMode()```
+#### Description
+Place MiP in trick mode.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### enableRoamMode()
+```void enableRoamMode()```
+#### Description
+Place MiP in roam mode.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### isAppModeEnabled()
+```bool isAppModeEnabled()```
+#### Description
+Returns whether the MiP is in app mode.
+
+#### Parameters
+None
+
+#### Returns
+* **true** if the MiP robot was successfully placed in app mode with a previous call to [enableAppMode()](#enableappmode).
+* **false** if it is not in app mode.
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### isCageModeEnabled()
+```bool isCageModeEnabled()```
+#### Description
+Returns whether the MiP is in cage mode.
+
+#### Parameters
+None
+
+#### Returns
+* **true** if the MiP robot was successfully placed in cage mode with a previous call to [enableCageMode()](#enablecagemode).
+* **false** if it is not in cage mode.
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### isDanceModeEnabled()
+```bool isDanceModeEnabled()```
+#### Description
+Returns whether the MiP is in dance mode.
+
+#### Parameters
+None
+
+#### Returns
+* **true** if the MiP robot was successfully placed in dance mode with a previous call to [enableDanceMode()](#enabledancemode).
+* **false** if it is not in dance mode.
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+---
+### isStackModeEnabled()
+```bool isStackModeEnabled()```
+#### Description
+Returns whether the MiP is in stack mode.
+
+#### Parameters
+None
+
+#### Returns
+* **true** if the MiP robot was successfully placed in stack mode with a previous call to [enableStackMode()](#enablestackmode).
+* **false** if it is not in stack mode.
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### isTrickModeEnabled()
+```bool isTrickModeEnabled()```
+#### Description
+Returns whether the MiP is in trick mode.
+
+#### Parameters
+None
+
+#### Returns
+* **true** if the MiP robot was successfully placed in trick mode with a previous call to [enableTrickMode()](#enabletrickmode).
+* **false** if it is not in trick mode.
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+---
+### isRoamModeEnabled()
+```bool isRoamModeEnabled()```
+#### Description
+Returns whether the MiP is in roam mode.
+
+#### Parameters
+None
+
+#### Returns
+* **true** if the MiP robot was successfully placed in roam mode with a previous call to [enableRoamMode()](#enableroammode).
+* **false** if it is not in roam mode.
+
+#### Example
+```c++
+#include <mip.h>
+
+static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
+
+  delay(500);
+}
+
+void loop() {
+  mip.enableCageMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
+  mip.enableDanceMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
+  mip.enableStackMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
+  mip.enableTrickMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
+  mip.enableRoamMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
+  mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
