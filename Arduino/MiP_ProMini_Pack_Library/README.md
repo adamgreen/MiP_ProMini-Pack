@@ -64,8 +64,8 @@ Group | Function
 Initialization  | [MiP()](#mip)
 <br>            | [begin()](#begin)
 <br>            | [end()](#end)
+<br>            | [sleep()](#sleep)
 <br>            | [isInitialized()](#isinitialized)
-<br>            | [disconnectApp()](#disconnectapp)
 Radar           | [enableRadarMode()](#enableradarmode)
 <br>            | [disableRadarMode()](#disableradarmode)
 <br>            | [isRadarModeEnabled()](#isradarmodeenabled)
@@ -195,7 +195,7 @@ void loop()
 ### end()
 ```void end()```
 #### Description
-Puts the MiP to sleep, disables serial communication, and allows the Serial Rx/Tx pins and serialSelectPin to be used for general input/output. The MiP robot will need to be shut off and back on to wake it from this sleep. Calling [begin()](#begin) will not wake it.
+Disconnects from the MiP, disables serial communication, and allows the Serial Rx/Tx pins and serialSelectPin to be used for general input/output.
 
 [isInitialized()](#isinitialized) will return false after end() has been called.
 
@@ -208,6 +208,61 @@ None
 #### Example
 ```c++
     mip.end();
+```
+
+
+---
+### sleep()
+```void sleep()```
+#### Description
+Puts the MiP to sleep. The MiP robot will need to be shut off and back on to wake it from this sleep. Calling [begin()](#begin) will not wake it.
+
+#### Parameters
+None
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP     mip;
+
+void setup()
+{
+    bool connectResult = mip.begin();
+    if (!connectResult)
+    {
+        Serial.begin(115200);
+        Serial.println(F("Failed connecting to MiP!"));
+        return;
+    }
+
+    Serial.println(F("Sleep.ino - Shows begin()/end()/sleep() functionality."));
+    Serial.println(F("Chest LED should be green to indicate UART connection."));
+    
+    delay(5000);
+    Serial.println(F("Disconnecting from MiP. Chest LED should revert to blue."));
+    mip.end();
+
+    delay(5000);
+    Serial.println(F("Attempting to reconnect to MiP. Chest LED should turn green again."));
+    connectResult = mip.begin();
+    if (!connectResult)
+    {
+        Serial.println(F("Failed reconnecting to MiP!"));
+        return;
+    }
+
+    delay(5000);
+    Serial.println(F("Putting MiP to sleep. Will require power cycle before it will accept UART connections again."));
+    mip.sleep();
+}
+
+void loop()
+{
+}
 ```
 
 
@@ -4266,42 +4321,3 @@ void loop()
 {
 }
 ```
-
-
----
-### disconnectApp()
-```void disconnectApp()```
-#### Description
-Disconnect all connected apps, including any connected to Bluetooth.
-
-#### Parameters
-None
-
-#### Returns
-Nothing
-
-#### Example
-```c++
-#include <mip.h>
-
-static MiP         mip;
-
-void setup() {
-  // First need to initialize the serial connection with the MiP.
-  bool connectResult = mip.begin();
-  if (!connectResult)
-  {
-    Serial.println(F("Failed connecting to MiP!"));
-    return;
-  }
-
-  Serial.println(F("DisconnectApp.ino - Disconnects all connected apps, including Bluetooth."));
-
-  delay(30000);
-  mip.disconnectApp();
-}
-
-void loop() {
-}
-```
-

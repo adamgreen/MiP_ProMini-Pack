@@ -80,6 +80,7 @@
 #define MIP_CMD_FLASH_CHEST_LED         0x89
 #define MIP_CMD_SET_HEAD_LEDS           0x8A
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
+#define MIP_CMD_SLEEP                   0xFA
 #define MIP_CMD_DISCONNECT_APP          0xFE
 
 
@@ -206,15 +207,24 @@ void MiP::end()
 {
     if (isInitialized())
     {
-        // Send 0xFA to the MiP via UART to put the MiP to sleep.
-        const uint8_t sleepMipCommand[] = { 0xFA };
-        rawSend(sleepMipCommand, sizeof(sleepMipCommand));
+        // Send the disconnect command.  If it is successful the app will be disconnected, indicated by a 
+        // blue chest LED.
+        const uint8_t command[] = { MIP_CMD_DISCONNECT_APP };
+        rawSend(command, sizeof(command));
     }
 
     clear();
 
     MiPStream.end();
     pinMode(m_serialSelectPin, INPUT);
+}
+
+void MiP::sleep()
+{
+    // Put the MiP to sleep. 
+    // The MiP will need to be reset before another begin() will succeed.
+    const uint8_t command[] = { MIP_CMD_SLEEP };
+    rawSend(command, sizeof(command));
 }
 
 
@@ -1630,17 +1640,6 @@ int8_t MiP::rawGetHardwareInfo(MiPHardwareInfo& hardware)
     hardware.voiceChip = response[1];
     hardware.hardware = response[2];
     return result;
-}
-
-void MiP::disconnectApp()
-{
-    uint8_t command[1];
-
-    command[0] = MIP_CMD_DISCONNECT_APP;
-
-    // Send this command blindly with no error checking.  If it is successful the app will be disconnected, indicated
-    // by a blue chest LED.
-    rawSend(command, sizeof(command));
 }
 
 void MiP::rawSend(const uint8_t request[], size_t requestLength)
