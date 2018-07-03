@@ -1656,19 +1656,9 @@ void MiP::enableCageMode()
     verifiedSetGameMode(MIP_CAGE_MODE);
 }
 
-void MiP::enableTrackingMode()
-{
-    verifiedSetGameMode(MIP_TRACKING_MODE);
-}
-
 void MiP::enableDanceMode()
 {
     verifiedSetGameMode(MIP_DANCE_MODE);
-}
-
-void MiP::enableDefaultMode()
-{
-    verifiedSetGameMode(MIP_DEFAULT_MODE);
 }
 
 void MiP::enableStackMode()
@@ -1686,19 +1676,46 @@ void MiP::enableRoamMode()
     verifiedSetGameMode(MIP_ROAM_MODE);
 }
 
-MiPGameMode MiP::readGameMode()
+bool MiP::isAppModeEnabled()
+{
+    return checkGameMode(MIP_APP_MODE);
+}
+
+bool MiP::isCageModeEnabled()
+{
+    return checkGameMode(MIP_CAGE_MODE);
+}
+
+bool MiP::isDanceModeEnabled()
+{
+    return checkGameMode(MIP_DANCE_MODE);
+}
+
+bool MiP::isStackModeEnabled()
+{
+    return checkGameMode(MIP_STACK_MODE);
+}
+
+bool MiP::isTrickModeEnabled()
+{
+    return checkGameMode(MIP_TRICK_MODE);
+}
+
+bool MiP::isRoamModeEnabled()
+{
+    return checkGameMode(MIP_ROAM_MODE);
+}
+
 {
     int8_t result;
-    MiPGameMode actualMode;
-			
-    // Retry the read if it should fail on the first attempt.
+    
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
     {
-        result = rawGetGameMode(actualMode);
+        MiPGameMode currentMode;
+        result = rawGetGameMode(currentMode);
         if (result == MIP_ERROR_NONE)
         {
-            m_lastError = MIP_ERROR_NONE;
-            return;
+            return currentMode == expectedMode;
         }
 
         // An error was encountered so we will loop around and try again.
@@ -1707,7 +1724,7 @@ MiPGameMode MiP::readGameMode()
     }
 
     m_lastError = result;
-	return actualMode;
+    return false;
 }
 
 // This internal protected method sends the command to change the game mode and then sends a request to get

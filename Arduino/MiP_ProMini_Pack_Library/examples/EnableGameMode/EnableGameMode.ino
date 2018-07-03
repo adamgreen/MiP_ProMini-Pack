@@ -13,11 +13,25 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    enableGameMode()
+    enableAppMode()
+    enableCageMode()
+    enableDanceMode()
+    enableStackMode()
+    enableTrickMode()
+    enableRoamMode()
+    isAppModeEnabled()
+    isCageModeEnabled()
+    isDanceModeEnabled()
+    isStackModeEnabled()
+    isTrickModeEnabled()
+    isRoamModeEnabled()
 */
 #include <mip.h>
 
 static MiP         mip;
+
+int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
+                                      // or long delays to see it in action.
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
@@ -30,32 +44,32 @@ void setup() {
 
   Serial.println(F("EnableGameMode.ino - Cycles through each mode available."));
 
-  delay(30000);
+  delay(500);
 }
 
 void loop() {
-  displayGameMode();
   mip.enableCageMode();
-  displayGameMode();
-  mip.enableTrackingMode();
-  displayGameMode();
+  delay(delayPeriod);
+  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+
   mip.enableDanceMode();
-  displayGameMode();
-  mip.enableDefaultMode();
-  displayGameMode();
+  delay(delayPeriod);
+  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+
   mip.enableStackMode();
-  displayGameMode();
+  delay(delayPeriod);
+  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+
   mip.enableTrickMode();
-  displayGameMode();
+  delay(delayPeriod);
+  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+
   mip.enableRoamMode();
-  displayGameMode();
+  delay(delayPeriod);
+  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  
   mip.enableAppMode();
+  delay(delayPeriod);
+  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
-
-void displayGameMode() {
-  delay(5000);
-  Serial.print(F("Mode: "));
-  Serial.println(mip.readGameMode());
-  delay(5000);
-}
-

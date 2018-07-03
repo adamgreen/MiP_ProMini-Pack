@@ -487,14 +487,12 @@ public:
 
     void enableAppMode();
     void enableCageMode();
-    void enableTrackingMode();
-	void enableDanceMode();
-    void enableDefaultMode();
+    void enableDanceMode();
     void enableStackMode();
     void enableTrickMode();
     void enableRoamMode();
-    MiPGameMode readGameMode();
-	
+    bool isAppModeEnabled();
+
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
