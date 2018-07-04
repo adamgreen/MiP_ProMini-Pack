@@ -1771,6 +1771,9 @@ void MiP::rawSetGameMode(MiPGameMode mode)
 {
     uint8_t command[1+1];
 
+    // Might not accept command if currently running another game mode so Stop first.
+    stop();
+    
     command[0] = MIP_CMD_SET_GAME_MODE;
     command[1] = mode;
     rawSend(command, sizeof(command));
@@ -1785,6 +1788,9 @@ int8_t MiP::rawGetGameMode(MiPGameMode& mode)
     size_t        responseLength;
     int8_t        result;
 
+    // Might not accept get game mode command when currently running a game mode so Stop first.
+    stop();
+    
     result = rawReceive(getGameMode, sizeof(getGameMode), response, sizeof(response), responseLength);
     if (result)
     {
@@ -1805,6 +1811,10 @@ int8_t MiP::rawGetGameMode(MiPGameMode& mode)
     }
 
     mode = (MiPGameMode)response[1];
+
+    // Restart the game mode now that we have successfully retrieved it.
+    rawSetGameMode(mode);
+    
     return MIP_ERROR_NONE;
 }
 

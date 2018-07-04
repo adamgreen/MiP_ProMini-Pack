@@ -28,7 +28,7 @@
 */
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
 int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
                                       // or long delays to see it in action.
@@ -49,27 +49,26 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
-  delay(delayPeriod);
   if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+  delay(delayPeriod);
 
   mip.enableDanceMode();
-  delay(delayPeriod);
   if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+  delay(delayPeriod);
 
   mip.enableStackMode();
-  delay(delayPeriod);
   if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+  delay(delayPeriod);
 
   mip.enableTrickMode();
-  delay(delayPeriod);
   if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+  delay(delayPeriod);
 
   mip.enableRoamMode();
-  delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
+  delay(delayPeriod);
   
   mip.enableAppMode();
-  delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+  delay(delayPeriod);
 }
