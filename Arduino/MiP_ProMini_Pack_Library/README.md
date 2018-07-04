@@ -4339,7 +4339,7 @@ void loop()
 ### enableAppMode()
 ```void enableAppMode()```
 #### Description
-Place MiP in app mode.
+Place MiP in app mode. The chest LED will turn green.  App mode allows the MiP to interface with applications running on either the UART port or via Bluetooth.
 
 #### Parameters
 None
@@ -4403,7 +4403,7 @@ void loop() {
 ### enableCageMode()
 ```void enableCageMode()```
 #### Description
-Place MiP in cage mode.
+Place MiP in cage mode.  The chest LED will turn white and the MiP will try to escape from you.  Place your hand in front of MiP's eyes to block its path.  MiP moves faster as the game progesses and makes victory sounds if it escapes from you.  To restart the game, clap twice.
 
 #### Parameters
 None
@@ -4467,7 +4467,7 @@ void loop() {
 ### enableDanceMode()
 ```void enableDanceMode()```
 #### Description
-Place MiP in dance mode.
+Place MiP in dance mode.  The chest LED will turn turquoise and MiP will dance around and play music.
 
 #### Parameters
 None
@@ -4531,7 +4531,7 @@ void loop() {
 ### enableStackMode()
 ```void enableStackMode()```
 #### Description
-Place MiP in stack mode.
+Place MiP in stack mode.  The chest LED will turn pink and MiP will play the stack game with you.  You will have only a few seconds to stack a heavy object or many light objects on top of the tray. If it can balance correctly, MiP will add additional time for you to stack. If you fail to reset the timer and the clock runs out, MiP spins around, tossing all the stacked items off the tray.
 
 #### Parameters
 None
@@ -4595,7 +4595,7 @@ void loop() {
 ### enableTrickMode()
 ```void enableTrickMode()```
 #### Description
-Place MiP in trick mode.
+Place MiP in trick mode.  The chest LED will flash red.  While the chest LED is flashing MiP will record your hand gestures.  MiP will signal each successful gesture by saying "OK" and lighting up its eyes.  You can record up to 50 gestures.  When complete, clap twice and MiP will replay the movements given by your gestures.
 
 #### Parameters
 None
@@ -4659,7 +4659,7 @@ void loop() {
 ### enableRoamMode()
 ```void enableRoamMode()```
 #### Description
-Place MiP in roam mode.
+Place MiP in roam mode.  The chest LED will turn yellow and roam freely, avoiding obstacles detected by the IR sensors.
 
 #### Parameters
 None
