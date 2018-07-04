@@ -498,6 +498,9 @@ public:
     bool isTrickModeEnabled();
     bool isRoamModeEnabled();
 
+    void   setUserData(byte address, byte userData);
+    int8_t getUserData(byte address, byte& userData);
+    
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
@@ -587,6 +590,10 @@ protected:
     bool    checkGameMode(MiPGameMode expectedMode);
     void    rawSetGameMode(MiPGameMode mode);
     int8_t  rawGetGameMode(MiPGameMode& mode);
+
+    void    verifiedSetUserData(byte address, byte userData);
+    void    rawSetUserData(byte address, byte userData);
+    int8_t  rawGetUserData(byte address, byte& userData);
 
     void    transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int8_t  transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);

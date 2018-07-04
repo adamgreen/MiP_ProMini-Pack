@@ -54,6 +54,8 @@
 #define MIP_CMD_SET_GESTURE_RADAR_MODE  0x0C
 #define MIP_CMD_GET_RADAR_RESPONSE      0x0C
 #define MIP_CMD_GET_GESTURE_RADAR_MODE  0x0D
+#define MIP_CMD_SET_USER_DATA           0x12
+#define MIP_CMD_GET_USER_DATA           0x13
 #define MIP_CMD_GET_SOFTWARE_VERSION    0x14
 #define MIP_CMD_SET_VOLUME              0x15
 #define MIP_CMD_GET_VOLUME              0x16
@@ -1820,6 +1822,87 @@ int8_t MiP::rawGetGameMode(MiPGameMode& mode)
 
 
 
+void MiP::setUserData(byte address, byte userData)
+{
+    verifiedSetUserData(address, userData);
+}
+
+int8_t MiP::getUserData(byte address, byte& userData)
+{
+   return rawGetUserData(address, userData);
+}
+
+void MiP::verifiedSetUserData(byte address, byte userData)
+{
+    int8_t result;
+
+    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    {
+        rawSetUserData(address, userData);
+
+        // Read back and make sure that it was set as expected.
+        byte storedData = 0x00;
+        result = rawGetUserData(address, storedData);
+        if (result == MIP_ERROR_NONE && storedData == userData)
+        {
+            // The set was successful so return immediately.
+            m_lastError = MIP_ERROR_NONE;
+            return;
+        }
+
+        // An error was encountered so we will loop around and try again.
+        // Wait for a bit before the next retry.
+        delay(MIP_RETRY_WAIT);
+    }
+
+    if (result != MIP_ERROR_NONE)
+    {
+        // Kept getting an error back from rawGetUserData().
+        m_lastError = result;
+    }
+    else
+    {
+        // rawGetUserData() was successful but didn't match the data we were expecting.
+        m_lastError = MIP_ERROR_MAX_RETRIES;
+    }
+}
+
+// This internal protected method sends the set user data command with no error checking. 
+// The error handling and recovery happens at a higher level of the driver.
+void MiP::rawSetUserData(byte address, byte userData)
+{
+    uint8_t command[1+1];
+    
+    command[0] = MIP_CMD_SET_USER_DATA;
+    command[1] = userData;
+    rawSend(command, sizeof(command));
+}
+
+// This internal protected method sends the get user data command with minimal error handling. 
+// The error and recovery happens at a higher level of the driver.
+int8_t MiP::rawGetUserData(byte address, byte& userData)
+{
+    const uint8_t getUserData[1] = { MIP_CMD_GET_USER_DATA };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int8_t        result;
+    
+    result = rawReceive(getUserData, sizeof(getUserData), response, sizeof(response), responseLength);
+    if (result)
+    {
+        return result;
+    }
+    if (responseLength != 2 || response[0] != MIP_CMD_GET_USER_DATA)
+    {
+        return MIP_ERROR_BAD_RESPONSE;
+    }
+
+    userData = (byte)response[1];    
+    return MIP_ERROR_NONE;
+}
+
+
+
 void MiP::rawSend(const uint8_t request[], size_t requestLength)
 {
     transportSendRequest(request, requestLength, MIP_EXPECT_NO_RESPONSE);
@@ -2002,6 +2085,7 @@ void MiP::processOobResponseData(uint8_t commandByte)
     case MIP_CMD_GET_GESTURE_RESPONSE:
     case MIP_CMD_CLAP_RESPONSE:
     case MIP_CMD_GET_WEIGHT:
+	case MIP_CMD_GET_USER_DATA:
         length = 1;
         break;
     case MIP_CMD_SHAKE_RESPONSE:
