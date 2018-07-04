@@ -25,7 +25,6 @@ void setup()
     bool connectResult = mip.begin();
     if (!connectResult)
     {
-        Serial.begin(115200);
         Serial.println(F("Failed connecting to MiP!"));
         return;
     }

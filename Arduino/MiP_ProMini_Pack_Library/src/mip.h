@@ -229,10 +229,35 @@ enum MiPSoundIndex
     MIP_SOUND_VOLUME_7   = 0xFE
 };
 
+enum MiPVolume
+{
+    MIP_VOLUME_OFF = 0,
+    MIP_VOLUME_1   = 1,
+    MIP_VOLUME_2   = 2,
+    MIP_VOLUME_3   = 3,
+    MIP_VOLUME_4   = 4,
+    MIP_VOLUME_5   = 5,
+    MIP_VOLUME_6   = 6,
+    MIP_VOLUME_7   = 7,
+    MIP_VOLUME_DEFAULT = 0xFF
+};
+
 enum MiPClapEnabled
 {
     MIP_CLAP_DISABLED = 0x00,
     MIP_CLAP_ENABLED  = 0x01,
+};
+
+enum MiPGameMode
+{
+    MIP_APP_MODE      = 0x01,
+    MIP_CAGE_MODE     = 0x02,
+    MIP_TRACKING_MODE = 0x03,
+    MIP_DANCE_MODE    = 0x04,
+    MIP_DEFAULT_MODE  = 0x05,
+    MIP_STACK_MODE    = 0x06,
+    MIP_TRICK_MODE    = 0x07,
+    MIP_ROAM_MODE     = 0x08
 };
 
 
@@ -250,7 +275,7 @@ public:
         battery = 0.0f;
         position = MIP_POSITION_ON_BACK_WITH_KICKSTAND;
     }
-    
+
     float       battery;
     MiPPosition position;
 };
@@ -271,7 +296,7 @@ public:
         green = 0;
         blue = 0;
     }
-    
+
     uint16_t onTime;
     uint16_t offTime;
     uint8_t  red;
@@ -294,7 +319,7 @@ public:
         led3 = MIP_HEAD_LED_OFF;
         led4 = MIP_HEAD_LED_OFF;
     }
-    
+
     MiPHeadLED led1;
     MiPHeadLED led2;
     MiPHeadLED led3;
@@ -316,7 +341,7 @@ public:
         day = 0;
         uniqueVersion = 0;
     }
-    
+
     uint16_t year;
     uint8_t  month;
     uint8_t  day;
@@ -336,7 +361,7 @@ public:
         voiceChip = 0;
         hardware = 0;
     }
-    
+
     uint8_t voiceChip;
     uint8_t hardware;
 };
@@ -354,7 +379,7 @@ public:
         enabled = MIP_CLAP_DISABLED;
         delay = 0;
     }
-    
+
     MiPClapEnabled enabled;
     uint16_t       delay;
 };
@@ -370,6 +395,7 @@ public:
 
     bool begin();
     void end();
+    void sleep();
 
     // Will return false if begin() wasn't successful in connecting to the MiP.
     bool isInitialized()
@@ -377,8 +403,8 @@ public:
         return (m_flags & MRI_FLAG_INITIALIZED);
     }
 
-    // When calling the public functions listed below, the MiP library will try its best to handle any errors 
-    // encountered by retrying the read/write operations behind the scenes. If the worst happens and it just can't 
+    // When calling the public functions listed below, the MiP library will try its best to handle any errors
+    // encountered by retrying the read/write operations behind the scenes. If the worst happens and it just can't
     // recover from a communication issue with the MiP, it will provide details about the cause of the problem through
     // the following functions.
     int8_t lastCallResult()
@@ -422,9 +448,11 @@ public:
     void fallBackward();
     void getUp(MiPGetUp getup = MIP_GETUP_FROM_EITHER);
 
+    void playSound(MiPSoundIndex sound, MiPVolume volume = MIP_VOLUME_DEFAULT);
+
     void beginSoundList();
-    void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay);
-    void playSoundList(uint8_t repeatCount);
+    void addEntryToSoundList(MiPSoundIndex sound, uint16_t delay = 0, MiPVolume volume = MIP_VOLUME_DEFAULT);
+    void playSoundList(uint8_t repeatCount = 0);
 
     void writeVolume(uint8_t volume);
     uint8_t readVolume();
@@ -456,6 +484,19 @@ public:
 
     void readSoftwareVersion(MiPSoftwareVersion& software);
     void readHardwareInfo(MiPHardwareInfo& hardware);
+
+    void enableAppMode();
+    void enableCageMode();
+    void enableDanceMode();
+    void enableStackMode();
+    void enableTrickMode();
+    void enableRoamMode();
+    bool isAppModeEnabled();
+    bool isCageModeEnabled();
+    bool isDanceModeEnabled();
+    bool isStackModeEnabled();
+    bool isTrickModeEnabled();
+    bool isRoamModeEnabled();
 
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
@@ -542,6 +583,11 @@ protected:
     int8_t  rawGetSoftwareVersion(MiPSoftwareVersion& software);
     int8_t  rawGetHardwareInfo(MiPHardwareInfo& hardware);
 
+    void    verifiedSetGameMode(MiPGameMode desiredMode);
+    bool    checkGameMode(MiPGameMode expectedMode);
+    void    rawSetGameMode(MiPGameMode mode);
+    int8_t  rawGetGameMode(MiPGameMode& mode);
+
     void    transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int8_t  transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
     bool    processAllResponseData();
@@ -569,6 +615,7 @@ protected:
     int8_t                       m_lastError;
     uint8_t                      m_playCommand[1+17];
     int8_t                       m_soundIndex;
+    uint8_t                      m_playVolume;
     MiPRadar                     m_lastRadar;
     MiPStatus                    m_lastStatus;
     int8_t                       m_lastWeight;
@@ -586,7 +633,7 @@ class MiPStream : public Stream
 {
 public:
     MiPStream();
-    
+
     // Methods that must be implemented for Stream subclasses.
     virtual int available();
     virtual int read();
@@ -610,7 +657,7 @@ public:
 
 protected:
     void initIfNeeded();
-    
+
     bool m_isInit;
 } extern MiPStream;
 

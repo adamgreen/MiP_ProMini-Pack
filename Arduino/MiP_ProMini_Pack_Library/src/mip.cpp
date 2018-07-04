@@ -69,10 +69,12 @@
 #define MIP_CMD_DRIVE_BACKWARD          0x72
 #define MIP_CMD_TURN_LEFT               0x73
 #define MIP_CMD_TURN_RIGHT              0x74
+#define MIP_CMD_SET_GAME_MODE           0x76
 #define MIP_CMD_STOP                    0x77
 #define MIP_CMD_CONTINUOUS_DRIVE        0x78
 #define MIP_CMD_GET_STATUS              0x79
 #define MIP_CMD_GET_WEIGHT              0x81
+#define MIP_CMD_GET_GAME_MODE           0x82
 #define MIP_CMD_GET_CHEST_LED           0x83
 #define MIP_CMD_SET_CHEST_LED           0x84
 #define MIP_CMD_READ_ODOMETER           0x85
@@ -80,6 +82,9 @@
 #define MIP_CMD_FLASH_CHEST_LED         0x89
 #define MIP_CMD_SET_HEAD_LEDS           0x8A
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
+#define MIP_CMD_SLEEP                   0xFA
+#define MIP_CMD_DISCONNECT_APP          0xFE
+
 
 // expectResponse parameter values for transportSendRequest() parameter.
 #define MIP_EXPECT_NO_RESPONSE 0
@@ -204,15 +209,24 @@ void MiP::end()
 {
     if (isInitialized())
     {
-        // Send 0xFA to the MiP via UART to put the MiP to sleep.
-        const uint8_t sleepMipCommand[] = { 0xFA };
-        rawSend(sleepMipCommand, sizeof(sleepMipCommand));
+        // Send the disconnect command.  If it is successful the app will be disconnected, indicated by a 
+        // blue chest LED.
+        const uint8_t command[] = { MIP_CMD_DISCONNECT_APP };
+        rawSend(command, sizeof(command));
     }
 
     clear();
 
     MiPStream.end();
     pinMode(m_serialSelectPin, INPUT);
+}
+
+void MiP::sleep()
+{
+    // Put the MiP to sleep. 
+    // The MiP will need to be reset before another begin() will succeed.
+    const uint8_t command[] = { MIP_CMD_SLEEP };
+    rawSend(command, sizeof(command));
 }
 
 
@@ -907,23 +921,44 @@ void MiP::getUp(MiPGetUp getup /* = MIP_GETUP_FROM_EITHER */)
 }
 
 
+void MiP::playSound(MiPSoundIndex sound, MiPVolume volume /* = MIP_VOLUME_DEFAULT */)
+{
+    beginSoundList();
+    addEntryToSoundList(sound, 0, volume);
+    playSoundList();
+}
+
 void MiP::beginSoundList()
 {
     m_soundIndex = 0;
+    m_playVolume = 0xFF;
     m_lastError = MIP_ERROR_NONE;
 }
 
-void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)
+void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay /* = 0 */, MiPVolume volume /* = MIP_VOLUME_DEFAULT */)
 {
     // Must call beginSoundList() before calling this function.
     MIP_ASSERT ( m_soundIndex != -1 );
 
-    // The sound list can only hold 8 sound entries.
-    MIP_ASSERT ( m_soundIndex < 8 );
-
     // Delay is in units of 30 msecs and can't exceed 255 * 30.
     MIP_ASSERT( delay <= 255 * 30 );
 
+    // Volume can only be set to values between 0 and 7 or 0xFF (which means keep volume as it was).
+    MIP_ASSERT ( volume <= MIP_VOLUME_7 || volume == MIP_VOLUME_DEFAULT );
+
+    // Need to issue volume command if volume is being changed.
+    if (volume != MIP_VOLUME_DEFAULT && volume != m_playVolume)
+    {
+        // The sound list can only hold 8 sound entries.
+        MIP_ASSERT ( m_soundIndex < 8 );
+        m_playCommand[1 + m_soundIndex * 2] = MIP_SOUND_VOLUME_OFF + volume;
+        m_playCommand[1 + m_soundIndex * 2 + 1] = 0;
+        m_playVolume = volume;
+        m_soundIndex++;
+    }
+    
+    // The sound list can only hold 8 sound entries.
+    MIP_ASSERT ( m_soundIndex < 8 );
     m_playCommand[1 + m_soundIndex * 2] = sound;
     m_playCommand[1 + m_soundIndex * 2 + 1] = delay / 30;
     m_soundIndex++;
@@ -931,7 +966,7 @@ void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay)
     m_lastError = MIP_ERROR_NONE;
 }
 
-void MiP::playSoundList(uint8_t repeatCount)
+void MiP::playSoundList(uint8_t repeatCount /* = 0 */)
 {
     // Must call beginSoundList() and addSoundToList() before calling this function.
     MIP_ASSERT ( m_soundIndex >= 1 );
@@ -1608,6 +1643,181 @@ int8_t MiP::rawGetHardwareInfo(MiPHardwareInfo& hardware)
     hardware.hardware = response[2];
     return result;
 }
+
+
+
+void MiP::enableAppMode()
+{
+    verifiedSetGameMode(MIP_APP_MODE);
+}
+
+void MiP::enableCageMode()
+{
+    verifiedSetGameMode(MIP_CAGE_MODE);
+}
+
+void MiP::enableDanceMode()
+{
+    verifiedSetGameMode(MIP_DANCE_MODE);
+}
+
+void MiP::enableStackMode()
+{
+    verifiedSetGameMode(MIP_STACK_MODE);
+}
+
+void MiP::enableTrickMode()
+{
+    verifiedSetGameMode(MIP_TRICK_MODE);
+}
+
+void MiP::enableRoamMode()
+{
+    verifiedSetGameMode(MIP_ROAM_MODE);
+}
+
+bool MiP::isAppModeEnabled()
+{
+    return checkGameMode(MIP_APP_MODE);
+}
+
+bool MiP::isCageModeEnabled()
+{
+    return checkGameMode(MIP_CAGE_MODE);
+}
+
+bool MiP::isDanceModeEnabled()
+{
+    return checkGameMode(MIP_DANCE_MODE);
+}
+
+bool MiP::isStackModeEnabled()
+{
+    return checkGameMode(MIP_STACK_MODE);
+}
+
+bool MiP::isTrickModeEnabled()
+{
+    return checkGameMode(MIP_TRICK_MODE);
+}
+
+bool MiP::isRoamModeEnabled()
+{
+    return checkGameMode(MIP_ROAM_MODE);
+}
+
+bool MiP::checkGameMode(MiPGameMode expectedMode)
+{
+    int8_t result;
+    
+    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    {
+        MiPGameMode currentMode;
+        result = rawGetGameMode(currentMode);
+        if (result == MIP_ERROR_NONE)
+        {
+            return currentMode == expectedMode;
+        }
+
+        // An error was encountered so we will loop around and try again.
+        // Wait for a bit before the next retry.
+        delay(MIP_RETRY_WAIT);
+    }
+
+    m_lastError = result;
+    return false;
+}
+
+// This internal protected method sends the command to change the game mode and then sends a request to get
+// the new mode. If this request fails or the new mode isn't as expected, it will retry the command.
+void MiP::verifiedSetGameMode(MiPGameMode desiredMode)
+{
+    int8_t result;
+
+    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    {
+        rawSetGameMode(desiredMode);
+
+        // Read back and make sure that it was set as expected.
+        MiPGameMode actualMode;
+        result = rawGetGameMode(actualMode);
+        if (result == MIP_ERROR_NONE && actualMode == desiredMode)
+        {
+            // The set was successful so return immediately.
+            m_lastError = MIP_ERROR_NONE;
+            return;
+        }
+
+        // An error was encountered so we will loop around and try again.
+        // Wait for a bit before the next retry.
+        delay(MIP_RETRY_WAIT);
+    }
+
+    if (result != MIP_ERROR_NONE)
+    {
+        // Kept getting an error back from rawGetGameMode().
+        m_lastError = result;
+    }
+    else
+    {
+        // rawGetGameMode() was successful but didn't match mode to which we were attempting to change.
+        m_lastError = MIP_ERROR_MAX_RETRIES;
+    }
+}
+
+// This internal protected method sends the set game mode command with no error checking. The error handling /
+// recovery happens at a higher level of the driver.
+void MiP::rawSetGameMode(MiPGameMode mode)
+{
+    uint8_t command[1+1];
+
+    // Might not accept command if currently running another game mode so Stop first.
+    stop();
+    
+    command[0] = MIP_CMD_SET_GAME_MODE;
+    command[1] = mode;
+    rawSend(command, sizeof(command));
+}
+
+// This internal protected method sends the get game mode command with minimal error handling. The error 
+// recovery happens at a higher level of the driver.
+int8_t MiP::rawGetGameMode(MiPGameMode& mode)
+{
+    const uint8_t getGameMode[1] = { MIP_CMD_GET_GAME_MODE };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int8_t        result;
+
+    // Might not accept get game mode command when currently running a game mode so Stop first.
+    stop();
+    
+    result = rawReceive(getGameMode, sizeof(getGameMode), response, sizeof(response), responseLength);
+    if (result)
+    {
+        return result;
+    }
+    if (responseLength != 2 ||
+        response[0] != MIP_CMD_GET_GAME_MODE ||
+        (response[1] != MIP_APP_MODE &&
+         response[1] != MIP_CAGE_MODE &&
+         response[1] != MIP_TRACKING_MODE &&
+         response[1] != MIP_DANCE_MODE &&
+         response[1] != MIP_DEFAULT_MODE &&
+         response[1] != MIP_STACK_MODE &&
+         response[1] != MIP_TRICK_MODE &&
+         response[1] != MIP_ROAM_MODE))
+    {
+        return MIP_ERROR_BAD_RESPONSE;
+    }
+
+    mode = (MiPGameMode)response[1];
+
+    // Restart the game mode now that we have successfully retrieved it.
+    rawSetGameMode(mode);
+    
+    return MIP_ERROR_NONE;
+}
+
 
 
 void MiP::rawSend(const uint8_t request[], size_t requestLength)
