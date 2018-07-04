@@ -132,6 +132,8 @@ Game Modes      | [enableAppMode()](#enableappmode)
 <br>            | [isStackModeEnabled()](#isstackmodeenabled)
 <br>            | [isTrickModeEnabled()](#istrickmodeenabled)
 <br>            | [isRoamModeEnabled()](#isroammodeenabled)
+EEPROM          | [setUserData()](#setUserData)
+<br>            | [getUserData()](#getUserData)
 
 
 ---
@@ -745,7 +747,7 @@ Switches the MiP robot's head mounted IR sensors into gesture detection mode. On
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * When enableGestureMode() is called, radar mode will be disabled. If you later enable radar mode, gesture mode will be disabled.
@@ -823,7 +825,7 @@ Switches the MiP robot's head mounted IR sensors out of gesture detection mode.
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * Calling disableGestureMode() actually disables all IR sensing so it will also shutdown radar mode as well.
@@ -5104,5 +5106,112 @@ void loop() {
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+
+---
+### setUserData()
+```void setUserData(byte address, byte userData)```
+#### Description
+Stores one byte of user data to the address specified.  Valid addresses are 0x20-0x2F.
+
+#### Parameters
+* **address** is the address at which to write the user's data.
+* **userData** is the one byte of data to be written to EEPROM.
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP         mip;
+const byte eepromAddress = 0x20;
+byte secretPassword = 0x0A;
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("ReadWriteEeprom.ino - Writes data to EEPROM and reads it back."));
+
+  Serial.print(F("Original password: "));
+  Serial.println(secretPassword);
+  
+  mip.setUserData(eepromAddress, secretPassword);
+  
+  // "Scramble" the secret password.
+  secretPassword = 0xFF;
+  Serial.print(F("Scrambled password: "));
+  Serial.println(secretPassword);
+
+  mip.getUserData(eepromAddress, secretPassword);
+  Serial.print(F("Recovered password: "));
+  Serial.print(secretPassword);
+}
+
+void loop() {
+}
+```
+
+
+
+---
+### getUserData()
+```int8_t getUserData(byte address, byte userData)```
+#### Description
+Reads one byte of user data from the address specified.  Valid addresses are 0x20-0x2F.
+
+#### Parameters
+* **address** is the address at which to read the user's data.
+* **userData** is the buffer in which to store the data read from EEPROM.
+
+#### Returns
+* **0** if the read was successful.
+* **1-4** if an error was detected.
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP         mip;
+const byte eepromAddress = 0x20;
+byte secretPassword = 0x0A;
+
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("ReadWriteEeprom.ino - Writes data to EEPROM and reads it back."));
+
+  Serial.print(F("Original password: "));
+  Serial.println(secretPassword);
+  
+  mip.setUserData(eepromAddress, secretPassword);
+  
+  // "Scramble" the secret password.
+  secretPassword = 0xFF;
+  Serial.print(F("Scrambled password: "));
+  Serial.println(secretPassword);
+
+  mip.getUserData(eepromAddress, secretPassword);
+  Serial.print(F("Recovered password: "));
+  Serial.print(secretPassword);
+}
+
+void loop() {
 }
 ```
