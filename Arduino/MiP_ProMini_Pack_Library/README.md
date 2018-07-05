@@ -28,7 +28,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
   * Weight updates
   * Shake events
 * If you are sending a lot of data to the Arduino IDE in between MiP function calls, you might cause these updates/events to be lost.
-* There is a LED labelled **MiP UART** towards the lower right corner of the MiP ProMini Pack. This will be lit when Serial is switched to exchange data with the MiP. 
+* There is a LED labelled **MiP UART** towards the lower right corner of the MiP ProMini Pack. This will be lit when Serial is switched to exchange data with the MiP.
 * If you see that it is off most of the time, then you are likely to miss these updates/events.
 * If you find your code isn't receiving expected updates/events then double check that you aren't sending too much data to the Arduino IDE.
 * It is probably best to not attempt receiving data sent from the Arduino IDE. Calling functions like ```Serial.read()``` from your code is likely to read MiP updates and not Arduino IDE data from the Serial receive buffer.
@@ -40,7 +40,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * [DisconnectApp](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DisconnectApp/DisconnectApp.ino): Disconnect all apps, including this sketch and any app that may be connected to Bluetooth.
 * [DistanceDrive](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DistanceDrive/DistanceDrive.ino): Tell the MiP robot exactly how far to travel and forget about it.
 * [DriveForwardBackward](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/DriveForwardBackward/DriveForwardBackward.ino): Tell the MiP robot how long to drive forward/backward and forget about it.
-* [EnableGameMode.ino](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/EnableGameMode/EnableGameMode.ino): Cycle through each of the game modes available.
+* [EnableGameMode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/EnableGameMode/EnableGameMode.ino): Cycle through each of the game modes available.
 * [FallDown](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/FallDown/FallDown.ino): Tired of standing around? Command MiP to fall flat on his face.
 * [Gesture](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Gesture/Gesture.ino): Use your hand to make gesture to your MiP robot. Send descriptive messages to the Arduio IDE about each gesture event detected.
 * [GestureRadarMode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/GestureRadarMode/GestureRadarMode.ino): Want to learn more about how to enable/disable IR based gesture and radar measurements? Check out this example.
@@ -50,6 +50,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * [PlaySound](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/PlaySound/PlaySound.ino): Learn how to get the MiP robot vocalizing under your control!
 * [Radar](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Radar/Radar.ino): Is there anything in front of your MiP robot? This example sends descriptive text to the Arduino IDE when it detects changes in the obstacles around it.
 * [RawSendReceive](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/RawSendReceive/RawSendReceive.ino): You found a command in WowWee's Protocol Specification that isn't supported by this library? This example shows you how to experiment with these new commands.
+* [ReadWriteEeprom](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReadWriteEeprom/ReadWriteEeprom.ino): Read and write your own data to MiP's EEPROM. This is useful for storing data across power cycles. See also [ZeroEeprom](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ZeroEeprom/ZeroEeprom.ino).
 * [SRSdemo](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SRSdemo/SRSdemo.ino): The MiP robot made an appearance at the [Seattle Robotics Society](http://www.seattlerobotics.org) meeting on April 21st, 2018. This is what he was running!
 * [Shake](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Shake/Shake.ino): Is someone shaking your poor little MiP robot? This example shows you how to detect such rudeness and report it to the Arduino IDE.
 * [SoftwareHardwareVersion](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SoftwareHardwareVersion/SoftwareHardwareVersion.ino): This example shows you how to peek under the covers and see what hardware / software is running inside your MiP robot.
@@ -58,6 +59,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * [TurnLeftRight](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/TurnLeftRight/TurnLeftRight.ino): Tell the MiP robot exactly how many degrees to turn and forget about it.
 * [Volume](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Volume/Volume.ino): Your MiP robot is too loud? Turn down the volume with this example.
 * [Weight](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Weight/Weight.ino): Detect weight changes in what the MiP is carrying and report them to the Arduino IDE.
+* [ZeroEeprom](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ZeroEeprom/ZeroEeprom.ino): Write zeroes to each available byte in EEPROM. See also [ReadWriteEeprom](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReadWriteEeprom/ReadWriteEeprom.ino).
 
 ## Functions
 Group | Function
@@ -132,6 +134,8 @@ Game Modes      | [enableAppMode()](#enableappmode)
 <br>            | [isStackModeEnabled()](#isstackmodeenabled)
 <br>            | [isTrickModeEnabled()](#istrickmodeenabled)
 <br>            | [isRoamModeEnabled()](#isroammodeenabled)
+EEPROM          | [setUserData()](#setUserData)
+<br>            | [getUserData()](#getUserData)
 
 
 ---
@@ -199,7 +203,7 @@ void setup()
 
 void loop()
 {
-    // ... 
+    // ...
 }
 ```
 
@@ -254,7 +258,7 @@ void setup()
 
     Serial.println(F("Sleep.ino - Shows begin()/end()/sleep() functionality."));
     Serial.println(F("Chest LED should be green to indicate UART connection."));
-    
+
     delay(5000);
     Serial.println(F("Disconnecting from MiP. Chest LED should revert to blue."));
     mip.end();
@@ -745,7 +749,7 @@ Switches the MiP robot's head mounted IR sensors into gesture detection mode. On
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * When enableGestureMode() is called, radar mode will be disabled. If you later enable radar mode, gesture mode will be disabled.
@@ -823,7 +827,7 @@ Switches the MiP robot's head mounted IR sensors out of gesture detection mode.
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * Calling disableGestureMode() actually disables all IR sensing so it will also shutdown radar mode as well.
@@ -1273,7 +1277,7 @@ static void printCurrentChestLEDSetting()
 {
     MiPChestLED chestLED;
     mip.readChestLED(chestLED);
-    
+
     Serial.println(F("Current Chest LED Setting"));
     Serial.print(F("    red: "));
         Serial.println(chestLED.red);
@@ -1373,7 +1377,7 @@ static void printCurrentChestLEDSetting()
 {
     MiPChestLED chestLED;
     mip.readChestLED(chestLED);
-    
+
     Serial.println(F("Current Chest LED Setting"));
     Serial.print(F("    red: "));
         Serial.println(chestLED.red);
@@ -1440,7 +1444,7 @@ void setup()
 
     Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
     mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
-  
+
     MiPHeadLEDs headLEDs;
     mip.readHeadLEDs(headLEDs);
     Serial.println(F("Head LEDs"));
@@ -1454,12 +1458,12 @@ void setup()
         printLEDString(headLEDs.led4);
 
     delay(4000);
-    
+
     // Turn all the LEDs back on now.
     Serial.println(F("Turning all eye LEDs back on now."));
     headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
     mip.writeHeadLEDs(headLEDs);
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }
@@ -1535,7 +1539,7 @@ void setup()
 
     Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
     mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
-  
+
     MiPHeadLEDs headLEDs;
     mip.readHeadLEDs(headLEDs);
     Serial.println(F("Head LEDs"));
@@ -1549,12 +1553,12 @@ void setup()
         printLEDString(headLEDs.led4);
 
     delay(4000);
-    
+
     // Turn all the LEDs back on now.
     Serial.println(F("Turning all eye LEDs back on now."));
     headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
     mip.writeHeadLEDs(headLEDs);
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }
@@ -1626,7 +1630,7 @@ void setup()
 
 void loop()
 {
-    static enum States 
+    static enum States
     {
         RIGHT_TURN,
         LEFT_TURN,
@@ -2264,7 +2268,7 @@ void setup()
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
     mip.playSoundList();
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }
@@ -2318,7 +2322,7 @@ void setup()
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
     mip.playSoundList();
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }
@@ -2485,7 +2489,7 @@ void setup()
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
     mip.playSoundList();
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }
@@ -2539,7 +2543,7 @@ void setup()
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
     mip.playSoundList();
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }
@@ -2821,9 +2825,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -2918,9 +2922,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3006,9 +3010,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3094,9 +3098,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3182,9 +3186,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3270,9 +3274,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3358,9 +3362,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3446,9 +3450,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3534,9 +3538,9 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
+
         lastPosition = currentPosition;
-    }    
+    }
 }
 ```
 
@@ -3639,7 +3643,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -3720,7 +3724,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -3799,7 +3803,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -3881,7 +3885,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -3959,7 +3963,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -4041,7 +4045,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -4124,7 +4128,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -4391,7 +4395,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4455,7 +4459,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4519,7 +4523,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4583,7 +4587,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4647,7 +4651,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4711,7 +4715,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4776,7 +4780,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4841,7 +4845,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4906,7 +4910,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -4970,7 +4974,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -5035,7 +5039,7 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
@@ -5100,9 +5104,116 @@ void loop() {
   delay(delayPeriod);
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   mip.stop();                         // MiP will not switch out of roaming mode while moving.
-  
+
   mip.enableAppMode();
   delay(delayPeriod);
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+}
+```
+
+
+
+---
+### setUserData()
+```void setUserData(uint8_t addressOffset, uint8_t userData)```
+#### Description
+Stores one byte of user data to the offset specified.  Valid offsets are 0x00-0x0F.
+
+#### Parameters
+* **addressOffset** is the address offset at which to write the user's data.
+* **userData** is the one byte of data to be written to EEPROM.
+
+#### Returns
+Nothing
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP           mip;
+const uint8_t eepromAddressOffset = 0x00;     // Use an offset between 0x00 and 0x0F.
+uint8_t       secretPassword = 0x0D;          // Try different hex values here to see them stored and
+                                              // recovered from EEPROM.
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("ReadWriteEeprom.ino - Writes data to EEPROM and reads it back."));
+
+  Serial.print(F("Original password: "));
+  Serial.println(secretPassword, HEX);
+
+  // Power-off the MiP, comment out this line, recompile and load to the ProMini-Pack to see EEPROM
+  // data preserved across power cycles.
+  mip.setUserData(eepromAddressOffset, secretPassword);
+
+  // "Scramble" the secret password.
+  secretPassword = 0xFF;
+  Serial.print(F("Scrambled password: "));
+  Serial.println(secretPassword, HEX);
+
+  Serial.print(F("Recovered password: "));
+  Serial.print(mip.getUserData(eepromAddressOffset), HEX);
+}
+
+void loop() {
+}
+```
+
+
+
+---
+### getUserData()
+```uint8_t getUserData(uint8_t addressOffset)```
+#### Description
+Reads one byte of user data from the address offset specified.  Valid addresses are 0x00-0x0F.
+
+#### Parameters
+* **addressOffset** is the address at which to read stored data.
+
+#### Returns
+* The contents of the EEPROM read from the given address offset.
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP           mip;
+const uint8_t eepromAddressOffset = 0x00;     // Use an offset between 0x00 and 0x0F.
+uint8_t       secretPassword = 0x0D;          // Try different hex values here to see them stored and
+                                              // recovered from EEPROM.
+void setup() {
+  // First need to initialize the serial connection with the MiP.
+  bool connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("ReadWriteEeprom.ino - Writes data to EEPROM and reads it back."));
+
+  Serial.print(F("Original password: "));
+  Serial.println(secretPassword, HEX);
+
+  // Power-off the MiP, comment out this line, recompile and load to the ProMini-Pack to see EEPROM
+  // data preserved across power cycles.
+  mip.setUserData(eepromAddressOffset, secretPassword);
+
+  // "Scramble" the secret password.
+  secretPassword = 0xFF;
+  Serial.print(F("Scrambled password: "));
+  Serial.println(secretPassword, HEX);
+
+  Serial.print(F("Recovered password: "));
+  Serial.print(mip.getUserData(eepromAddressOffset), HEX);
+}
+
+void loop() {
 }
 ```

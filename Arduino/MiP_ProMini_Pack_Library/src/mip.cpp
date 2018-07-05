@@ -36,14 +36,19 @@
 #define MIP_RESPONSE_TIMEOUT 100
 
 // Delay between requests sent to MiP (in milliseconds). If the user attempts to send requests to the MiP faster than
-// this, the library will busy wait and only continue with the request after this amount of time has passed. The MiP 
+// this, the library will busy wait and only continue with the request after this amount of time has passed. The MiP
 // will sometimes ignore requests sent faster than this.
 #define MIP_REQUEST_DELAY 8
 
-// Delay between continuousDrive requests sent to MiP (in milliseconds). continuousDrive() will just ignore faster 
+// Delay between continuousDrive requests sent to MiP (in milliseconds). continuousDrive() will just ignore faster
 // requests.
 #define MIP_CONTINUOUS_DRIVE_DELAY 50
 
+// EEPROM base address.  When reading or writing to EEPROM the user will pass an offset that is added to this base address.
+#define MIP_BASE_EEPROM_ADDRESS 0x20
+
+// Last addressable address in EEPROM.
+#define MIP_LAST_EEPROM_ADDRESS 0x2F
 
 // MiP Protocol Commands.
 // These command codes are placed in the first byte of requests sent to the MiP and responses sent back from the MiP.
@@ -54,6 +59,8 @@
 #define MIP_CMD_SET_GESTURE_RADAR_MODE  0x0C
 #define MIP_CMD_GET_RADAR_RESPONSE      0x0C
 #define MIP_CMD_GET_GESTURE_RADAR_MODE  0x0D
+#define MIP_CMD_SET_USER_DATA           0x12
+#define MIP_CMD_GET_USER_DATA           0x13
 #define MIP_CMD_GET_SOFTWARE_VERSION    0x14
 #define MIP_CMD_SET_VOLUME              0x15
 #define MIP_CMD_GET_VOLUME              0x16
@@ -155,7 +162,7 @@ bool MiP::begin()
 
     // The MiP requires the UART to communicate at 115200-N-8-1.
     // Call MiPStream.begin() instead of Serial.begin() directly so that it can track the begin/end state. This allows
-    // it to know that it should automatically initialize the Serial stream to 115200 if the user attempts to write to 
+    // it to know that it should automatically initialize the Serial stream to 115200 if the user attempts to write to
     // it before calling this MiP::begin method.
     MiPStream.begin(115200);
     Serial.setTimeout(MIP_RESPONSE_TIMEOUT);
@@ -209,7 +216,7 @@ void MiP::end()
 {
     if (isInitialized())
     {
-        // Send the disconnect command.  If it is successful the app will be disconnected, indicated by a 
+        // Send the disconnect command.  If it is successful the app will be disconnected, indicated by a
         // blue chest LED.
         const uint8_t command[] = { MIP_CMD_DISCONNECT_APP };
         rawSend(command, sizeof(command));
@@ -223,7 +230,7 @@ void MiP::end()
 
 void MiP::sleep()
 {
-    // Put the MiP to sleep. 
+    // Put the MiP to sleep.
     // The MiP will need to be reset before another begin() will succeed.
     const uint8_t command[] = { MIP_CMD_SLEEP };
     rawSend(command, sizeof(command));
@@ -236,22 +243,22 @@ void MiP::printLastCallResult()
     if (m_lastError != MIP_ERROR_NONE)
     {
         MiPStream.print(F("mip: MiP API returned "));
-        switch (m_lastError) 
+        switch (m_lastError)
         {
-        case MIP_ERROR_TIMEOUT: 
+        case MIP_ERROR_TIMEOUT:
             MiPStream.println(F("MIP_ERROR_TIMEOUT (Timed out waiting for response)"));
             break;
-        case MIP_ERROR_NO_EVENT: 
+        case MIP_ERROR_NO_EVENT:
             MiPStream.println(F("MIP_ERROR_NO_EVENT (No event has arrived from MiP yet)"));
             break;
-        case MIP_ERROR_BAD_RESPONSE: 
-            MiPStream.println(F("MIP_ERROR_BAD_RESPONSE (Unexpected response from MiP)")); 
+        case MIP_ERROR_BAD_RESPONSE:
+            MiPStream.println(F("MIP_ERROR_BAD_RESPONSE (Unexpected response from MiP)"));
             break;
         case MIP_ERROR_MAX_RETRIES:
             MiPStream.println(F("MIP_ERROR_MAX_RETRIES (Exceeded maximum number of retries to get this operation to succeed)"));
             break;
-        default: 
-            MiPStream.println(F("unknown error")); 
+        default:
+            MiPStream.println(F("unknown error"));
             break;
         }
     }
@@ -338,7 +345,7 @@ bool MiP::areGestureAndRadarModesDisabled()
 bool MiP::checkGestureRadarMode(MiPGestureRadarMode expectedMode)
 {
     int8_t result;
-    
+
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
     {
         MiPGestureRadarMode currentMode;
@@ -407,7 +414,7 @@ void MiP::rawSetGestureRadarMode(MiPGestureRadarMode mode)
     rawSend(command, sizeof(command));
 }
 
-// This internal protected method sends the get gesture/radar mode command with minimal error handling. The error 
+// This internal protected method sends the get gesture/radar mode command with minimal error handling. The error
 // recovery happens at a higher level of the driver.
 int8_t MiP::rawGetGestureRadarMode(MiPGestureRadarMode& mode)
 {
@@ -452,7 +459,7 @@ void MiP::writeChestLED(uint8_t red, uint8_t green, uint8_t blue)
         // Read back and make sure that it was set as expected.
         MiPChestLED actualChestLED;
         result = rawGetChestLED(actualChestLED);
-        if (result == MIP_ERROR_NONE && 
+        if (result == MIP_ERROR_NONE &&
             actualChestLED.red == red &&
             actualChestLED.green == green &&
             actualChestLED.blue == blue)
@@ -490,7 +497,7 @@ void MiP::writeChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTim
 
     // The blue channel is actually only 6-bit and not a full 8-bit so zero out lower 2 bits (the MiP does this too).
     blue &= ~3;
-    
+
     // Send the set command and then issue the corresponding get command. Retry if the get fails or doesn't return the
     // expected new setting.
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
@@ -500,7 +507,7 @@ void MiP::writeChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTim
         // Read back and make sure that it was set as expected.
         MiPChestLED actualChestLED;
         result = rawGetChestLED(actualChestLED);
-        if (result == MIP_ERROR_NONE && 
+        if (result == MIP_ERROR_NONE &&
             actualChestLED.red == red &&
             actualChestLED.green == green &&
             actualChestLED.blue == blue &&
@@ -618,7 +625,7 @@ int8_t MiP::rawGetChestLED(MiPChestLED& chestLED)
 void MiP::writeHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4)
 {
     int8_t result;
-    
+
     // Send the set command and then issue the corresponding get command. Retry if the get fails or doesn't return the
     // expected new setting.
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
@@ -628,7 +635,7 @@ void MiP::writeHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHe
         // Read back and make sure that it was set as expected.
         MiPHeadLEDs headLEDs;
         result = rawGetHeadLEDs(headLEDs);
-        if (result == MIP_ERROR_NONE && 
+        if (result == MIP_ERROR_NONE &&
             headLEDs.led1 == led1 &&
             headLEDs.led2 == led2 &&
             headLEDs.led3 == led3 &&
@@ -664,7 +671,7 @@ void MiP::writeHeadLEDs(const MiPHeadLEDs& headLEDs)
 void MiP::readHeadLEDs(MiPHeadLEDs& headLEDs)
 {
     int8_t result;
-    
+
     // Retry the read if it should fail on the first attempt.
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
     {
@@ -956,7 +963,7 @@ void MiP::addEntryToSoundList(MiPSoundIndex sound, uint16_t delay /* = 0 */, MiP
         m_playVolume = volume;
         m_soundIndex++;
     }
-    
+
     // The sound list can only hold 8 sound entries.
     MIP_ASSERT ( m_soundIndex < 8 );
     m_playCommand[1 + m_soundIndex * 2] = sound;
@@ -988,14 +995,14 @@ void MiP::playSoundList(uint8_t repeatCount /* = 0 */)
 
     // Set the index to 8 to flag that no more items can be added to the sound list but you can still play it again.
     m_soundIndex = 8;
-    
+
     m_lastError = MIP_ERROR_NONE;
 }
 
 void MiP::writeVolume(uint8_t volume)
 {
     int8_t result;
-    
+
     // Send the set command and then issue the corresponding get command. Retry if the get fails or doesn't return the
     // expected new setting.
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
@@ -1162,7 +1169,7 @@ float MiP::readBatteryVoltage()
 {
     // Fetch bytes from the Serial receive buffer and process any event data found within.
     processAllResponseData();
-    
+
     m_lastError = MIP_ERROR_NONE;
     return m_lastStatus.battery;
 }
@@ -1171,7 +1178,7 @@ MiPPosition MiP::readPosition()
 {
     // Fetch bytes from the Serial receive buffer and process any event data found within.
     processAllResponseData();
-    
+
     m_lastError = MIP_ERROR_NONE;
     return m_lastStatus.position;
 }
@@ -1251,7 +1258,7 @@ int8_t MiP::readWeight()
 {
     // Fetch bytes from the Serial receive buffer and process any event data found within.
     processAllResponseData();
-    
+
     if ((m_flags & MIP_FLAG_WEIGHT_VALID))
     {
         // Have a cached weight event already, so just return it.
@@ -1331,7 +1338,7 @@ void MiP::disableClapEvents()
 void MiP::checkedEnableClapEvents(MiPClapEnabled enabled)
 {
     int8_t result;
-    
+
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
     {
         rawEnableClap(enabled);
@@ -1366,7 +1373,7 @@ void MiP::checkedEnableClapEvents(MiPClapEnabled enabled)
 void MiP::writeClapDelay(uint16_t delayTime)
 {
     int8_t result;
-    
+
     // Send the set command and then issue the corresponding get command. Retry if the get fails or doesn't return the
     // expected new setting.
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
@@ -1709,7 +1716,7 @@ bool MiP::isRoamModeEnabled()
 bool MiP::checkGameMode(MiPGameMode expectedMode)
 {
     int8_t result;
-    
+
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
     {
         MiPGameMode currentMode;
@@ -1773,13 +1780,13 @@ void MiP::rawSetGameMode(MiPGameMode mode)
 
     // Might not accept command if currently running another game mode so Stop first.
     stop();
-    
+
     command[0] = MIP_CMD_SET_GAME_MODE;
     command[1] = mode;
     rawSend(command, sizeof(command));
 }
 
-// This internal protected method sends the get game mode command with minimal error handling. The error 
+// This internal protected method sends the get game mode command with minimal error handling. The error
 // recovery happens at a higher level of the driver.
 int8_t MiP::rawGetGameMode(MiPGameMode& mode)
 {
@@ -1790,7 +1797,7 @@ int8_t MiP::rawGetGameMode(MiPGameMode& mode)
 
     // Might not accept get game mode command when currently running a game mode so Stop first.
     stop();
-    
+
     result = rawReceive(getGameMode, sizeof(getGameMode), response, sizeof(response), responseLength);
     if (result)
     {
@@ -1814,7 +1821,117 @@ int8_t MiP::rawGetGameMode(MiPGameMode& mode)
 
     // Restart the game mode now that we have successfully retrieved it.
     rawSetGameMode(mode);
-    
+
+    return MIP_ERROR_NONE;
+}
+
+
+
+void MiP::setUserData(uint8_t addressOffset, uint8_t userData)
+{
+    uint8_t address = MIP_BASE_EEPROM_ADDRESS + addressOffset;
+
+    // address must be between 0x20 and 0x2F, inclusive.
+    MIP_ASSERT( MIP_BASE_EEPROM_ADDRESS <= address && address <= MIP_LAST_EEPROM_ADDRESS );
+
+    int8_t result;
+
+
+    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    {
+        rawSetUserData(address, userData);
+
+        // Read back and make sure that it was set as expected.
+        byte storedData = 0x00;
+        result = rawGetUserData(address, storedData);
+        if (result == MIP_ERROR_NONE && storedData == userData)
+        {
+            // The set was successful so return immediately.
+            m_lastError = MIP_ERROR_NONE;
+            return;
+        }
+
+        // An error was encountered so we will loop around and try again.
+        // Wait for a bit before the next retry.
+        delay(MIP_RETRY_WAIT);
+    }
+
+    if (result != MIP_ERROR_NONE)
+    {
+        // Kept getting an error back from rawGetUserData().
+        m_lastError = result;
+    }
+    else
+    {
+        // rawGetUserData() was successful but didn't match the data we were expecting.
+        m_lastError = MIP_ERROR_MAX_RETRIES;
+    }
+}
+
+uint8_t MiP::getUserData(uint8_t addressOffset)
+{
+    uint8_t address = MIP_BASE_EEPROM_ADDRESS + addressOffset;
+
+    // address must be between 0x20 and 0x2F, inclusive.
+    MIP_ASSERT( MIP_BASE_EEPROM_ADDRESS <= address && address <= MIP_LAST_EEPROM_ADDRESS );
+
+   int8_t result;
+
+    // Retry the read if it should fail on the first attempt.
+    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    {
+        uint8_t storedData;
+        result = rawGetUserData(address, storedData);
+        if (result == MIP_ERROR_NONE)
+        {
+            m_lastError = MIP_ERROR_NONE;
+            return storedData;
+        }
+
+        // An error was encountered so we will loop around and try again.
+        // Wait for a bit before the next retry.
+        delay(MIP_RETRY_WAIT);
+    }
+
+    m_lastError = result;
+    return 0;
+}
+
+// This internal protected method sends the set user data command with no error checking.
+// The error handling and recovery happens at a higher level of the driver.
+void MiP::rawSetUserData(uint8_t address, uint8_t userData)
+{
+    uint8_t command[1+2];
+
+    command[0] = MIP_CMD_SET_USER_DATA;
+    command[1] = address;
+    command[2] = userData;
+    rawSend(command, sizeof(command));
+}
+
+// This internal protected method sends the get user data command with minimal error handling.
+// The error and recovery happens at a higher level of the driver.
+int8_t MiP::rawGetUserData(uint8_t address, uint8_t& userData)
+{
+    uint8_t getUserData[1+1] = { MIP_CMD_GET_USER_DATA };
+    getUserData[1] = address;
+    uint8_t       response[1+2];
+    size_t        responseLength;
+    int8_t        result;
+
+    result = rawReceive(getUserData, sizeof(getUserData), response, sizeof(response), responseLength);
+    if (result)
+    {
+        return result;
+    }
+    if (responseLength != 3 ||
+        response[0] != MIP_CMD_GET_USER_DATA ||
+        response[1] != address)
+    {
+        return MIP_ERROR_BAD_RESPONSE;
+    }
+
+    userData = (uint8_t)response[2];
     return MIP_ERROR_NONE;
 }
 
@@ -1845,7 +1962,7 @@ void MiP::transportSendRequest(const uint8_t* pRequest, size_t requestLength, in
     while (millis() - m_lastRequestTime < MIP_REQUEST_DELAY)
     {
     }
-    
+
     // Remember the command byte (first byte) if expecting a response to this request since the response should start
     // with the same byte.
     if (expectResponse)
@@ -1927,7 +2044,7 @@ bool MiP::processAllResponseData()
             // Store away the command byte that we just read into response buffer so that it isn't lost.
             m_responseBuffer[0] = commandByte;
 
-            // Already read the command byte into element 0 of the response buffer earlier so just need to read in the 
+            // Already read the command byte into element 0 of the response buffer earlier so just need to read in the
             // rest of the expected response bytes now.
             bytesToRead = m_expectedResponseSize - 1;
             bytesRead = Serial.readBytes(buffer, bytesToRead * 2);
@@ -1947,7 +2064,7 @@ bool MiP::processAllResponseData()
                 m_responseBuffer[0] = 0;
                 MiPStream.print(F("MiP: Response too short: "));
                     MiPStream.print(bytesRead);
-                    MiPStream.print(','); 
+                    MiPStream.print(',');
                     MiPStream.println(bytesToRead * 2);
                 break;
             }
@@ -2027,7 +2144,7 @@ void MiP::processOobResponseData(uint8_t commandByte)
     {
         MiPStream.print(F("MiP: OOB too short: "));
             MiPStream.print(bytesRead);
-            MiPStream.print(','); 
+            MiPStream.print(',');
             MiPStream.println(length * 2);
         return;
     }
@@ -2076,7 +2193,7 @@ void MiP::processOobResponseData(uint8_t commandByte)
 uint8_t MiP::discardUnexpectedSerialData()
 {
     uint8_t discardedBytes = 0;
-    
+
     // Unexpected response data encountered. Throw away all data in serial buffer since it is hard to tell
     // where next response begins.
     while (Serial.available() > 0)
@@ -2124,7 +2241,7 @@ size_t MiPStream::write(uint8_t byte)
     bool needToRestore = MiP::isInstanceSerialGoingToMiP();
     MiP::switchInstanceSerialToPC();
     size_t result = Serial.write(byte);
-    if (needToRestore) 
+    if (needToRestore)
     {
         MiP::switchInstanceSerialToMiP();
     }
@@ -2137,7 +2254,7 @@ size_t MiPStream::write(const uint8_t *pBuffer, size_t size)
     bool needToRestore = MiP::isInstanceSerialGoingToMiP();
     MiP::switchInstanceSerialToPC();
     size_t result = Serial.write(pBuffer, size);
-    if (needToRestore) 
+    if (needToRestore)
     {
         MiP::switchInstanceSerialToMiP();
     }
@@ -2161,7 +2278,7 @@ void MiPStream::begin(unsigned long baud, uint8_t mode)
     // Silence compiler warnings about unused parameters.
     (void)baud;
     (void)mode;
-    
+
     if (m_isInit)
     {
         // Ignore redundant begin() calls.
@@ -2180,7 +2297,7 @@ void MiPStream::end()
         // Ignore end() if no begin() call has been made.
         return;
     }
-    
+
     Serial.end();
     m_isInit = false;
 }
