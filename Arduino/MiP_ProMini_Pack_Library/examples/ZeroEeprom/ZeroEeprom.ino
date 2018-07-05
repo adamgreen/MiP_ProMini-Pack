@@ -18,10 +18,10 @@
 */
 #include <mip.h>
 
-MiP           mip;
-const uint8_t eepromAddressOffset = 0x00;     // Use an offset between 0x00 and 0x0F.
-uint8_t       secretPassword = 0x0D;          // Try different hex values here to see them stored and
-                                              // recovered from EEPROM.
+MiP     mip;
+uint8_t eepromContents;
+char    outputString;
+
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
@@ -31,22 +31,14 @@ void setup() {
     return;
   }
 
-  Serial.println(F("ReadWriteEeprom.ino - Writes data to EEPROM and reads it back."));
+  Serial.println(F("ZeroEeprom.ino - Writes zeros to each byte in EEPROM."));
 
-  Serial.print(F("Original password: "));
-  Serial.println(secretPassword, HEX);
+  for (uint8_t i = 0x00; i <= 0x0F; i++) { // Variable i is the EEPROM address offset where we will start writing zeroes.
+    mip.setUserData(i, 0x00);
+    delay(1000);
 
-  // Power-off the MiP, comment out this line, recompile and load to the ProMini-Pack to see EEPROM
-  // data preserved across power cycles.
-  mip.setUserData(eepromAddressOffset, secretPassword);
-
-  // "Scramble" the secret password.
-  secretPassword = 0xFF;
-  Serial.print(F("Scrambled password: "));
-  Serial.println(secretPassword, HEX);
-
-  Serial.print(F("Recovered password: "));
-  Serial.print(mip.getUserData(eepromAddressOffset), HEX);
+    Serial.print("0x2"); Serial.print(i, HEX); Serial.print(": "); Serial.print("0x0"); Serial.println(mip.getUserData(i), HEX);
+  }
 }
 
 void loop() {
