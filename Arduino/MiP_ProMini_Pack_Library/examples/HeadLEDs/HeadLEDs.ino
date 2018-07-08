@@ -20,63 +20,59 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
-    mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+  Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
+  mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
 
-    MiPHeadLEDs headLEDs;
-    mip.readHeadLEDs(headLEDs);
-    Serial.println(F("Head LEDs"));
-    Serial.print(F("    led1: "));
-        printLEDString(headLEDs.led1);
-    Serial.print(F("    led2: "));
-        printLEDString(headLEDs.led2);
-    Serial.print(F("    led3: "));
-        printLEDString(headLEDs.led3);
-    Serial.print(F("    led4: "));
-        printLEDString(headLEDs.led4);
+  MiPHeadLEDs headLEDs;
+  mip.readHeadLEDs(headLEDs);
+  Serial.println(F("Head LEDs"));
+  Serial.print(F("    led1: "));
+    printLEDString(headLEDs.led1);
+  Serial.print(F("    led2: "));
+    printLEDString(headLEDs.led2);
+  Serial.print(F("    led3: "));
+    printLEDString(headLEDs.led3);
+  Serial.print(F("    led4: "));
+    printLEDString(headLEDs.led4);
 
-    delay(4000);
+  delay(4000);
 
-    // Turn all the LEDs back on now.
-    Serial.println(F("Turning all eye LEDs back on now."));
-    headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
-    mip.writeHeadLEDs(headLEDs);
+  // Turn all the LEDs back on now.
+  Serial.println(F("Turning all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.writeHeadLEDs(headLEDs);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-static void printLEDString(MiPHeadLED led)
-{
-    switch (led)
-    {
+static void printLEDString(MiPHeadLED led) {
+  switch (led) {
     case MIP_HEAD_LED_OFF:
-        Serial.println(F("Off"));
-        break;
+      Serial.println(F("Off"));
+      break;
     case MIP_HEAD_LED_ON:
-        Serial.println(F("On"));
-        break;
+      Serial.println(F("On"));
+      break;
     case MIP_HEAD_LED_BLINK_SLOW:
-        Serial.println(F("Blink Slow"));
-        break;
+      Serial.println(F("Blink Slow"));
+      break;
     case MIP_HEAD_LED_BLINK_FAST:
-        Serial.println(F("Blink Fast"));
-        break;
+      Serial.println(F("Blink Fast"));
+      break;
     default:
-        Serial.println();
-        break;
-    }
+      Serial.println();
+      break;
+  }
 }
 
-void loop()
-{
+void loop() {
 }
+

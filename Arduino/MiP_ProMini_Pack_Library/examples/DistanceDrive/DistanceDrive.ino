@@ -19,28 +19,25 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("DistanceDrive.ino - Use distanceDrive function. Drive forward, turn 360 degrees in each direction and backward."));
+  Serial.println(F("DistanceDrive.ino - Use distanceDrive function. Drive forward, turn 360 degrees in each direction and backward."));
 
-    // Queue up multiple commands to run in sequence.
-    mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
-    mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
-    mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
-    mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
+  // Queue up multiple commands to run in sequence.
+  mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+  mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
+  mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
+  mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 

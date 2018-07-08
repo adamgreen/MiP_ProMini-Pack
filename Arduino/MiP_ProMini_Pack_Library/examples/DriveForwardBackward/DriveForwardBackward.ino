@@ -20,27 +20,24 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions. Drive ahead and back, 1 second in each direction."));
+  Serial.println(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions. Drive ahead and back, 1 second in each direction."));
 
-    mip.driveForward(15, 1000);
-    delay(2000);
-    mip.driveBackward(15, 1000);
-    delay(2000);
+  mip.driveForward(15, 1000);
+  delay(2000);
+  mip.driveBackward(15, 1000);
+  delay(2000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 

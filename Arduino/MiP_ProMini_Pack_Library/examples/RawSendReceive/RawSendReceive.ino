@@ -20,46 +20,42 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("RawSendReceive.ino - Use raw*() functions.\n"
-                     "Should set chest LED to purple and display MiP firmware revision"));
+  Serial.println(F("RawSendReceive.ino - Use raw*() functions.\n"
+                   "Should set chest LED to purple and display MiP firmware revision"));
 
-    // Send 4-byte MiP command to set Chest LED to Purple.
-    uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
-    mip.rawSend(setChestPurple, sizeof(setChestPurple)-1);
-  mip.printLastCallResult();
+  // Send 4-byte MiP command to set Chest LED to Purple.
+  uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
+  mip.rawSend(setChestPurple, sizeof(setChestPurple) - 1);
 
-    // Request the MiP firmware revision information and display it.
-    uint8_t getMiPSoftwareVersion[] = "\x14";
-    size_t  responseLength = 0;
-    uint8_t response[5];
-    int result = mip.rawReceive(getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion)-1,
-                                response, sizeof(response), responseLength);
-    if (result == MIP_ERROR_NONE && responseLength == 5 && response[0] == 0x14)
-    {
-        Serial.print(F("MiP Software Version: "));
-            Serial.print(response[1] + 2000);
-            Serial.print('-');
-            Serial.print(response[2]);
-            Serial.print('-');
-            Serial.print(response[3]);
-            Serial.print(F(" (build #"));
-            Serial.print(response[4]);
-            Serial.print(')');
-    }
+  // Request the MiP firmware revision information and display it.
+  uint8_t getMiPSoftwareVersion[] = "\x14";
+  size_t  responseLength = 0;
+  uint8_t response[5];
+  int result = mip.rawReceive(getMiPSoftwareVersion, sizeof(getMiPSoftwareVersion) - 1,
+                              response, sizeof(response), responseLength);
+  if (result == MIP_ERROR_NONE && responseLength == 5 && response[0] == 0x14) {
+    Serial.print(F("MiP Software Version: "));
+    Serial.print(response[1] + 2000);
+    Serial.print('-');
+    Serial.print(response[2]);
+    Serial.print('-');
+    Serial.print(response[3]);
+    Serial.print(F(" (build #"));
+    Serial.print(response[4]);
+    Serial.print(')');
+  }
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
+

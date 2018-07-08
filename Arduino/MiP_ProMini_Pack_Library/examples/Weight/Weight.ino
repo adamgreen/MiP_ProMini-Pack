@@ -19,28 +19,24 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Weight.ino - Use weight update functions."));
+  Serial.println(F("Weight.ino - Use weight update functions."));
 }
 
-void loop()
-{
-    static int8_t lastWeight = -128;
-    int8_t currentWeight = mip.readWeight();
+void loop() {
+  static int8_t lastWeight = -128;
+  int8_t currentWeight = mip.readWeight();
 
-    if (currentWeight != lastWeight)
-    {
-        Serial.print(F("Weight = "));
-          Serial.println(currentWeight);
-        lastWeight = currentWeight;
-    }
+  if (currentWeight != lastWeight) {
+    Serial.print(F("Weight = "));
+      Serial.println(currentWeight);
+    lastWeight = currentWeight;
+  }
 }
 

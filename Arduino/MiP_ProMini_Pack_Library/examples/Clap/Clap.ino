@@ -25,60 +25,51 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
+

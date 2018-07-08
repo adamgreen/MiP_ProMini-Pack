@@ -20,27 +20,24 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
+  Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
 
-    mip.turnLeft(180, 12);
-    delay(2000);
-    mip.turnRight(180, 12);
-    delay(2000);
+  mip.turnLeft(180, 12);
+  delay(2000);
+  mip.turnRight(180, 12);
+  delay(2000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 
