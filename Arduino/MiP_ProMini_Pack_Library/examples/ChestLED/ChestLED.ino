@@ -72,7 +72,7 @@ static void printCurrentChestLEDSetting()
 {
     MiPChestLED chestLED;
     mip.readChestLED(chestLED);
-    
+
     Serial.println(F("Current Chest LED Setting"));
     Serial.print(F("    red: "));
         Serial.println(chestLED.red);
@@ -88,4 +88,3 @@ static void printCurrentChestLEDSetting()
         Serial.println(F(" milliseconds"));
     Serial.println();
 }
-

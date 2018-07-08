@@ -47,7 +47,7 @@ void setup()
     // Play the sound list again after waiting for the previous play to complete.
     delay(10000);
     mip.playSoundList();
-    
+
     Serial.println();
     Serial.println(F("Sample done."));
 }

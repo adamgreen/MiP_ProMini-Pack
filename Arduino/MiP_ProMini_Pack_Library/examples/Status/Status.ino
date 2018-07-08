@@ -85,8 +85,7 @@ void loop()
         {
             Serial.println(F("Position: On Back With Kickstand"));
         }
-  
-        lastPosition = currentPosition;
-    }    
-}
 
+        lastPosition = currentPosition;
+    }
+}

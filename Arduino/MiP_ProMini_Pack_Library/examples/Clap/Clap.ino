@@ -54,7 +54,7 @@ void setup()
     uint16_t delay = mip.readClapDelay();
     Serial.print(F("readClapDelay() returns "));
     Serial.println(delay);
-        
+
     Serial.println(F("Calling enableClapEvents()"));
     mip.enableClapEvents();
     isEnabled = mip.areClapEventsEnabled();
@@ -82,4 +82,3 @@ void loop()
             Serial.println(F(" claps"));
     }
 }
-

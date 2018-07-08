@@ -67,7 +67,7 @@ void loop() {
   mip.enableRoamMode();
   if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
   delay(delayPeriod);
-  
+
   mip.enableAppMode();
   if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
   delay(delayPeriod);

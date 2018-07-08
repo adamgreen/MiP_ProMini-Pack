@@ -36,7 +36,7 @@ void setup()
     uint8_t setChestPurple[] = "\x84\xFF\x01\xFF";
     mip.rawSend(setChestPurple, sizeof(setChestPurple)-1);
   mip.printLastCallResult();
-  
+
     // Request the MiP firmware revision information and display it.
     uint8_t getMiPSoftwareVersion[] = "\x14";
     size_t  responseLength = 0;

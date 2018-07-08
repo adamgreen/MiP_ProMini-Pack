@@ -30,7 +30,7 @@ void setup()
 
     Serial.println(F("Sleep.ino - Shows begin()/end()/sleep() functionality."));
     Serial.println(F("Chest LED should be green to indicate UART connection."));
-    
+
     delay(5000);
     Serial.println(F("Disconnecting from MiP. Chest LED should revert to blue."));
     mip.end();

@@ -33,7 +33,7 @@ void setup()
 
 void loop()
 {
-    static enum States 
+    static enum States
     {
         RIGHT_TURN,
         LEFT_TURN,
