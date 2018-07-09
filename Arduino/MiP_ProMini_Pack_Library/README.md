@@ -187,23 +187,20 @@ None
 // Setup new MiP object.
 MiP     mip;
 
-void setup()
-{
-    // Call begin() to initialize the MiP robot.
-    // Returns false if it fails to initialize the MiP robot.
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  // Call begin() to initialize the MiP robot.
+  // Returns false if it fails to initialize the MiP robot.
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    // ...
+  // ...
 }
 
-void loop()
-{
-    // ...
+void loop() {
+  // ...
 }
 ```
 
@@ -224,7 +221,7 @@ None
 
 #### Example
 ```c++
-    mip.end();
+  mip.end();
 ```
 
 
@@ -246,39 +243,34 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.begin(115200);
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Sleep.ino - Shows begin()/end()/sleep() functionality."));
-    Serial.println(F("Chest LED should be green to indicate UART connection."));
+  Serial.println(F("Sleep.ino - Shows begin()/end()/sleep() functionality."));
+  Serial.println(F("Chest LED should be green to indicate UART connection."));
 
-    delay(5000);
-    Serial.println(F("Disconnecting from MiP. Chest LED should revert to blue."));
-    mip.end();
+  delay(5000);
+  Serial.println(F("Disconnecting from MiP. Chest LED should revert to blue."));
+  mip.end();
 
-    delay(5000);
-    Serial.println(F("Attempting to reconnect to MiP. Chest LED should turn green again."));
-    connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed reconnecting to MiP!"));
-        return;
-    }
+  delay(5000);
+  Serial.println(F("Attempting to reconnect to MiP. Chest LED should turn green again."));
+  connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed reconnecting to MiP!"));
+    return;
+  }
 
-    delay(5000);
-    Serial.println(F("Putting MiP to sleep. Will require power cycle before it will accept UART connections again."));
-    mip.sleep();
+  delay(5000);
+  Serial.println(F("Putting MiP to sleep. Will require power cycle before it will accept UART connections again."));
+  mip.sleep();
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -298,10 +290,9 @@ None
 
 #### Example
 ```c++
-    if (!mip.isInitialized())
-    {
-        // Handle the fact that the MiP robot hasn't been initialized yet.
-    }
+  if (!mip.isInitialized()) {
+    // Handle the fact that the MiP robot hasn't been initialized yet.
+  }
 ```
 
 
@@ -326,48 +317,43 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Radar.ino - Display current radar readings to user."));
+  Serial.println(F("Radar.ino - Display current radar readings to user."));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    mip.enableRadarMode();
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  mip.enableRadarMode();
 }
 
-void loop()
-{
-    static MiPRadar lastRadar = MIP_RADAR_INVALID;
-    MiPRadar        currentRadar = mip.readRadar();
+void loop() {
+  static MiPRadar lastRadar = MIP_RADAR_INVALID;
+  MiPRadar        currentRadar = mip.readRadar();
 
-    if (currentRadar != MIP_RADAR_INVALID && lastRadar != currentRadar)
-    {
-        Serial.print(F("Radar = "));
-        switch(currentRadar)
-        {
-        case MIP_RADAR_NONE:
-            Serial.println(F("None"));
-            break;
-        case MIP_RADAR_10CM_30CM:
-            Serial.println(F("10cm - 30cm"));
-            break;
-        case MIP_RADAR_0CM_10CM:
-            Serial.println(F("0cm - 10cm"));
-            break;
-        default:
-            break;
-        }
-        lastRadar = currentRadar;
+  if (currentRadar != MIP_RADAR_INVALID && lastRadar != currentRadar) {
+    Serial.print(F("Radar = "));
+    switch (currentRadar) {
+      case MIP_RADAR_NONE:
+        Serial.println(F("None"));
+        break;
+      case MIP_RADAR_10CM_30CM:
+        Serial.println(F("10cm - 30cm"));
+        break;
+      case MIP_RADAR_0CM_10CM:
+        Serial.println(F("0cm - 10cm"));
+        break;
+      default:
+        break;
     }
+    lastRadar = currentRadar;
+  }
 }
 ```
 
@@ -393,80 +379,62 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
+  Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
 
-    Serial.println(F("Calling mip.enableRadarMode()"));
-    mip.enableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableRadarMode()"));
+  mip.enableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableRadarMode()"));
-    mip.disableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
+  Serial.println(F("Calling mip.disableRadarMode()"));
+  mip.disableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
 
-    Serial.println(F("Calling mip.enableGestureMode()"));
-    mip.enableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableGestureMode()"));
+  mip.enableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableGestureMode()"));
-    mip.disableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
-    Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
-    if (mip.areGestureAndRadarModesDisabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.disableGestureMode()"));
+  mip.disableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
+  Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
+  if (mip.areGestureAndRadarModesDisabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -490,80 +458,62 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
+  Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
 
-    Serial.println(F("Calling mip.enableRadarMode()"));
-    mip.enableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableRadarMode()"));
+  mip.enableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableRadarMode()"));
-    mip.disableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
+  Serial.println(F("Calling mip.disableRadarMode()"));
+  mip.disableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
 
-    Serial.println(F("Calling mip.enableGestureMode()"));
-    mip.enableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableGestureMode()"));
+  mip.enableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableGestureMode()"));
-    mip.disableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
-    Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
-    if (mip.areGestureAndRadarModesDisabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.disableGestureMode()"));
+  mip.disableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
+  Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
+  if (mip.areGestureAndRadarModesDisabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -587,80 +537,62 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
+  Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
 
-    Serial.println(F("Calling mip.enableRadarMode()"));
-    mip.enableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableRadarMode()"));
+  mip.enableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableRadarMode()"));
-    mip.disableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
+  Serial.println(F("Calling mip.disableRadarMode()"));
+  mip.disableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
 
-    Serial.println(F("Calling mip.enableGestureMode()"));
-    mip.enableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableGestureMode()"));
+  mip.enableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableGestureMode()"));
-    mip.disableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
-    Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
-    if (mip.areGestureAndRadarModesDisabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.disableGestureMode()"));
+  mip.disableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
+  Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
+  if (mip.areGestureAndRadarModesDisabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -693,48 +625,43 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Radar.ino - Display current radar readings to user."));
+  Serial.println(F("Radar.ino - Display current radar readings to user."));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    mip.enableRadarMode();
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  mip.enableRadarMode();
 }
 
-void loop()
-{
-    static MiPRadar lastRadar = MIP_RADAR_INVALID;
-    MiPRadar        currentRadar = mip.readRadar();
+void loop() {
+  static MiPRadar lastRadar = MIP_RADAR_INVALID;
+  MiPRadar        currentRadar = mip.readRadar();
 
-    if (currentRadar != MIP_RADAR_INVALID && lastRadar != currentRadar)
-    {
-        Serial.print(F("Radar = "));
-        switch(currentRadar)
-        {
-        case MIP_RADAR_NONE:
-            Serial.println(F("None"));
-            break;
-        case MIP_RADAR_10CM_30CM:
-            Serial.println(F("10cm - 30cm"));
-            break;
-        case MIP_RADAR_0CM_10CM:
-            Serial.println(F("0cm - 10cm"));
-            break;
-        default:
-            break;
-        }
-        lastRadar = currentRadar;
+  if (currentRadar != MIP_RADAR_INVALID && lastRadar != currentRadar) {
+    Serial.print(F("Radar = "));
+    switch (currentRadar) {
+      case MIP_RADAR_NONE:
+        Serial.println(F("None"));
+        break;
+      case MIP_RADAR_10CM_30CM:
+        Serial.println(F("10cm - 30cm"));
+        break;
+      case MIP_RADAR_0CM_10CM:
+        Serial.println(F("0cm - 10cm"));
+        break;
+      default:
+        break;
     }
+    lastRadar = currentRadar;
+  }
 }
 ```
 
@@ -760,59 +687,54 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
+  Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    mip.enableGestureMode();
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  mip.enableGestureMode();
 }
 
-void loop()
-{
-    while (mip.availableGestureEvents() > 0)
-    {
-        MiPGesture gesture = mip.readGestureEvent();
-        Serial.print(F("Detected "));
-        switch (gesture)
-        {
-        case MIP_GESTURE_LEFT:
-            Serial.println(F("Left gesture!"));
-            break;
-        case MIP_GESTURE_RIGHT:
-            Serial.println(F("Right gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_SWEEP_LEFT:
-            Serial.println(F("Center Sweep Left gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_SWEEP_RIGHT:
-            Serial.println(F("Center Sweep Right gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_HOLD:
-            Serial.println(F("Center Hold gesture!"));
-            break;
-        case MIP_GESTURE_FORWARD:
-            Serial.println(F("Forward gesture!"));
-            break;
-        case MIP_GESTURE_BACKWARD:
-            Serial.println(F("Backward gesture!"));
-            break;
-        case MIP_GESTURE_INVALID:
-            // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
-            Serial.println(F("INVALID gesture!"));
-            break;
-        }
+void loop() {
+  while (mip.availableGestureEvents() > 0) {
+    MiPGesture gesture = mip.readGestureEvent();
+    Serial.print(F("Detected "));
+    switch (gesture) {
+      case MIP_GESTURE_LEFT:
+        Serial.println(F("Left gesture!"));
+        break;
+      case MIP_GESTURE_RIGHT:
+        Serial.println(F("Right gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_SWEEP_LEFT:
+        Serial.println(F("Center Sweep Left gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_SWEEP_RIGHT:
+        Serial.println(F("Center Sweep Right gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_HOLD:
+        Serial.println(F("Center Hold gesture!"));
+        break;
+      case MIP_GESTURE_FORWARD:
+        Serial.println(F("Forward gesture!"));
+        break;
+      case MIP_GESTURE_BACKWARD:
+        Serial.println(F("Backward gesture!"));
+        break;
+      case MIP_GESTURE_INVALID:
+        // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
+        Serial.println(F("INVALID gesture!"));
+        break;
     }
+  }
 }
 ```
 
@@ -838,80 +760,62 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
+  Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
 
-    Serial.println(F("Calling mip.enableRadarMode()"));
-    mip.enableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableRadarMode()"));
+  mip.enableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableRadarMode()"));
-    mip.disableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
+  Serial.println(F("Calling mip.disableRadarMode()"));
+  mip.disableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
 
-    Serial.println(F("Calling mip.enableGestureMode()"));
-    mip.enableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableGestureMode()"));
+  mip.enableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableGestureMode()"));
-    mip.disableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
-    Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
-    if (mip.areGestureAndRadarModesDisabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.disableGestureMode()"));
+  mip.disableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
+  Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
+  if (mip.areGestureAndRadarModesDisabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -935,80 +839,62 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
+  Serial.println(F("GestureRadarMode.ino - Switches between gesture, radar, and default modes."));
 
-    Serial.println(F("Calling mip.enableRadarMode()"));
-    mip.enableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableRadarMode()"));
+  mip.enableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableRadarMode()"));
-    mip.disableRadarMode();
-    Serial.print(F("mip.isRadarModeEnabled() = "));
-    if (mip.isRadarModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
+  Serial.println(F("Calling mip.disableRadarMode()"));
+  mip.disableRadarMode();
+  Serial.print(F("mip.isRadarModeEnabled() = "));
+  if (mip.isRadarModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
 
-    Serial.println(F("Calling mip.enableGestureMode()"));
-    mip.enableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.enableGestureMode()"));
+  mip.enableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println(F("Calling mip.disableGestureMode()"));
-    mip.disableGestureMode();
-    Serial.print(F("mip.isGestureModeEnabled() = "));
-    if (mip.isGestureModeEnabled())
-    {
-        Serial.println(F("true - Failed"));
-    }
-    else
-    {
-        Serial.println(F("false - Pass"));
-    }
-    Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
-    if (mip.areGestureAndRadarModesDisabled())
-    {
-        Serial.println(F("true - Pass"));
-    }
-    else
-    {
-        Serial.println(F("false - Failed"));
-    }
+  Serial.println(F("Calling mip.disableGestureMode()"));
+  mip.disableGestureMode();
+  Serial.print(F("mip.isGestureModeEnabled() = "));
+  if (mip.isGestureModeEnabled()) {
+    Serial.println(F("true - Failed"));
+  } else {
+    Serial.println(F("false - Pass"));
+  }
+  Serial.print(F("mip.areGestureAndRadarModesDisabled() = "));
+  if (mip.areGestureAndRadarModesDisabled()) {
+    Serial.println(F("true - Pass"));
+  } else {
+    Serial.println(F("false - Failed"));
+  }
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1037,59 +923,54 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
+  Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    mip.enableGestureMode();
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  mip.enableGestureMode();
 }
 
-void loop()
-{
-    while (mip.availableGestureEvents() > 0)
-    {
-        MiPGesture gesture = mip.readGestureEvent();
-        Serial.print(F("Detected "));
-        switch (gesture)
-        {
-        case MIP_GESTURE_LEFT:
-            Serial.println(F("Left gesture!"));
-            break;
-        case MIP_GESTURE_RIGHT:
-            Serial.println(F("Right gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_SWEEP_LEFT:
-            Serial.println(F("Center Sweep Left gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_SWEEP_RIGHT:
-            Serial.println(F("Center Sweep Right gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_HOLD:
-            Serial.println(F("Center Hold gesture!"));
-            break;
-        case MIP_GESTURE_FORWARD:
-            Serial.println(F("Forward gesture!"));
-            break;
-        case MIP_GESTURE_BACKWARD:
-            Serial.println(F("Backward gesture!"));
-            break;
-        case MIP_GESTURE_INVALID:
-            // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
-            Serial.println(F("INVALID gesture!"));
-            break;
-        }
+void loop() {
+  while (mip.availableGestureEvents() > 0) {
+    MiPGesture gesture = mip.readGestureEvent();
+    Serial.print(F("Detected "));
+    switch (gesture) {
+      case MIP_GESTURE_LEFT:
+        Serial.println(F("Left gesture!"));
+        break;
+      case MIP_GESTURE_RIGHT:
+        Serial.println(F("Right gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_SWEEP_LEFT:
+        Serial.println(F("Center Sweep Left gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_SWEEP_RIGHT:
+        Serial.println(F("Center Sweep Right gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_HOLD:
+        Serial.println(F("Center Hold gesture!"));
+        break;
+      case MIP_GESTURE_FORWARD:
+        Serial.println(F("Forward gesture!"));
+        break;
+      case MIP_GESTURE_BACKWARD:
+        Serial.println(F("Backward gesture!"));
+        break;
+      case MIP_GESTURE_INVALID:
+        // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
+        Serial.println(F("INVALID gesture!"));
+        break;
     }
+  }
 }
 ```
 
@@ -1128,59 +1009,54 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
+  Serial.println(F("Gesture.ino - Detect gesture and inform user as they occur."));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    mip.enableGestureMode();
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  mip.enableGestureMode();
 }
 
-void loop()
-{
-    while (mip.availableGestureEvents() > 0)
-    {
-        MiPGesture gesture = mip.readGestureEvent();
-        Serial.print(F("Detected "));
-        switch (gesture)
-        {
-        case MIP_GESTURE_LEFT:
-            Serial.println(F("Left gesture!"));
-            break;
-        case MIP_GESTURE_RIGHT:
-            Serial.println(F("Right gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_SWEEP_LEFT:
-            Serial.println(F("Center Sweep Left gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_SWEEP_RIGHT:
-            Serial.println(F("Center Sweep Right gesture!"));
-            break;
-        case MIP_GESTURE_CENTER_HOLD:
-            Serial.println(F("Center Hold gesture!"));
-            break;
-        case MIP_GESTURE_FORWARD:
-            Serial.println(F("Forward gesture!"));
-            break;
-        case MIP_GESTURE_BACKWARD:
-            Serial.println(F("Backward gesture!"));
-            break;
-        case MIP_GESTURE_INVALID:
-            // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
-            Serial.println(F("INVALID gesture!"));
-            break;
-        }
+void loop() {
+  while (mip.availableGestureEvents() > 0) {
+    MiPGesture gesture = mip.readGestureEvent();
+    Serial.print(F("Detected "));
+    switch (gesture) {
+      case MIP_GESTURE_LEFT:
+        Serial.println(F("Left gesture!"));
+        break;
+      case MIP_GESTURE_RIGHT:
+        Serial.println(F("Right gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_SWEEP_LEFT:
+        Serial.println(F("Center Sweep Left gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_SWEEP_RIGHT:
+        Serial.println(F("Center Sweep Right gesture!"));
+        break;
+      case MIP_GESTURE_CENTER_HOLD:
+        Serial.println(F("Center Hold gesture!"));
+        break;
+      case MIP_GESTURE_FORWARD:
+        Serial.println(F("Forward gesture!"));
+        break;
+      case MIP_GESTURE_BACKWARD:
+        Serial.println(F("Backward gesture!"));
+        break;
+      case MIP_GESTURE_INVALID:
+        // This shouldn't really happen since mip.availableGestureEvents() returned > 0.
+        Serial.println(F("INVALID gesture!"));
+        break;
     }
+  }
 }
 ```
 
@@ -1225,73 +1101,69 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("ChestLED.ino - Set Chest LED to different colors.\n"));
+  Serial.println(F("ChestLED.ino - Set Chest LED to different colors.\n"));
 
-    Serial.println(F("Set chest LED to magenta."));
-    uint8_t red = 0xff;
-    uint8_t green = 0x01;
-    uint8_t blue = 0xfe;
-    mip.writeChestLED(red, green, blue);
-    printCurrentChestLEDSetting();
-    delay(1000);
+  Serial.println(F("Set chest LED to magenta."));
+  uint8_t red = 0xff;
+  uint8_t green = 0x01;
+  uint8_t blue = 0xfe;
+  mip.writeChestLED(red, green, blue);
+  printCurrentChestLEDSetting();
+  delay(1000);
 
-    Serial.println(F("Set chest LED to blink red."));
-    red = 0xff;
-    green = 0x01;
-    blue = 0x05;
-    const uint16_t onTime = 990;
-    const uint16_t offTime = 989;
-    mip.writeChestLED(red, green, blue, onTime, offTime);
-    printCurrentChestLEDSetting();
-    delay(4000);
+  Serial.println(F("Set chest LED to blink red."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0x05;
+  const uint16_t onTime = 990;
+  const uint16_t offTime = 989;
+  mip.writeChestLED(red, green, blue, onTime, offTime);
+  printCurrentChestLEDSetting();
+  delay(4000);
 
-    Serial.println(F("Set chest LED back to green."));
-    MiPChestLED chestLED;
-    chestLED.red = 0x00;
-    chestLED.green = 0xff;
-    chestLED.blue = 0x00;
-    chestLED.onTime = 0;
-    chestLED.offTime = 0;
-    mip.writeChestLED(chestLED);
-    printCurrentChestLEDSetting();
-    delay(1000);
+  Serial.println(F("Set chest LED back to green."));
+  MiPChestLED chestLED;
+  chestLED.red = 0x00;
+  chestLED.green = 0xff;
+  chestLED.blue = 0x00;
+  chestLED.onTime = 0;
+  chestLED.offTime = 0;
+  mip.writeChestLED(chestLED);
+  printCurrentChestLEDSetting();
+  delay(1000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 
-static void printCurrentChestLEDSetting()
-{
-    MiPChestLED chestLED;
-    mip.readChestLED(chestLED);
+static void printCurrentChestLEDSetting() {
+  MiPChestLED chestLED;
+  mip.readChestLED(chestLED);
 
-    Serial.println(F("Current Chest LED Setting"));
-    Serial.print(F("    red: "));
-        Serial.println(chestLED.red);
-    Serial.print(F("    green: "));
-        Serial.println(chestLED.green);
-    Serial.print(F("    blue: "));
-        Serial.println(chestLED.blue);
-    Serial.print(F("    on time: "));
-        Serial.print(chestLED.onTime);
-        Serial.println(F(" milliseconds"));
-    Serial.print(F("    off time: "));
-        Serial.print(chestLED.offTime);
-        Serial.println(F(" milliseconds"));
-    Serial.println();
+  Serial.println(F("Current Chest LED Setting"));
+  Serial.print(F("    red: "));
+    Serial.println(chestLED.red);
+  Serial.print(F("    green: "));
+    Serial.println(chestLED.green);
+  Serial.print(F("    blue: "));
+    Serial.println(chestLED.blue);
+  Serial.print(F("    on time: "));
+    Serial.print(chestLED.onTime);
+    Serial.println(F(" milliseconds"));
+  Serial.print(F("    off time: "));
+    Serial.print(chestLED.offTime);
+    Serial.println(F(" milliseconds"));
+  Serial.println();
 }
 ```
 
@@ -1325,73 +1197,69 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("ChestLED.ino - Set Chest LED to different colors.\n"));
+  Serial.println(F("ChestLED.ino - Set Chest LED to different colors.\n"));
 
-    Serial.println(F("Set chest LED to magenta."));
-    uint8_t red = 0xff;
-    uint8_t green = 0x01;
-    uint8_t blue = 0xfe;
-    mip.writeChestLED(red, green, blue);
-    printCurrentChestLEDSetting();
-    delay(1000);
+  Serial.println(F("Set chest LED to magenta."));
+  uint8_t red = 0xff;
+  uint8_t green = 0x01;
+  uint8_t blue = 0xfe;
+  mip.writeChestLED(red, green, blue);
+  printCurrentChestLEDSetting();
+  delay(1000);
 
-    Serial.println(F("Set chest LED to blink red."));
-    red = 0xff;
-    green = 0x01;
-    blue = 0x05;
-    const uint16_t onTime = 990;
-    const uint16_t offTime = 989;
-    mip.writeChestLED(red, green, blue, onTime, offTime);
-    printCurrentChestLEDSetting();
-    delay(4000);
+  Serial.println(F("Set chest LED to blink red."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0x05;
+  const uint16_t onTime = 990;
+  const uint16_t offTime = 989;
+  mip.writeChestLED(red, green, blue, onTime, offTime);
+  printCurrentChestLEDSetting();
+  delay(4000);
 
-    Serial.println(F("Set chest LED back to green."));
-    MiPChestLED chestLED;
-    chestLED.red = 0x00;
-    chestLED.green = 0xff;
-    chestLED.blue = 0x00;
-    chestLED.onTime = 0;
-    chestLED.offTime = 0;
-    mip.writeChestLED(chestLED);
-    printCurrentChestLEDSetting();
-    delay(1000);
+  Serial.println(F("Set chest LED back to green."));
+  MiPChestLED chestLED;
+  chestLED.red = 0x00;
+  chestLED.green = 0xff;
+  chestLED.blue = 0x00;
+  chestLED.onTime = 0;
+  chestLED.offTime = 0;
+  mip.writeChestLED(chestLED);
+  printCurrentChestLEDSetting();
+  delay(1000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 
-static void printCurrentChestLEDSetting()
-{
-    MiPChestLED chestLED;
-    mip.readChestLED(chestLED);
+static void printCurrentChestLEDSetting() {
+  MiPChestLED chestLED;
+  mip.readChestLED(chestLED);
 
-    Serial.println(F("Current Chest LED Setting"));
-    Serial.print(F("    red: "));
-        Serial.println(chestLED.red);
-    Serial.print(F("    green: "));
-        Serial.println(chestLED.green);
-    Serial.print(F("    blue: "));
-        Serial.println(chestLED.blue);
-    Serial.print(F("    on time: "));
-        Serial.print(chestLED.onTime);
-        Serial.println(F(" milliseconds"));
-    Serial.print(F("    off time: "));
-        Serial.print(chestLED.offTime);
-        Serial.println(F(" milliseconds"));
-    Serial.println();
+  Serial.println(F("Current Chest LED Setting"));
+  Serial.print(F("    red: "));
+    Serial.println(chestLED.red);
+  Serial.print(F("    green: "));
+    Serial.println(chestLED.green);
+  Serial.print(F("    blue: "));
+    Serial.println(chestLED.blue);
+  Serial.print(F("    on time: "));
+    Serial.print(chestLED.onTime);
+    Serial.println(F(" milliseconds"));
+  Serial.print(F("    off time: "));
+    Serial.print(chestLED.offTime);
+    Serial.println(F(" milliseconds"));
+  Serial.println();
 }
 ```
 
@@ -1433,65 +1301,60 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
-    mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+  Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
+  mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
 
-    MiPHeadLEDs headLEDs;
-    mip.readHeadLEDs(headLEDs);
-    Serial.println(F("Head LEDs"));
-    Serial.print(F("    led1: "));
-        printLEDString(headLEDs.led1);
-    Serial.print(F("    led2: "));
-        printLEDString(headLEDs.led2);
-    Serial.print(F("    led3: "));
-        printLEDString(headLEDs.led3);
-    Serial.print(F("    led4: "));
-        printLEDString(headLEDs.led4);
+  MiPHeadLEDs headLEDs;
+  mip.readHeadLEDs(headLEDs);
+  Serial.println(F("Head LEDs"));
+  Serial.print(F("    led1: "));
+    printLEDString(headLEDs.led1);
+  Serial.print(F("    led2: "));
+    printLEDString(headLEDs.led2);
+  Serial.print(F("    led3: "));
+    printLEDString(headLEDs.led3);
+  Serial.print(F("    led4: "));
+    printLEDString(headLEDs.led4);
 
-    delay(4000);
+  delay(4000);
 
-    // Turn all the LEDs back on now.
-    Serial.println(F("Turning all eye LEDs back on now."));
-    headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
-    mip.writeHeadLEDs(headLEDs);
+  // Turn all the LEDs back on now.
+  Serial.println(F("Turning all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.writeHeadLEDs(headLEDs);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-static void printLEDString(MiPHeadLED led)
-{
-    switch (led)
-    {
+static void printLEDString(MiPHeadLED led) {
+  switch (led) {
     case MIP_HEAD_LED_OFF:
-        Serial.println(F("Off"));
-        break;
+      Serial.println(F("Off"));
+      break;
     case MIP_HEAD_LED_ON:
-        Serial.println(F("On"));
-        break;
+      Serial.println(F("On"));
+      break;
     case MIP_HEAD_LED_BLINK_SLOW:
-        Serial.println(F("Blink Slow"));
-        break;
+      Serial.println(F("Blink Slow"));
+      break;
     case MIP_HEAD_LED_BLINK_FAST:
-        Serial.println(F("Blink Fast"));
-        break;
+      Serial.println(F("Blink Fast"));
+      break;
     default:
-        Serial.println();
-        break;
-    }
+      Serial.println();
+      break;
+  }
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1528,65 +1391,60 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
-    mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+  Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
+  mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
 
-    MiPHeadLEDs headLEDs;
-    mip.readHeadLEDs(headLEDs);
-    Serial.println(F("Head LEDs"));
-    Serial.print(F("    led1: "));
-        printLEDString(headLEDs.led1);
-    Serial.print(F("    led2: "));
-        printLEDString(headLEDs.led2);
-    Serial.print(F("    led3: "));
-        printLEDString(headLEDs.led3);
-    Serial.print(F("    led4: "));
-        printLEDString(headLEDs.led4);
+  MiPHeadLEDs headLEDs;
+  mip.readHeadLEDs(headLEDs);
+  Serial.println(F("Head LEDs"));
+  Serial.print(F("    led1: "));
+    printLEDString(headLEDs.led1);
+  Serial.print(F("    led2: "));
+    printLEDString(headLEDs.led2);
+  Serial.print(F("    led3: "));
+    printLEDString(headLEDs.led3);
+  Serial.print(F("    led4: "));
+    printLEDString(headLEDs.led4);
 
-    delay(4000);
+  delay(4000);
 
-    // Turn all the LEDs back on now.
-    Serial.println(F("Turning all eye LEDs back on now."));
-    headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
-    mip.writeHeadLEDs(headLEDs);
+  // Turn all the LEDs back on now.
+  Serial.println(F("Turning all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.writeHeadLEDs(headLEDs);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-static void printLEDString(MiPHeadLED led)
-{
-    switch (led)
-    {
+static void printLEDString(MiPHeadLED led) {
+  switch (led) {
     case MIP_HEAD_LED_OFF:
-        Serial.println(F("Off"));
-        break;
+      Serial.println(F("Off"));
+      break;
     case MIP_HEAD_LED_ON:
-        Serial.println(F("On"));
-        break;
+      Serial.println(F("On"));
+      break;
     case MIP_HEAD_LED_BLINK_SLOW:
-        Serial.println(F("Blink Slow"));
-        break;
+      Serial.println(F("Blink Slow"));
+      break;
     case MIP_HEAD_LED_BLINK_FAST:
-        Serial.println(F("Blink Fast"));
-        break;
+      Serial.println(F("Blink Fast"));
+      break;
     default:
-        Serial.println();
-        break;
-    }
+      Serial.println();
+      break;
+  }
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1616,60 +1474,50 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("ContinuousDrive.ino - Use continuousDrive() function. Drive forward with right turn and then backward with left turn."));
+  Serial.println(F("ContinuousDrive.ino - Use continuousDrive() function. Drive forward with right turn and then backward with left turn."));
 }
 
 void loop()
 {
-    static enum States
-    {
-        RIGHT_TURN,
-        LEFT_TURN,
-        DONE
-    } state = RIGHT_TURN;
-    static uint32_t startTime = millis();
-    uint32_t        currentTime = millis();
-    uint32_t        elapsedTime = currentTime - startTime;
+  static enum States {
+    RIGHT_TURN,
+    LEFT_TURN,
+    DONE
+  } state = RIGHT_TURN;
+  static uint32_t startTime = millis();
+  uint32_t        currentTime = millis();
+  uint32_t        elapsedTime = currentTime - startTime;
 
-    switch (state)
-    {
+  switch (state) {
     case RIGHT_TURN:
-        if (elapsedTime < 2000)
-        {
-          // Drive forward at half-speed and turn right at quarter rate.
-          mip.continuousDrive(16, 8);
-        }
-        else
-        {
-            startTime = currentTime;
-            state = LEFT_TURN;
-        }
-        break;
+      if (elapsedTime < 2000) {
+        // Drive forward at half-speed and turn right at quarter rate.
+        mip.continuousDrive(16, 8);
+      } else {
+        startTime = currentTime;
+        state = LEFT_TURN;
+      }
+      break;
     case LEFT_TURN:
-        if (elapsedTime < 2000)
-        {
-            // Drive backward at half-speed and turn left at quarter rate.
-            mip.continuousDrive(-16, -8);
-        }
-        else
-        {
-            Serial.println();
-            Serial.println(F("Sample done."));
-            state = DONE;
-        }
-        break;
+      if (elapsedTime < 2000) {
+        // Drive backward at half-speed and turn left at quarter rate.
+        mip.continuousDrive(-16, -8);
+      } else {
+        Serial.println();
+        Serial.println(F("Sample done."));
+        state = DONE;
+      }
+      break;
     default:
-        break;
-    }
+      break;
+  }
 }
 ```
 
@@ -1700,29 +1548,26 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("DistanceDrive.ino - Use distanceDrive function. Drive forward, turn 360 degrees in each direction and backward."));
+  Serial.println(F("DistanceDrive.ino - Use distanceDrive function. Drive forward, turn 360 degrees in each direction and backward."));
 
-    // Queue up multiple commands to run in sequence.
-    mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
-    mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
-    mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
-    mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
+  // Queue up multiple commands to run in sequence.
+  mip.distanceDrive(MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+  mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
+  mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
+  mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1746,28 +1591,25 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
+  Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
 
-    mip.turnLeft(180, 12);
-    delay(2000);
-    mip.turnRight(180, 12);
-    delay(2000);
+  mip.turnLeft(180, 12);
+  delay(2000);
+  mip.turnRight(180, 12);
+  delay(2000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1791,28 +1633,25 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
+  Serial.println(F("TurnLeftRight.ino - Use turnLeft & turnRight() functions. Turn 180 degrees to left and then 180 degrees to right."));
 
-    mip.turnLeft(180, 12);
-    delay(2000);
-    mip.turnRight(180, 12);
-    delay(2000);
+  mip.turnLeft(180, 12);
+  delay(2000);
+  mip.turnRight(180, 12);
+  delay(2000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1836,28 +1675,25 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions. Drive ahead and back, 1 second in each direction."));
+  Serial.println(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions. Drive ahead and back, 1 second in each direction."));
 
-    mip.driveForward(15, 1000);
-    delay(2000);
-    mip.driveBackward(15, 1000);
-    delay(2000);
+  mip.driveForward(15, 1000);
+  delay(2000);
+  mip.driveBackward(15, 1000);
+  delay(2000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1881,28 +1717,25 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions. Drive ahead and back, 1 second in each direction."));
+  Serial.println(F("DriveForwardBackward.ino - Use driveForward() & driveBackward() functions. Drive ahead and back, 1 second in each direction."));
 
-    mip.driveForward(15, 1000);
-    delay(2000);
-    mip.driveBackward(15, 1000);
-    delay(2000);
+  mip.driveForward(15, 1000);
+  delay(2000);
+  mip.driveBackward(15, 1000);
+  delay(2000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1925,28 +1758,25 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Stop.ino - Use stop() function. Interrupt a 360 degree turn with stop()."));
+  Serial.println(F("Stop.ino - Use stop() function. Interrupt a 360 degree turn with stop()."));
 
-    mip.turnLeft(360, 6);
-    delay(1000);
-    mip.stop();
-    delay(1000);
+  mip.turnLeft(360, 6);
+  delay(1000);
+  mip.stop();
+  delay(1000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -1969,42 +1799,39 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
+  Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    delay(1000);
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  delay(1000);
 
-    Serial.println(F("Falling forward."));
-    mip.fallForward();
+  Serial.println(F("Falling forward."));
+  mip.fallForward();
 
-    delay(1000);
-    Serial.println(F("Waiting for robot to be standing upright again."));
-    while (!mip.isUpright())
-    {
-    }
-    delay(1000);
+  delay(1000);
+  Serial.println(F("Waiting for robot to be standing upright again."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  delay(1000);
 
-    Serial.println(F("Falling backward."));
-    mip.fallBackward();
+  Serial.println(F("Falling backward."));
+  mip.fallBackward();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2027,42 +1854,39 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
+  Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    delay(1000);
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  delay(1000);
 
-    Serial.println(F("Falling forward."));
-    mip.fallForward();
+  Serial.println(F("Falling forward."));
+  mip.fallForward();
 
-    delay(1000);
-    Serial.println(F("Waiting for robot to be standing upright again."));
-    while (!mip.isUpright())
-    {
-    }
-    delay(1000);
+  delay(1000);
+  Serial.println(F("Waiting for robot to be standing upright again."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  delay(1000);
 
-    Serial.println(F("Falling backward."));
-    mip.fallBackward();
+  Serial.println(F("Falling backward."));
+  mip.fallBackward();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2088,29 +1912,26 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("GetUp.ino - Use getUp(). Attempt to get up from a front fall."));
+  Serial.println(F("GetUp.ino - Use getUp(). Attempt to get up from a front fall."));
 
-    mip.fallForward();
-    delay(3000);
+  mip.fallForward();
+  delay(3000);
 
-    mip.getUp(MIP_GETUP_FROM_FRONT);
-    delay(3000);
+  mip.getUp(MIP_GETUP_FROM_FRONT);
+  delay(3000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2243,38 +2064,35 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("PlaySound.ino - Play a few sounds."));
+  Serial.println(F("PlaySound.ino - Play a few sounds."));
 
-    // Play a single sound.
-    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
-    delay(3000);
+  // Play a single sound.
+  mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+  delay(3000);
 
-    // Play 2 sounds with 1 second delay between them, repeating them a second time.
-    // Play the first at a lower volume than the second.
-    mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
-    mip.playSoundList(1);
+  // Play 2 sounds with 1 second delay between them, repeating them a second time.
+  // Play the first at a lower volume than the second.
+  mip.beginSoundList();
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
+  mip.playSoundList(1);
 
-    // Play the sound list again after waiting for the previous play to complete.
-    delay(10000);
-    mip.playSoundList();
+  // Play the sound list again after waiting for the previous play to complete.
+  delay(10000);
+  mip.playSoundList();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2297,38 +2115,35 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("PlaySound.ino - Play a few sounds."));
+  Serial.println(F("PlaySound.ino - Play a few sounds."));
 
-    // Play a single sound.
-    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
-    delay(3000);
+  // Play a single sound.
+  mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+  delay(3000);
 
-    // Play 2 sounds with 1 second delay between them, repeating them a second time.
-    // Play the first at a lower volume than the second.
-    mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
-    mip.playSoundList(1);
+  // Play 2 sounds with 1 second delay between them, repeating them a second time.
+  // Play the first at a lower volume than the second.
+  mip.beginSoundList();
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
+  mip.playSoundList(1);
 
-    // Play the sound list again after waiting for the previous play to complete.
-    delay(10000);
-    mip.playSoundList();
+  // Play the sound list again after waiting for the previous play to complete.
+  delay(10000);
+  mip.playSoundList();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2464,38 +2279,35 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("PlaySound.ino - Play a few sounds."));
+  Serial.println(F("PlaySound.ino - Play a few sounds."));
 
-    // Play a single sound.
-    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
-    delay(3000);
+  // Play a single sound.
+  mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+  delay(3000);
 
-    // Play 2 sounds with 1 second delay between them, repeating them a second time.
-    // Play the first at a lower volume than the second.
-    mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
-    mip.playSoundList(1);
+  // Play 2 sounds with 1 second delay between them, repeating them a second time.
+  // Play the first at a lower volume than the second.
+  mip.beginSoundList();
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
+  mip.playSoundList(1);
 
-    // Play the sound list again after waiting for the previous play to complete.
-    delay(10000);
-    mip.playSoundList();
+  // Play the sound list again after waiting for the previous play to complete.
+  delay(10000);
+  mip.playSoundList();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2518,38 +2330,35 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("PlaySound.ino - Play a few sounds."));
+  Serial.println(F("PlaySound.ino - Play a few sounds."));
 
-    // Play a single sound.
-    mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
-    delay(3000);
+  // Play a single sound.
+  mip.playSound(MIP_SOUND_ACTION_DRINKING, MIP_VOLUME_4);
+  delay(3000);
 
-    // Play 2 sounds with 1 second delay between them, repeating them a second time.
-    // Play the first at a lower volume than the second.
-    mip.beginSoundList();
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
-    mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
-    mip.playSoundList(1);
+  // Play 2 sounds with 1 second delay between them, repeating them a second time.
+  // Play the first at a lower volume than the second.
+  mip.beginSoundList();
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_EATING, 1000, MIP_VOLUME_4);
+  mip.addEntryToSoundList(MIP_SOUND_ACTION_BURPING, 0, MIP_VOLUME_7);
+  mip.playSoundList(1);
 
-    // Play the sound list again after waiting for the previous play to complete.
-    delay(10000);
-    mip.playSoundList();
+  // Play the sound list again after waiting for the previous play to complete.
+  delay(10000);
+  mip.playSoundList();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2572,30 +2381,27 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
+  Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
 
-    mip.writeVolume(1);
+  mip.writeVolume(1);
 
-    uint8_t volume = mip.readVolume();
+  uint8_t volume = mip.readVolume();
 
-    Serial.print(F("Volume = "));
-      Serial.println(volume);
+  Serial.print(F("Volume = "));
+    Serial.println(volume);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2617,30 +2423,27 @@ The current volume level (0 - 7).  A level of 0 means the sound is off and 7 is 
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
+  Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
 
-    mip.writeVolume(1);
+  mip.writeVolume(1);
 
-    uint8_t volume = mip.readVolume();
+  uint8_t volume = mip.readVolume();
 
-    Serial.print(F("Volume = "));
-      Serial.println(volume);
+  Serial.print(F("Volume = "));
+    Serial.println(volume);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2667,30 +2470,27 @@ The distance travelled (in centimeters) since the last reset.
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
+  Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
 
-    float cm = mip.readDistanceTravelled();
-    Serial.print(F("MiP has travelled "));
-        Serial.print(cm);
-        Serial.println(F(" cm since the last reset."));
+  float cm = mip.readDistanceTravelled();
+  Serial.print(F("MiP has travelled "));
+    Serial.print(cm);
+    Serial.println(F(" cm since the last reset."));
 
-    mip.resetDistanceTravelled();
+  mip.resetDistanceTravelled();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2717,30 +2517,27 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
+  Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
 
-    float cm = mip.readDistanceTravelled();
-    Serial.print(F("MiP has travelled "));
-        Serial.print(cm);
-        Serial.println(F(" cm since the last reset."));
+  float cm = mip.readDistanceTravelled();
+  Serial.print(F("MiP has travelled "));
+    Serial.print(cm);
+    Serial.println(F(" cm since the last reset."));
 
-    mip.resetDistanceTravelled();
+  mip.resetDistanceTravelled();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -2767,67 +2564,55 @@ The current battery voltage in Volts.
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -2864,67 +2649,55 @@ One of the values from the following table:
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -2952,67 +2725,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3040,67 +2801,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3128,67 +2877,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3216,67 +2953,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3304,67 +3029,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3392,67 +3105,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3480,67 +3181,55 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-
-        lastPosition = currentPosition;
-    }
+    lastPosition = currentPosition;
+  }
 }
 ```
 
@@ -3566,29 +3255,25 @@ A signed integer representing how much it is tilted to keep its center of mass d
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Weight.ino - Use weight update functions."));
+  Serial.println(F("Weight.ino - Use weight update functions."));
 }
 
-void loop()
-{
-    static int8_t lastWeight = -128;
-    int8_t currentWeight = mip.readWeight();
+void loop() {
+  static int8_t lastWeight = -128;
+  int8_t currentWeight = mip.readWeight();
 
-    if (currentWeight != lastWeight)
-    {
-        Serial.print(F("Weight = "));
-          Serial.println(currentWeight);
-        lastWeight = currentWeight;
-    }
+  if (currentWeight != lastWeight) {
+    Serial.print(F("Weight = "));
+      Serial.println(currentWeight);
+    lastWeight = currentWeight;
+  }
 }
 ```
 
@@ -3614,62 +3299,52 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -3695,62 +3370,52 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -3774,62 +3439,52 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -3856,62 +3511,52 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -3934,62 +3579,52 @@ The current setting of the delay expected between claps.  It defaults to 500.
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -4016,62 +3651,52 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -4099,62 +3724,52 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Clap.ino - Use clap related functions."));
+  Serial.println(F("Clap.ino - Use clap related functions."));
 
-    Serial.println(F("Calling disableClapEvents()"));
-    mip.disableClapEvents();
-    bool isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - fail"));
-    }
-    else
-    {
-        Serial.println(F("false - pass"));
-    }
+  Serial.println(F("Calling disableClapEvents()"));
+  mip.disableClapEvents();
+  bool isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - fail"));
+  } else {
+    Serial.println(F("false - pass"));
+  }
 
-    Serial.println(F("Calling writeClapDelay(501)"));
-    mip.writeClapDelay(501);
-    uint16_t delay = mip.readClapDelay();
-    Serial.print(F("readClapDelay() returns "));
-    Serial.println(delay);
+  Serial.println(F("Calling writeClapDelay(501)"));
+  mip.writeClapDelay(501);
+  uint16_t delay = mip.readClapDelay();
+  Serial.print(F("readClapDelay() returns "));
+  Serial.println(delay);
 
-    Serial.println(F("Calling enableClapEvents()"));
-    mip.enableClapEvents();
-    isEnabled = mip.areClapEventsEnabled();
-    Serial.print(F("areClapEventsEnabled() returns "));
-    if (isEnabled)
-    {
-        Serial.println(F("true - pass"));
-    }
-    else
-    {
-        Serial.println(F("false - fail"));
-    }
+  Serial.println(F("Calling enableClapEvents()"));
+  mip.enableClapEvents();
+  isEnabled = mip.areClapEventsEnabled();
+  Serial.print(F("areClapEventsEnabled() returns "));
+  if (isEnabled) {
+    Serial.println(F("true - pass"));
+  } else {
+    Serial.println(F("false - fail"));
+  }
 
-    Serial.println();
-    Serial.println(F("Waiting for clap events!"));
+  Serial.println();
+  Serial.println(F("Waiting for clap events!"));
 }
 
-void loop()
-{
-    while (mip.availableClapEvents() > 0)
-    {
-        uint8_t clapCount = mip.readClapEvent();
-        Serial.print(F("Detected "));
-            Serial.print(clapCount);
-            Serial.println(F(" claps"));
-    }
+void loop() {
+  while (mip.availableClapEvents() > 0) {
+    uint8_t clapCount = mip.readClapEvent();
+    Serial.print(F("Detected "));
+      Serial.print(clapCount);
+      Serial.println(F(" claps"));
+  }
 }
 ```
 
@@ -4178,24 +3793,20 @@ None
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Shake.ino - Detect shakes."));
+  Serial.println(F("Shake.ino - Detect shakes."));
 }
 
-void loop()
-{
-    if (mip.hasBeenShaken())
-    {
-        Serial.println(F("Shake detected!"));
-    }
+void loop() {
+  if (mip.hasBeenShaken()) {
+    Serial.println(F("Shake detected!"));
+  }
 }
 ```
 
@@ -4230,43 +3841,39 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.begin(115200);
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
+  Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
 
-    MiPSoftwareVersion softwareVersion;
-    mip.readSoftwareVersion(softwareVersion);
-    Serial.print(F("software version: "));
-        Serial.print(softwareVersion.year);
-        Serial.print('-');
-        Serial.print(softwareVersion.month);
-        Serial.print('-');
-        Serial.print(softwareVersion.day);
-        Serial.print('.');
-        Serial.println(softwareVersion.uniqueVersion);
+  MiPSoftwareVersion softwareVersion;
+  mip.readSoftwareVersion(softwareVersion);
+  Serial.print(F("software version: "));
+  Serial.print(softwareVersion.year);
+    Serial.print('-');
+    Serial.print(softwareVersion.month);
+    Serial.print('-');
+    Serial.print(softwareVersion.day);
+    Serial.print('.');
+    Serial.println(softwareVersion.uniqueVersion);
 
-    MiPHardwareInfo hardwareInfo;
-    mip.readHardwareInfo(hardwareInfo);
-    Serial.println(F("hardware info"));
-    Serial.print(F("  voice chip version: "));
-        Serial.println(hardwareInfo.voiceChip);
-    Serial.print(F("  hardware version: "));
-        Serial.println(hardwareInfo.hardware);
+  MiPHardwareInfo hardwareInfo;
+  mip.readHardwareInfo(hardwareInfo);
+  Serial.println(F("hardware info"));
+  Serial.print(F("  voice chip version: "));
+    Serial.println(hardwareInfo.voiceChip);
+  Serial.print(F("  hardware version: "));
+    Serial.println(hardwareInfo.hardware);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -4298,43 +3905,39 @@ Nothing
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.begin(115200);
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
+  Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
 
-    MiPSoftwareVersion softwareVersion;
-    mip.readSoftwareVersion(softwareVersion);
-    Serial.print(F("software version: "));
-        Serial.print(softwareVersion.year);
-        Serial.print('-');
-        Serial.print(softwareVersion.month);
-        Serial.print('-');
-        Serial.print(softwareVersion.day);
-        Serial.print('.');
-        Serial.println(softwareVersion.uniqueVersion);
+  MiPSoftwareVersion softwareVersion;
+  mip.readSoftwareVersion(softwareVersion);
+  Serial.print(F("software version: "));
+  Serial.print(softwareVersion.year);
+    Serial.print('-');
+    Serial.print(softwareVersion.month);
+    Serial.print('-');
+    Serial.print(softwareVersion.day);
+    Serial.print('.');
+    Serial.println(softwareVersion.uniqueVersion);
 
-    MiPHardwareInfo hardwareInfo;
-    mip.readHardwareInfo(hardwareInfo);
-    Serial.println(F("hardware info"));
-    Serial.print(F("  voice chip version: "));
-        Serial.println(hardwareInfo.voiceChip);
-    Serial.print(F("  hardware version: "));
-        Serial.println(hardwareInfo.hardware);
+  MiPHardwareInfo hardwareInfo;
+  mip.readHardwareInfo(hardwareInfo);
+  Serial.println(F("hardware info"));
+  Serial.print(F("  voice chip version: "));
+    Serial.println(hardwareInfo.voiceChip);
+  Serial.print(F("  hardware version: "));
+    Serial.println(hardwareInfo.hardware);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 ```
 
@@ -4355,16 +3958,16 @@ Nothing
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4376,29 +3979,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4419,16 +4033,16 @@ Nothing
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4440,29 +4054,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4483,16 +4108,16 @@ Nothing
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4504,29 +4129,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4547,16 +4183,16 @@ Nothing
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4568,29 +4204,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4611,16 +4258,16 @@ Nothing
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4632,29 +4279,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4675,16 +4333,16 @@ Nothing
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4696,29 +4354,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4740,16 +4409,16 @@ None
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4761,29 +4430,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4805,16 +4485,16 @@ None
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4826,29 +4506,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4870,16 +4561,16 @@ None
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4891,29 +4582,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4934,16 +4636,16 @@ None
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -4955,29 +4657,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -4999,16 +4712,16 @@ None
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -5020,29 +4733,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -5064,16 +4788,16 @@ None
 ```c++
 #include <mip.h>
 
-static MiP         mip;
+MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -5085,29 +4809,40 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
 
   mip.enableDanceMode();
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
 
   mip.enableStackMode();
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
 
   mip.enableTrickMode();
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
 
   mip.enableRoamMode();
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
-  mip.stop();                         // MiP will not switch out of roaming mode while moving.
 
   mip.enableAppMode();
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
 }
 ```
 
@@ -5131,14 +4866,18 @@ Nothing
 #include <mip.h>
 
 MiP           mip;
-const uint8_t eepromAddressOffset = 0x00;     // Use an offset between 0x00 and 0x0F.
-uint8_t       secretPassword = 0x0D;          // Try different hex values here to see them stored and
-                                              // recovered from EEPROM.
+
+// Use an offset between 0x00 and 0x0F.
+const uint8_t eepromAddressOffset = 0x00;
+
+// Try different hex values here to see them stored and
+// recovered from EEPROM.
+uint8_t       secretPassword = 0x0D;
+
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -5184,14 +4923,18 @@ Reads one byte of user data from the address offset specified.  Valid addresses 
 #include <mip.h>
 
 MiP           mip;
-const uint8_t eepromAddressOffset = 0x00;     // Use an offset between 0x00 and 0x0F.
-uint8_t       secretPassword = 0x0D;          // Try different hex values here to see them stored and
-                                              // recovered from EEPROM.
+
+// Use an offset between 0x00 and 0x0F.
+const uint8_t eepromAddressOffset = 0x00;
+
+// Try different hex values here to see them stored and
+// recovered from EEPROM.
+uint8_t       secretPassword = 0x0D;
+
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
