@@ -29,7 +29,7 @@ void setup() {
   Serial.println(F("DistanceDrive.ino - Use distanceDrive function. Drive forward, turn 360 degrees in each direction and backward."));
 
   // Queue up multiple commands to run in sequence.
-  mip.distanceDrive( MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
+  mip.distanceDrive(MIP_DRIVE_FORWARD, 30, MIP_TURN_RIGHT, 0);
   mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_LEFT, 360);
   mip.distanceDrive(MIP_DRIVE_FORWARD, 0, MIP_TURN_RIGHT, 360);
   mip.distanceDrive(MIP_DRIVE_BACKWARD, 30, MIP_TURN_RIGHT, 0);
