@@ -217,7 +217,7 @@ Disconnects from the MiP, disables serial communication, and allows the Serial R
 None
 
 #### Returns
-None
+Nothing
 
 #### Example
 ```c++
@@ -306,7 +306,7 @@ Switches the MiP robot's head mounted IR sensors into radar mode. Once this mode
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * When enableRadarMode() is called, gesture mode will be disabled. If you later enable gesture mode, radar mode will be disabled.
@@ -368,7 +368,7 @@ Switches the MiP robot's head mounted IR sensors out of radar mode.
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * Calling disableRadarMode() actually disables all IR sensing so it will also shutdown gesture mode as well.
@@ -3288,7 +3288,7 @@ Enable the MiP robot to detect user claps. Once this is enabled, your code can c
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * The MiP robot defaults to having the clap detection feature disabled after the ProMini Pack attaches.
@@ -3359,7 +3359,7 @@ Disables the MiP robot's ability to detect user claps.
 None
 
 #### Returns
-None
+Nothing
 
 #### Notes
 * The MiP robot defaults to having the clap detection feature disabled after the ProMini Pack attaches.
