@@ -53,12 +53,15 @@
 // MiP Protocol Commands.
 // These command codes are placed in the first byte of requests sent to the MiP and responses sent back from the MiP.
 // See https://github.com/WowWeeLabs/MiP-BLE-Protocol/blob/master/MiP-Protocol.md for more information.
+#define MIP_CMD_RECEIVE_IR_DONGLE_CODE  0x03
 #define MIP_CMD_PLAY_SOUND              0x06
 #define MIP_CMD_SET_POSITION            0x08
 #define MIP_CMD_GET_GESTURE_RESPONSE    0x0A
 #define MIP_CMD_SET_GESTURE_RADAR_MODE  0x0C
 #define MIP_CMD_GET_RADAR_RESPONSE      0x0C
 #define MIP_CMD_GET_GESTURE_RADAR_MODE  0x0D
+#define MIP_CMD_SET_IR_REMOTE_CONTROL   0x10
+#define MIP_CMD_GET_IR_REMOTE_CONTROL   0x11
 #define MIP_CMD_SET_USER_DATA           0x12
 #define MIP_CMD_GET_USER_DATA           0x13
 #define MIP_CMD_GET_SOFTWARE_VERSION    0x14
@@ -89,6 +92,7 @@
 #define MIP_CMD_FLASH_CHEST_LED         0x89
 #define MIP_CMD_SET_HEAD_LEDS           0x8A
 #define MIP_CMD_GET_HEAD_LEDS           0x8B
+#define MIP_CMD_SEND_IR_DONGLE_CODE     0x8C
 #define MIP_CMD_SLEEP                   0xFA
 #define MIP_CMD_DISCONNECT_APP          0xFE
 
@@ -1933,6 +1937,146 @@ int8_t MiP::rawGetUserData(uint8_t address, uint8_t& userData)
 
     userData = (uint8_t)response[2];
     return MIP_ERROR_NONE;
+}
+
+
+
+void MiP::enableIRRemoteControl()
+{
+    verifiedEnabledIRRemoteControl();
+}
+
+bool MiP::isIRRemoteControlEnabled()
+{
+    const uint8_t remoteControlEnabled[1] = { MIP_CMD_GET_IR_REMOTE_CONTROL };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int8_t        result;
+
+    result = rawReceive(remoteControlEnabled, sizeof(remoteControlEnabled), response, sizeof(response), responseLength);
+    if (result)
+    {
+        return result;
+    }
+    if (responseLength != sizeof(response) ||
+        response[0] != MIP_CMD_GET_IR_REMOTE_CONTROL ||
+        (response[1] != 0x00 ||
+		response[1] != 0x01))
+    {
+        return MIP_ERROR_BAD_RESPONSE;
+    }
+
+    return response[1] == 0x00 ? false : true;
+}
+
+void MiP::sendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower)
+{
+	// sendCode may contain up to four elements and dataNumbers indicates how many are useful.
+	// e.g. if dataNumbers contains a "1", then sendCode[0] is the only meaningful data.
+	// All other elements in sendCode will be ignored by MiP.
+	MIP_ASSERT( 0 <= dataNumbers && dataNumbers <= 4 );
+	
+	// Check for valid transmitPower values.  Must be between 1 and 120.
+	MIP_ASSERT( 1 <= transmitPower && transmitPower <= 120 );
+	
+	// Send this command blindly with no error checking since there is no easy way to determine if it has failed.
+	rawSendIRDongleCode(sendCode, dataNumbers, transmitPower);
+}
+
+void MiP::receiveIRDongleCode(uint8_t* receiveCode, uint8_t& dataNumbers)
+{
+	// Send this command blindly with no error checking since there is no easy way to determine if it has failed.
+	rawReceiveIRDongleCode(receiveCode, dataNumbers);
+}
+
+// This internal protected method sends the send IR dongle code command with no error checking.
+// The error handling and recovery happens at a higher level of the driver.
+void MiP::rawSendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower)
+{
+    uint8_t command[1+5];
+
+    command[0] = MIP_CMD_SEND_IR_DONGLE_CODE;
+	
+	for(int i = dataNumbers; i <= 4; i++)
+	{
+	   command[i] = sendCode[i-1];
+	}
+	command[4] = dataNumbers;
+    command[5] = transmitPower;
+
+    rawSend(command, sizeof(command));
+}
+
+// This internal protected method sends the receive IR dongle code command with no error checking.
+// The error handling and recovery happens at a higher level of the driver.
+int8_t MiP::rawReceiveIRDongleCode(uint8_t* receiveCode, uint8_t& dataNumbers)
+{
+    const uint8_t receiveIRDongleCode[1] = { MIP_CMD_RECEIVE_IR_DONGLE_CODE };
+    uint8_t       response[1+5];
+    size_t        responseLength;
+    int8_t        result;
+
+    result = rawReceive(receiveIRDongleCode, sizeof(receiveIRDongleCode), response, sizeof(response), responseLength);
+    if (result)
+    {
+        return result;
+    }
+    if (responseLength != sizeof(response) ||
+        response[0] != MIP_CMD_RECEIVE_IR_DONGLE_CODE ||
+        (response[1] != 0x02 ||
+		response[1] != 0x03 ||
+		response[1] != 0x04))
+    {
+        return MIP_ERROR_BAD_RESPONSE;
+    }
+
+	for(int i = 0; i < response[i]; i++)
+		receiveCode[i] = response[i+2];
+    dataNumbers = response[1];
+    return result;
+}
+
+// This internal protected method verifies that IR remote control is enabled.
+void MiP::verifiedEnabledIRRemoteControl()
+{
+    bool result;
+
+    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    {
+        rawSetIRRemoteControl();
+
+        // Read back and make sure that it was set as expected.
+        result = isIRRemoteControlEnabled();
+        if (result)
+        {
+            // The set was successful so return immediately.
+            m_lastError = MIP_ERROR_NONE;
+            return;
+        }
+
+        // An error was encountered so we will loop around and try again.
+        // Wait for a bit before the next retry.
+        delay(MIP_RETRY_WAIT);
+    }
+
+    if (result != MIP_ERROR_NONE)
+    {
+        // Kept getting an error back from rawGetGameMode().
+        m_lastError = result;
+    }
+    else
+    {
+        // rawGetGameMode() was successful but didn't match mode to which we were attempting to change.
+        m_lastError = MIP_ERROR_MAX_RETRIES;
+    }
+}
+
+void MiP::rawSetIRRemoteControl()
+{
+    const uint8_t remoteControlEnabled[1] = { MIP_CMD_SET_IR_REMOTE_CONTROL };
+    uint8_t       response[1];
+
+    rawSend(remoteControlEnabled, sizeof(remoteControlEnabled));
 }
 
 

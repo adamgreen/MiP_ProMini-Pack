@@ -501,6 +501,11 @@ public:
     void   setUserData(uint8_t addressOffset, uint8_t userData);
     uint8_t getUserData(uint8_t addressOffset);
 
+    void enableIRRemoteControl();
+    bool isIRRemoteControlEnabled();
+    void sendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower);
+    void receiveIRDongleCode(uint8_t* receiveCode, uint8_t& dataNumbers);
+    
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
@@ -593,6 +598,11 @@ protected:
 
     void    rawSetUserData(uint8_t address, uint8_t userData);
     int8_t  rawGetUserData(uint8_t address, uint8_t& userData);
+
+    void    rawSendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower);
+    int8_t  rawReceiveIRDongleCode(uint8_t* receiveCode, uint8_t& dataNumbers);
+    void    verifiedEnabledIRRemoteControl();
+    void    rawSetIRRemoteControl();
 
     void    transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int8_t  transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
