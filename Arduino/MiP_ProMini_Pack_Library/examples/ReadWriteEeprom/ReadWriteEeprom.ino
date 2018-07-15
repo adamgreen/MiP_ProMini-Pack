@@ -19,14 +19,18 @@
 #include <mip.h>
 
 MiP           mip;
-const uint8_t eepromAddressOffset = 0x00;     // Use an offset between 0x00 and 0x0F.
-uint8_t       secretPassword = 0x0D;          // Try different hex values here to see them stored and
-                                              // recovered from EEPROM.
+
+// Use an offset between 0x00 and 0x0F.
+const uint8_t eepromAddressOffset = 0x00;
+
+// Try different hex values here to see them stored and
+// recovered from EEPROM.
+uint8_t       secretPassword = 0x0D;
+
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -51,3 +55,4 @@ void setup() {
 
 void loop() {
 }
+

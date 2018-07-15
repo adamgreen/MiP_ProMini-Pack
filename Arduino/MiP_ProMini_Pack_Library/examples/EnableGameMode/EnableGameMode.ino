@@ -30,14 +30,14 @@
 
 MiP mip;
 
-int delayPeriod = 10000;              // Use short delays for bench testing with serial monitor
-                                      // or long delays to see it in action.
+// Use short delays for bench testing with serial monitor
+// or long delays to see it in action.
+int delayPeriod = 10000;
 
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
@@ -49,26 +49,39 @@ void setup() {
 
 void loop() {
   mip.enableCageMode();
-  if (mip.isCageModeEnabled()) Serial.println(F("Cage mode enabled."));
+  if (mip.isCageModeEnabled()) {
+    Serial.println(F("Cage mode enabled."));
+  }
   delay(delayPeriod);
 
   mip.enableDanceMode();
-  if (mip.isDanceModeEnabled()) Serial.println(F("Dance mode enabled."));
+  if (mip.isDanceModeEnabled()) {
+    Serial.println(F("Dance mode enabled."));
+  }
   delay(delayPeriod);
 
   mip.enableStackMode();
-  if (mip.isStackModeEnabled()) Serial.println(F("Stack mode enabled."));
+  if (mip.isStackModeEnabled()) {
+    Serial.println(F("Stack mode enabled."));
+  }
   delay(delayPeriod);
 
   mip.enableTrickMode();
-  if (mip.isTrickModeEnabled()) Serial.println(F("Trick mode enabled."));
+  if (mip.isTrickModeEnabled()) {
+    Serial.println(F("Trick mode enabled."));
+  }
   delay(delayPeriod);
 
   mip.enableRoamMode();
-  if (mip.isRoamModeEnabled()) Serial.println(F("Roam mode enabled."));
+  if (mip.isRoamModeEnabled()) {
+    Serial.println(F("Roam mode enabled."));
+  }
   delay(delayPeriod);
-  
+
   mip.enableAppMode();
-  if (mip.isAppModeEnabled()) Serial.println(F("App mode enabled."));
+  if (mip.isAppModeEnabled()) {
+    Serial.println(F("App mode enabled."));
+  }
   delay(delayPeriod);
 }
+

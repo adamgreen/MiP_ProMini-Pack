@@ -20,29 +20,26 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
+  Serial.println(F("Odometer.ino - Read out current odometer reading and reset."));
 
-    float cm = mip.readDistanceTravelled();
-    Serial.print(F("MiP has travelled "));
-        Serial.print(cm);
-        Serial.println(F(" cm since the last reset."));
+  float cm = mip.readDistanceTravelled();
+  Serial.print(F("MiP has travelled "));
+    Serial.print(cm);
+    Serial.println(F(" cm since the last reset."));
 
-    mip.resetDistanceTravelled();
+  mip.resetDistanceTravelled();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 

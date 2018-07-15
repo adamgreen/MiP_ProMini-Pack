@@ -19,23 +19,19 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Shake.ino - Detect shakes."));
+  Serial.println(F("Shake.ino - Detect shakes."));
 }
 
-void loop()
-{
-    if (mip.hasBeenShaken())
-    {
-        Serial.println(F("Shake detected!"));
-    }
+void loop() {
+  if (mip.hasBeenShaken()) {
+    Serial.println(F("Shake detected!"));
+  }
 }
 

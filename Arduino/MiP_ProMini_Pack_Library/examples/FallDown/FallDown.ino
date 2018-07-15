@@ -20,41 +20,38 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
+  Serial.println(F("FallDown.ino - Fall forward and backward.\n"));
 
-    Serial.println(F("Waiting for robot to be standing upright."));
-    while (!mip.isUpright())
-    {
-    }
-    delay(1000);
+  Serial.println(F("Waiting for robot to be standing upright."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  delay(1000);
 
-    Serial.println(F("Falling forward."));
-    mip.fallForward();
+  Serial.println(F("Falling forward."));
+  mip.fallForward();
 
-    delay(1000);
-    Serial.println(F("Waiting for robot to be standing upright again."));
-    while (!mip.isUpright())
-    {
-    }
-    delay(1000);
+  delay(1000);
+  Serial.println(F("Waiting for robot to be standing upright again."));
+  while (!mip.isUpright()) {
+    // Waiting
+  }
+  delay(1000);
 
-    Serial.println(F("Falling backward."));
-    mip.fallBackward();
+  Serial.println(F("Falling backward."));
+  mip.fallBackward();
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 

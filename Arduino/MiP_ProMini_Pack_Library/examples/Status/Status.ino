@@ -27,66 +27,54 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Status.ino - Display MiP status as it changes."));
+  Serial.println(F("Status.ino - Display MiP status as it changes."));
 }
 
-void loop()
-{
-    static float       lastBatteryLevel = 0.0f;
-    static MiPPosition lastPosition = (MiPPosition)-1;
+void loop() {
+  static float       lastBatteryLevel = 0.0f;
+  static MiPPosition lastPosition = (MiPPosition) - 1;
 
-    float              currentBatteryLevel = mip.readBatteryVoltage();
-    MiPPosition        currentPosition = mip.readPosition();
+  float              currentBatteryLevel = mip.readBatteryVoltage();
+  MiPPosition        currentPosition = mip.readPosition();
 
-    if (currentBatteryLevel != lastBatteryLevel)
-    {
-        Serial.println(F("Battery: "));
-            Serial.print(currentBatteryLevel);
-            Serial.println(F("V"));
-        lastBatteryLevel = currentBatteryLevel;
+  if (currentBatteryLevel != lastBatteryLevel) {
+    Serial.print(F("Battery: "));
+      Serial.print(currentBatteryLevel);
+      Serial.println(F("V"));
+    lastBatteryLevel = currentBatteryLevel;
+  }
+
+  if (currentPosition != lastPosition) {
+    if (mip.isOnBack()) {
+      Serial.println(F("Position: On Back"));
+    }
+    if (mip.isFaceDown()) {
+      Serial.println(F("Position: Face Down"));
+    }
+    if (mip.isUpright()) {
+      Serial.println(F("Position: Upright"));
+    }
+    if (mip.isPickedUp()) {
+      Serial.println(F("Position: Picked Up"));
+    }
+    if (mip.isHandStanding()) {
+      Serial.println(F("Position: Hand Stand"));
+    }
+    if (mip.isFaceDownOnTray()) {
+      Serial.println(F("Position: Face Down on Tray"));
+    }
+    if (mip.isOnBackWithKickstand()) {
+      Serial.println(F("Position: On Back With Kickstand"));
     }
 
-    if (currentPosition != lastPosition)
-    {
-        if (mip.isOnBack())
-        {
-            Serial.println(F("Position: On Back"));
-        }
-        if (mip.isFaceDown())
-        {
-            Serial.println(F("Position: Face Down"));
-        }
-        if (mip.isUpright())
-        {
-            Serial.println(F("Position: Upright"));
-        }
-        if (mip.isPickedUp())
-        {
-            Serial.println(F("Position: Picked Up"));
-        }
-        if (mip.isHandStanding())
-        {
-            Serial.println(F("Position: Hand Stand"));
-        }
-        if (mip.isFaceDownOnTray())
-        {
-            Serial.println(F("Position: Face Down on Tray"));
-        }
-        if (mip.isOnBackWithKickstand())
-        {
-            Serial.println(F("Position: On Back With Kickstand"));
-        }
-  
-        lastPosition = currentPosition;
-    }    
+    lastPosition = currentPosition;
+  }
 }
 

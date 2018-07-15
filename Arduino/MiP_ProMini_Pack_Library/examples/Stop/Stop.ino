@@ -19,27 +19,24 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Stop.ino - Use stop() function. Interrupt a 360 degree turn with stop()."));
+  Serial.println(F("Stop.ino - Use stop() function. Interrupt a 360 degree turn with stop()."));
 
-    mip.turnLeft(360, 6);
-    delay(1000);
-    mip.stop();
-    delay(1000);
+  mip.turnLeft(360, 6);
+  delay(1000);
+  mip.stop();
+  delay(1000);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 

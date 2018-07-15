@@ -20,41 +20,38 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
+  Serial.println(F("SoftwareHardwareVersion.ino - Use readSoftwareVersion() & readHardwareInfo() functions."));
 
-    MiPSoftwareVersion softwareVersion;
-    mip.readSoftwareVersion(softwareVersion);
-    Serial.print(F("software version: "));
-        Serial.print(softwareVersion.year);
-        Serial.print('-');
-        Serial.print(softwareVersion.month);
-        Serial.print('-');
-        Serial.print(softwareVersion.day);
-        Serial.print('.');
-        Serial.println(softwareVersion.uniqueVersion);
+  MiPSoftwareVersion softwareVersion;
+  mip.readSoftwareVersion(softwareVersion);
+  Serial.print(F("software version: "));
+  Serial.print(softwareVersion.year);
+    Serial.print('-');
+    Serial.print(softwareVersion.month);
+    Serial.print('-');
+    Serial.print(softwareVersion.day);
+    Serial.print('.');
+    Serial.println(softwareVersion.uniqueVersion);
 
-    MiPHardwareInfo hardwareInfo;
-    mip.readHardwareInfo(hardwareInfo);
-    Serial.println(F("hardware info"));
-    Serial.print(F("  voice chip version: "));
-        Serial.println(hardwareInfo.voiceChip);
-    Serial.print(F("  hardware version: "));
-        Serial.println(hardwareInfo.hardware);
+  MiPHardwareInfo hardwareInfo;
+  mip.readHardwareInfo(hardwareInfo);
+  Serial.println(F("hardware info"));
+  Serial.print(F("  voice chip version: "));
+    Serial.println(hardwareInfo.voiceChip);
+  Serial.print(F("  hardware version: "));
+    Serial.println(hardwareInfo.hardware);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 
