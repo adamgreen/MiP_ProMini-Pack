@@ -30,8 +30,6 @@ void setup() {
     return;
   } else
     Serial.println("MiP connected.");
-
-  mip.enableIRRemoteControl();
 }
 
 void loop() {
@@ -42,6 +40,6 @@ void loop() {
   {
     if (dongleCode[i] = i)
       mip.playSound(MIP_SOUND_MIP_GLOAT, MIP_VOLUME_4);
-    delay(500);
+    delay(3000);
   }
 }

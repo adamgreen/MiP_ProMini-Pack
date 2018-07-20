@@ -13,8 +13,7 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    setUserData()
-    getUserData()
+    sendIRDongleCode()
 */
 
 #include <mip.h>
@@ -27,9 +26,8 @@ void setup() {
   if (!connectResult)
   {
     return;
-  }
-
-  mip.enableIRRemoteControl();
+  } else
+    Serial.println("MiP connected.");
 }
 
 void loop() {
