@@ -54,6 +54,7 @@
 // These command codes are placed in the first byte of requests sent to the MiP and responses sent back from the MiP.
 // See https://github.com/WowWeeLabs/MiP-BLE-Protocol/blob/master/MiP-Protocol.md for more information.
 #define MIP_CMD_RECEIVE_IR_DONGLE_CODE  0x03
+#define MIP_CMD_GET_DETECTED_MIP        0x04
 #define MIP_CMD_PLAY_SOUND              0x06
 #define MIP_CMD_SET_POSITION            0x08
 #define MIP_CMD_GET_GESTURE_RESPONSE    0x0A
@@ -61,7 +62,6 @@
 #define MIP_CMD_GET_RADAR_RESPONSE      0x0C
 #define MIP_CMD_GET_GESTURE_RADAR_MODE  0x0D
 #define MIP_CMD_SET_DETECTION_MODE      0x0E
-#define MIP_CMD_GET_DETECTION_MODE      0x0F
 #define MIP_CMD_SET_IR_REMOTE_CONTROL   0x10
 #define MIP_CMD_GET_IR_REMOTE_CONTROL   0x11
 #define MIP_CMD_SET_USER_DATA           0x12
@@ -162,6 +162,9 @@ void MiP::clear()
     m_lastWeight = 0;
     m_clapEvents.clear();
     m_gestureEvents.clear();
+    m_detectedMiP.clear();
+    m_receivedIRCode.clear();
+    m_irId = 0x00;
 }
 
 bool MiP::begin()
@@ -1947,73 +1950,52 @@ int8_t MiP::rawGetUserData(uint8_t address, uint8_t& userData)
 
 
 
-// This is a public method and I think it's done.
-void MiP::enableDetectionMode(uint8_t id, uint8_t txPower)
+void MiP::enableMiPDetectionMode(uint8_t id, uint8_t txPower)
 {
-    verifiedDetectionMode(MIP_IR_DETECTION_MODE_ENABLE, id, txPower);
+    m_irId = id;
+    
+    rawSetMiPDetectionMode(id, txPower);
 }
 
-// This is a public method and I think it's done.
-void MiP::disableDetectionMode()
+void MiP::disableMiPDetectionMode()
 {
-    verifiedDetectionMode(MIP_IR_DETECTION_MODE_DISABLE, 0, 0);
+    m_irId = MIP_IR_DETECTION_MODE_DISABLE;
+    
+    // According to WowWee documentation, TX power must be between 1 and 120 even when disabling.
+    rawSetMiPDetectionMode(MIP_IR_DETECTION_MODE_DISABLE, 0x01);
 }
 
-// This is a public method and I think it's done.
-bool MiP::isDetectionModeEnabled()
+bool MiP::isMiPDetectionModeEnabled()
 {
-    uint8_t detectionMode
-
-    rawGetDetectionMode(detectionMode, uint8_t id);
-
-    return detectionMode == MIP_IR_DETECTION_MODE_ENABLE ? true : false;
+    return m_irId > MIP_IR_DETECTION_MODE_DISABLE ? true : false;
 }
 
-// This is a protected method and I think it's done.
-void MiP::verifiedDetectionMode(uint8_t desiredMode, uint8_t id, uint8_t txPower)
+int8_t MiP::readDetectedMiP(uint8_t& detectedMiP)
 {
-    int8_t result;
+    // Fetch bytes from the Serial receive buffer and process any event data found within.
+    processAllResponseData();
 
-    for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
+    if(!m_detectedMiP.detected)
     {
-        result = rawSetDetectionMode(desiredMode, id, txPower);
-
-        // Read back and make sure that it was set as expected.
-        uint8_t& actualMode;
-
-        result = rawGetDetectionMode(actualMode, 1, 1);
-
-        if (result == MIP_ERROR_NONE && actualMode == desiredMode)
-        {
-            // The set was successful so return immediately.
-            m_lastError = MIP_ERROR_NONE;
-            return;
-        }
-
-        // An error was encountered so we will loop around and try again.
-        // Wait for a bit before the next retry.
-        delay(MIP_RETRY_WAIT);
+        return 0;  
     }
 
-    if (result != MIP_ERROR_NONE)
-    {
-        // Kept getting an error back from rawGetGestureRadarMode().
-        m_lastError = result;
-    }
-    else
-    {
-        // rawGetGestureRadarMode() was successful but didn't match mode to which we were attempting to change.
-        m_lastError = MIP_ERROR_MAX_RETRIES;
-    }
+    detectedMiP = m_detectedMiP.id;
+    
+    // Now that it's been read, invalidate the last detected MiP.
+    m_detectedMiP.clear();
+    
+    return 1;
 }
 
-// This is a protected method and I think it's done.
-void MiP::rawSetDetectionMode(uint8_t desiredMode, uint8_t id, uint8_t txPower)
+// This internal protected method sends the set detection mode command with minimal error 
+// handling. The error recovery happens at a higher level of the driver.
+void MiP::rawSetMiPDetectionMode(uint8_t id, uint8_t txPower)
 {
     uint8_t command[1+2];
 
-    MIP_ASSERT( 1 <= id && id <= 255 );
-    MIP_ASSERT( 1 <= txPower && txPower <= 120 );
+    MIP_ASSERT( MIP_IR_DETECTION_MODE_DISABLE <= id && id <= 0xFF );
+    MIP_ASSERT( 0x01 <= txPower && txPower <= 0x78 );
 
     command[0] = MIP_CMD_SET_DETECTION_MODE;
     command[1] = id;
@@ -2022,44 +2004,16 @@ void MiP::rawSetDetectionMode(uint8_t desiredMode, uint8_t id, uint8_t txPower)
     rawSend(command, sizeof(command));
 }
 
-// This is a protected method and I think it's done.
-int8_t MiP::rawGetDetectionMode(uint8_t& detectionMode, uint8_t& id, uint8_t& txPower)
-{
-    const uint8_t getDetectionMode[1] = { MIP_CMD_GET_DETECTION_MODE };
-    uint8_t       response[1+2];
-    size_t        responseLength;
-    int8_t        result;
-
-    result = rawReceive(getDetectionMode, sizeof(getDetectionMode), response, sizeof(response), responseLength);
-    if (result)
-    {
-        return result;
-    }
-    if (responseLength != 3 ||
-        response[0] != MIP_CMD_GET_DETECTION_MODE)
-    {
-        return MIP_ERROR_BAD_RESPONSE;
-    }
-
-    detetionMode = response[1];
-    id = response[2];
-    txPower = response[3];
-    return MIP_ERROR_NONE;
-}
-
-// This is a public method and I think it's done.
 void MiP::enableIRRemoteControl()
 {
     verifiedIRRemoteControl(MIP_IR_REMOTE_CONTROL_ENABLE);
 }
 
-// This is a public method and I think it's done.
 void MiP::disableIRRemoteControl()
 {
     verifiedIRRemoteControl(MIP_IR_REMOTE_CONTROL_DISABLE);
 }
 
-// This is a public method and I think it's done.
 bool MiP::isIRRemoteControlEnabled()
 {
     const uint8_t remoteControlEnabled[1] = { MIP_CMD_GET_IR_REMOTE_CONTROL };
@@ -2074,9 +2028,7 @@ bool MiP::isIRRemoteControlEnabled()
         return result;
     }
     if (responseLength != sizeof(response) ||
-        response[0] != MIP_CMD_GET_IR_REMOTE_CONTROL ||
-        (response[1] != MIP_IR_REMOTE_CONTROL_ENABLE ||
-        response[1] != MIP_IR_REMOTE_CONTROL_DISABLE))
+        response[0] != MIP_CMD_GET_IR_REMOTE_CONTROL)
     {
         return MIP_ERROR_BAD_RESPONSE;
     }
@@ -2084,26 +2036,16 @@ bool MiP::isIRRemoteControlEnabled()
     return response[1] == MIP_IR_REMOTE_CONTROL_ENABLE ? true : false;
 }
 
-// This is a public method and I think it's done.
 void MiP::sendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower)
 {
-    // sendCode may contain up to four elements and dataNumbers indicates how many are useful.
-    // e.g. if dataNumbers contains a "1", then sendCode[0] is the only meaningful data.
-    // All other elements in sendCode will be ignored by MiP.
-    MIP_ASSERT( 0 <= dataNumbers && dataNumbers <= 4 );
+    // According to WowWee documentation, indicate number of valid bits in transmission.
+    MIP_ASSERT( 0 <= dataNumbers && dataNumbers <= 0x20 );
 
     // Check for valid transmitPower values.  Must be between 1 and 120.
-    MIP_ASSERT( 1 <= transmitPower && transmitPower <= 120 );
+    MIP_ASSERT( 1 <= transmitPower && transmitPower <= 0x78 );
 
     // Send this command blindly with no error checking since there is no easy way to determine if it has failed.
     rawSendIRDongleCode(sendCode, dataNumbers, transmitPower);
-}
-
-// This is a public method and I think it's done.
-void MiP::receiveIRDongleCode(uint8_t* receiveCode, uint8_t& dataNumbers)
-{
-    // Send this command blindly with no error checking since there is no easy way to determine if it has failed.
-    rawReceiveIRDongleCode(receiveCode, dataNumbers);
 }
 
 // This internal protected method sends the send IR dongle code command with no error checking.
@@ -2113,58 +2055,62 @@ void MiP::rawSendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t t
     uint8_t command[1+6];
 
     command[0] = MIP_CMD_SEND_IR_DONGLE_CODE;
-
-    for(int i = 1; i <= dataNumbers; i++)
-    {
-       command[i] = sendCode[i-1];
-    }
+    command[1] = sendCode[0];
+    command[2] = sendCode[1];
+    command[3] = sendCode[2];
+    command[4] = sendCode[3];
     command[5] = dataNumbers;
     command[6] = transmitPower;
 
+    MiPStream.print(F("command[0] contains ")); MiPStream.println(command[0], HEX);
+    MiPStream.print(F("command[1] contains ")); MiPStream.println(command[1], HEX);
+    MiPStream.print(F("command[2] contains ")); MiPStream.println(command[2], HEX);
+    MiPStream.print(F("command[3] contains ")); MiPStream.println(command[3], HEX);
+    MiPStream.print(F("command[4] contains ")); MiPStream.println(command[4], HEX);
+    MiPStream.print(F("command[5] contains ")); MiPStream.println(command[5], HEX);
+    MiPStream.print(F("command[6] contains ")); MiPStream.println(command[6], HEX);
+    
     rawSend(command, sizeof(command));
 }
 
-// This internal protected method sends the receive IR dongle code command with no error checking.
-// The error handling and recovery happens at a higher level of the driver.
-int8_t MiP::rawReceiveIRDongleCode(uint8_t* receiveCode, uint8_t& dataNumbers)
+int8_t MiP::readIRDongleCode(MiPIRCode& codeEvent)
 {
-    const uint8_t receiveIRDongleCode[1] = { MIP_CMD_RECEIVE_IR_DONGLE_CODE };
-    uint8_t       response[1+5];
-    size_t        responseLength;
-    int8_t        result;
+    // Fetch bytes from the Serial receive buffer and process any event data found within.
+    processAllResponseData();
 
-    result = rawReceive(receiveIRDongleCode, sizeof(receiveIRDongleCode), response, sizeof(response), responseLength);
-    if (result)
+    if (!m_receivedIRCode.received)
     {
-        return result;
+        m_lastError = MIP_ERROR_NO_EVENT;
+        return -1; //MIP_GESTURE_INVALID;
     }
-    if (responseLength != sizeof(response) ||
-        response[0] != MIP_CMD_RECEIVE_IR_DONGLE_CODE ||
-        (response[1] != 0x02 ||
-         response[1] != 0x03 ||
-         response[1] != 0x04))
-    {
-        return MIP_ERROR_BAD_RESPONSE;
-    }
-
-    for(int i = 0; i < response[i]; i++)
-        receiveCode[i] = response[i+2];
-    dataNumbers = response[1];
-    return result;
+    
+    codeEvent.received = true;
+    codeEvent.code[0] = m_receivedIRCode.code[0];
+    codeEvent.code[1] = m_receivedIRCode.code[1];
+    codeEvent.code[2] = m_receivedIRCode.code[2];
+    codeEvent.code[3] = m_receivedIRCode.code[3];
+    codeEvent.dataNumbers = m_receivedIRCode.dataNumbers;
+    
+    // Now that the code had been read, invalidate the last received code.
+    m_receivedIRCode.dataNumbers = 0;
+    
+    m_lastError = MIP_ERROR_NONE;
+    return 0;
 }
 
 // This internal protected method verifies that IR remote control is enabled.
-void MiP::verifiedIRRemoteControl(uint8_t remoteControl)
+void MiP::verifiedIRRemoteControl(uint8_t desiredRemoteControlMode)
 {
-    bool result;
+    int8_t result;
 
     for (uint8_t retry = 0 ; retry < MIP_MAX_RETRIES ; retry++)
     {
-        rawSetIRRemoteControl(remoteControl);
+        rawSetIRRemoteControl(desiredRemoteControlMode);
 
         // Read back and make sure that it was set as expected.
-        result = isIRRemoteControlEnabled();
-        if (result)
+        uint8_t actualMode;
+        result = rawGetIRRemoteControl(actualMode);
+        if (result == MIP_ERROR_NONE && actualMode == desiredRemoteControlMode)
         {
             // The set was successful so return immediately.
             m_lastError = MIP_ERROR_NONE;
@@ -2188,13 +2134,42 @@ void MiP::verifiedIRRemoteControl(uint8_t remoteControl)
     }
 }
 
-// This is a protected method and I think it's done.
-void MiP::rawSetIRRemoteControl()
+// This internal protected method sends the set IR remote control command with minimal error 
+// handling. The error recovery happens at a higher level of the driver.
+void MiP::rawSetIRRemoteControl(uint8_t remoteControl)
 {
-    const uint8_t remoteControlEnabled[2] = { MIP_CMD_SET_IR_REMOTE_CONTROL,
-        MIP_IR_DETECTION_MODE_ENABLE };
+    uint8_t command[1+1];
 
-    rawSend(remoteControlEnabled, sizeof(remoteControlEnabled));
+    MIP_ASSERT( remoteControl == MIP_IR_REMOTE_CONTROL_ENABLE ||  remoteControl == MIP_IR_REMOTE_CONTROL_DISABLE);
+
+    command[0] = MIP_CMD_SET_IR_REMOTE_CONTROL;
+    command[1] = remoteControl;
+
+    rawSend(command, sizeof(command));
+}
+
+// This internal protected method sends the get IR remote control status command with minimal 
+// error handling. The error recovery happens at a higher level of the driver.
+int8_t MiP::rawGetIRRemoteControl(uint8_t& remoteControl)
+{
+    const uint8_t getIRRemoteControl[1] = { MIP_CMD_GET_IR_REMOTE_CONTROL };
+    uint8_t       response[1+1];
+    size_t        responseLength;
+    int8_t        result;
+
+    result = rawReceive(getIRRemoteControl, sizeof(getIRRemoteControl), response, sizeof(response), responseLength);
+    if (result)
+    {
+        return result;
+    }
+    if (responseLength != sizeof(response) ||
+        response[0] != MIP_CMD_GET_IR_REMOTE_CONTROL)
+    {
+        return MIP_ERROR_BAD_RESPONSE;
+    }
+
+    remoteControl = response[1];
+    return result;
 }
 
 
@@ -2381,6 +2356,7 @@ void MiP::processOobResponseData(uint8_t commandByte)
     case MIP_CMD_GET_GESTURE_RESPONSE:
     case MIP_CMD_CLAP_RESPONSE:
     case MIP_CMD_GET_WEIGHT:
+    case MIP_CMD_GET_DETECTED_MIP:
         length = 1;
         break;
     case MIP_CMD_SHAKE_RESPONSE:
@@ -2388,6 +2364,9 @@ void MiP::processOobResponseData(uint8_t commandByte)
         break;
     case MIP_CMD_GET_STATUS:
         length = 2;
+        break;
+    case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
+        length = 5;
         break;
     default:
         uint8_t discardedBytes = discardUnexpectedSerialData();
@@ -2444,6 +2423,17 @@ void MiP::processOobResponseData(uint8_t commandByte)
         break;
     case MIP_CMD_CLAP_RESPONSE:
         m_clapEvents.push(response[1]);
+        break;
+    case MIP_CMD_GET_DETECTED_MIP:
+        m_detectedMiP.id = response[1];
+        m_detectedMiP.detected = true;
+        break;
+    case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
+        m_receivedIRCode.dataNumbers = response[1];
+        for(int i = 0; i < m_receivedIRCode.dataNumbers; i++){
+            m_receivedIRCode.code[i] = response[i+2];
+        }
+        m_receivedIRCode.received = true;
         break;
     default:
         // Invalid notification command bytes were already handled in the previous switch so should never get here.

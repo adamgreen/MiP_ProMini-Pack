@@ -13,16 +13,18 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    sendIRDongleCode()
+    enableIRRemoteControl()
+    disableIRRemoteControl()
+    isIRRemoteControlEnabled()
 */
 
 #include <mip.h>
 
 MiP mip;
 
-// Try different values for VALID_DATA_BYTES (0x08, 0x10, 0x18, 0x20)
-#define VALID_DATA_BYTES 0x20
-#define MIP_IR_TX_POWER  0x78
+// Load this sketch on a pair of MiPs facing each other and use a different MIP_ID_NO for each.
+#define MIP_ID_NO       0x10
+#define MIP_IR_TX_POWER 0x78
 
 void setup() {
   bool connectResult = mip.begin();
@@ -32,14 +34,22 @@ void setup() {
     return;
   }
 
-  Serial.println(F("SendIRDongleCode.ino - Send up to four bytes to another MiP using IR."));
-}
+  Serial.println(F("EnableIRRemoteControl.ino - Enable your MiP to be controlled using IR."));
 
-void loop() {
-  // Try different values for dongleCode[].
-  uint8_t dongleCode[4] = { 0x01, 0x02, 0x03, 0x04 };
+  if (!mip.isIRRemoteControlEnabled())
+    Serial.println(F("IR remote control is disabled."));
+
+  mip.enableIRRemoteControl();
+
+  if (mip.isIRRemoteControlEnabled())
+    Serial.println(F("IR remote control is enabled."));
 
   delay(3000);
-  
-  mip.sendIRDongleCode(dongleCode, VALID_DATA_BYTES, MIP_IR_TX_POWER);
+
+  mip.disableIRRemoteControl();
+
+  if (!mip.isIRRemoteControlEnabled())
+    Serial.println(F("IR remote control is disabled."));
 }
+
+void loop() {}

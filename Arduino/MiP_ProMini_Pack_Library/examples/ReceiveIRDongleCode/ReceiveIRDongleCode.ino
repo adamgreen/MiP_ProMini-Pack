@@ -18,28 +18,31 @@
 
 #include <mip.h>
 
-MiP           mip;
-uint8_t dongleCode[4] = {0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t sizeOfResponse;
+MiP       mip;
+uint8_t   dongleCode[4] = { 0x00, 0x00, 0x00, 0x00 };
+MiPIRCode receiveCode;
 
 void setup() {
-  // Initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
   if (!connectResult)
   {
+    Serial.println(F("Failed connecting to MiP!"));
     return;
-  } else
-    Serial.println("MiP connected.");
+  }
+
+  Serial.println(F("ReceiveIRDongleCode.ino - Receive up to four bytes from another MiP using IR."));
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  mip.receiveIRDongleCode(dongleCode, sizeOfResponse);
+  mip.readIRDongleCode(receiveCode);
 
-  for (int i = 0; i < sizeOfResponse; i++)
+  Serial.println(F("Looking for data."));
+  for (int i = 0; i < receiveCode.dataNumbers ; i++)
   {
-    if (dongleCode[i] = i)
-      mip.playSound(MIP_SOUND_MIP_GLOAT, MIP_VOLUME_4);
-    delay(3000);
+    Serial.print(i); Serial.print(F(" byte data: ")); Serial.println(receiveCode.code[i], HEX);
   }
+  
+  receiveCode.clear();
+  
+  delay(3000);
 }
