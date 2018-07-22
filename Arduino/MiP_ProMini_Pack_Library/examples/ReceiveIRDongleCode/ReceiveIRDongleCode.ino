@@ -19,11 +19,12 @@
 #include <mip.h>
 
 MiP       mip;
-uint8_t   dongleCode[4] = { 0x00, 0x00, 0x00, 0x00 };
+uint8_t   dongleCode[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
 MiPIRCode receiveCode;
+bool      connectResult;
 
 void setup() {
-  bool connectResult = mip.begin();
+  connectResult = mip.begin();
   if (!connectResult)
   {
     Serial.println(F("Failed connecting to MiP!"));
@@ -34,6 +35,10 @@ void setup() {
 }
 
 void loop() {
+  // Don't run if no connection was established. Useful for development when J1 is jumpered.
+  if (!connectResult)
+    return;
+
   mip.readIRDongleCode(receiveCode);
 
   Serial.println(F("Looking for data."));
@@ -41,8 +46,8 @@ void loop() {
   {
     Serial.print(i); Serial.print(F(" byte data: ")); Serial.println(receiveCode.code[i], HEX);
   }
-  
+
   receiveCode.clear();
-  
+
   delay(3000);
 }

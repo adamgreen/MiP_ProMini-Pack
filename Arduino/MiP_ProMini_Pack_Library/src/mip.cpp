@@ -255,7 +255,7 @@ void MiP::printLastCallResult()
 {
     if (m_lastError != MIP_ERROR_NONE)
     {
-        MiPStream.print(F("mip: MiP API returned "));
+        MiPStream.print(F("MiP: API returned "));
         switch (m_lastError)
         {
         case MIP_ERROR_TIMEOUT:
@@ -1953,14 +1953,14 @@ int8_t MiP::rawGetUserData(uint8_t address, uint8_t& userData)
 void MiP::enableMiPDetectionMode(uint8_t id, uint8_t txPower)
 {
     m_irId = id;
-    
+
     rawSetMiPDetectionMode(id, txPower);
 }
 
 void MiP::disableMiPDetectionMode()
 {
     m_irId = MIP_IR_DETECTION_MODE_DISABLE;
-    
+
     // According to WowWee documentation, TX power must be between 1 and 120 even when disabling.
     rawSetMiPDetectionMode(MIP_IR_DETECTION_MODE_DISABLE, 0x01);
 }
@@ -1977,18 +1977,18 @@ int8_t MiP::readDetectedMiP(uint8_t& detectedMiP)
 
     if(!m_detectedMiP.detected)
     {
-        return 0;  
+        return 0;
     }
 
     detectedMiP = m_detectedMiP.id;
-    
+
     // Now that it's been read, invalidate the last detected MiP.
     m_detectedMiP.clear();
-    
+
     return 1;
 }
 
-// This internal protected method sends the set detection mode command with minimal error 
+// This internal protected method sends the set detection mode command with minimal error
 // handling. The error recovery happens at a higher level of the driver.
 void MiP::rawSetMiPDetectionMode(uint8_t id, uint8_t txPower)
 {
@@ -2039,7 +2039,7 @@ bool MiP::isIRRemoteControlEnabled()
 void MiP::sendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower)
 {
     // According to WowWee documentation, indicate number of valid bits in transmission.
-    MIP_ASSERT( 0 <= dataNumbers && dataNumbers <= 0x20 );
+    MIP_ASSERT( dataNumbers == 0x10 || dataNumbers == 0x18 || dataNumbers == 0x20 );
 
     // Check for valid transmitPower values.  Must be between 1 and 120.
     MIP_ASSERT( 1 <= transmitPower && transmitPower <= 0x78 );
@@ -2062,14 +2062,6 @@ void MiP::rawSendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t t
     command[5] = dataNumbers;
     command[6] = transmitPower;
 
-    MiPStream.print(F("command[0] contains ")); MiPStream.println(command[0], HEX);
-    MiPStream.print(F("command[1] contains ")); MiPStream.println(command[1], HEX);
-    MiPStream.print(F("command[2] contains ")); MiPStream.println(command[2], HEX);
-    MiPStream.print(F("command[3] contains ")); MiPStream.println(command[3], HEX);
-    MiPStream.print(F("command[4] contains ")); MiPStream.println(command[4], HEX);
-    MiPStream.print(F("command[5] contains ")); MiPStream.println(command[5], HEX);
-    MiPStream.print(F("command[6] contains ")); MiPStream.println(command[6], HEX);
-    
     rawSend(command, sizeof(command));
 }
 
@@ -2083,17 +2075,17 @@ int8_t MiP::readIRDongleCode(MiPIRCode& codeEvent)
         m_lastError = MIP_ERROR_NO_EVENT;
         return -1; //MIP_GESTURE_INVALID;
     }
-    
+
     codeEvent.received = true;
     codeEvent.code[0] = m_receivedIRCode.code[0];
     codeEvent.code[1] = m_receivedIRCode.code[1];
     codeEvent.code[2] = m_receivedIRCode.code[2];
     codeEvent.code[3] = m_receivedIRCode.code[3];
     codeEvent.dataNumbers = m_receivedIRCode.dataNumbers;
-    
+
     // Now that the code had been read, invalidate the last received code.
     m_receivedIRCode.dataNumbers = 0;
-    
+
     m_lastError = MIP_ERROR_NONE;
     return 0;
 }
@@ -2134,7 +2126,7 @@ void MiP::verifiedIRRemoteControl(uint8_t desiredRemoteControlMode)
     }
 }
 
-// This internal protected method sends the set IR remote control command with minimal error 
+// This internal protected method sends the set IR remote control command with minimal error
 // handling. The error recovery happens at a higher level of the driver.
 void MiP::rawSetIRRemoteControl(uint8_t remoteControl)
 {
@@ -2148,7 +2140,7 @@ void MiP::rawSetIRRemoteControl(uint8_t remoteControl)
     rawSend(command, sizeof(command));
 }
 
-// This internal protected method sends the get IR remote control status command with minimal 
+// This internal protected method sends the get IR remote control status command with minimal
 // error handling. The error recovery happens at a higher level of the driver.
 int8_t MiP::rawGetIRRemoteControl(uint8_t& remoteControl)
 {
@@ -2217,6 +2209,7 @@ void MiP::transportSendRequest(const uint8_t* pRequest, size_t requestLength, in
     while (requestLength-- > 0)
     {
         Serial.write(*pRequest++);
+
     }
 
     m_lastRequestTime = millis();
@@ -2349,6 +2342,9 @@ void MiP::processOobResponseData(uint8_t commandByte)
 {
     size_t length = 0;
 
+    uint8_t highNibble;
+    uint8_t lowNibble;
+
     // The number of additional bytes to read depends on which notification has been found in serial buffer.
     switch (commandByte)
     {
@@ -2366,7 +2362,9 @@ void MiP::processOobResponseData(uint8_t commandByte)
         length = 2;
         break;
     case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
-        length = 5;
+        highNibble = Serial.read();
+        lowNibble = Serial.read();
+        length = (parseHexDigit(highNibble) << 4) | parseHexDigit(lowNibble);
         break;
     default:
         uint8_t discardedBytes = discardUnexpectedSerialData();
@@ -2429,9 +2427,9 @@ void MiP::processOobResponseData(uint8_t commandByte)
         m_detectedMiP.detected = true;
         break;
     case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
-        m_receivedIRCode.dataNumbers = response[1];
+        m_receivedIRCode.dataNumbers = length;
         for(int i = 0; i < m_receivedIRCode.dataNumbers; i++){
-            m_receivedIRCode.code[i] = response[i+2];
+            m_receivedIRCode.code[i] = response[i+1];
         }
         m_receivedIRCode.received = true;
         break;

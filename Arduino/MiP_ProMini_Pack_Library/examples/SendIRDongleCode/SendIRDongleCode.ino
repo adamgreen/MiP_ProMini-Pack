@@ -18,14 +18,15 @@
 
 #include <mip.h>
 
-MiP mip;
-
-// Try different values for VALID_DATA_BYTES (0x08, 0x10, 0x18, 0x20)
+// Try different values for VALID_DATA_BYTES (0x10, 0x18, 0x20)
 #define VALID_DATA_BYTES 0x20
 #define MIP_IR_TX_POWER  0x78
 
+MiP  mip;
+bool connectResult;
+
 void setup() {
-  bool connectResult = mip.begin();
+  connectResult = mip.begin();
   if (!connectResult)
   {
     Serial.println(F("Failed connecting to MiP!"));
@@ -36,10 +37,14 @@ void setup() {
 }
 
 void loop() {
+  // Don't run if no connection was established. Useful for development when J1 is jumpered.
+  if (!connectResult)
+    return;
+
   // Try different values for dongleCode[].
-  uint8_t dongleCode[4] = { 0x01, 0x02, 0x03, 0x04 };
+  uint8_t dongleCode[5] = { 0x04, 0x03, 0x02, 0x01 };
 
   delay(3000);
-  
+
   mip.sendIRDongleCode(dongleCode, VALID_DATA_BYTES, MIP_IR_TX_POWER);
 }

@@ -38,7 +38,7 @@
 
 // Maximum length of MiP request and response buffer lengths.
 #define MIP_REQUEST_MAX_LEN     (17 + 1)    // Longest request is MIP_CMD_PLAY_SOUND.
-#define MIP_RESPONSE_MAX_LEN    (6 + 1)     // Longest response is MIP_CMD_RECEIVE_IR_DONGLE_CODE.
+#define MIP_RESPONSE_MAX_LEN    (5 + 1)     // Longest response is MIP_CMD_REQUEST_CHEST_LED.
 
 enum MiPGestureRadarMode
 {
