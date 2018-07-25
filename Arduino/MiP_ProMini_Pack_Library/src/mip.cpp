@@ -103,11 +103,12 @@
 #define MIP_EXPECT_NO_RESPONSE 0
 #define MIP_EXPECT_RESPONSE    1
 
+
 // IR mode definitions.
 #define MIP_IR_DETECTION_MODE_DISABLE 0
-#define MIP_IR_DETECTION_MODE_ENABLE  1
 #define MIP_IR_REMOTE_CONTROL_DISABLE 0
 #define MIP_IR_REMOTE_CONTROL_ENABLE  1
+
 
 // It is expected that the user will only instantiate a single MiP object (mostly likely a global object). This
 // pointer is set from within that singleton's constructor and later used by the global MiPStream when it needs to
@@ -2209,7 +2210,6 @@ void MiP::transportSendRequest(const uint8_t* pRequest, size_t requestLength, in
     while (requestLength-- > 0)
     {
         Serial.write(*pRequest++);
-
     }
 
     m_lastRequestTime = millis();
@@ -2376,9 +2376,20 @@ void MiP::processOobResponseData(uint8_t commandByte)
         return;
     }
 
-    // Read in the additional bytes of the notification.
-    uint8_t buffer[2 * 2];
+    // Read in the additional bytes of the notification.  The "4" comes from maximum length
+    // which is a response for MIP_CMD_RECEIVE_IR_DONGLE_CODE.
+    uint8_t buffer[4 * 2];
     size_t  bytesRead = Serial.readBytes(buffer, length * 2);
+    for (int i = 0 ; i < bytesRead; i++){
+        // STT: debugging. 
+        MiPStream.print(buffer[i]);  
+    }
+
+    if(commandByte == MIP_CMD_RECEIVE_IR_DONGLE_CODE){
+        for(int i = 0; i < length * 2; i++)
+        MiPStream.print(buffer[i]);
+    }
+
     if (bytesRead != length * 2)
     {
         MiPStream.print(F("MiP: OOB too short: "));
