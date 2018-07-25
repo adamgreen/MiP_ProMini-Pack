@@ -2382,13 +2382,9 @@ void MiP::processOobResponseData(uint8_t commandByte)
     size_t  bytesRead = Serial.readBytes(buffer, length * 2);
     for (int i = 0 ; i < bytesRead; i++){
         // STT: debugging. 
-        MiPStream.print(buffer[i]);  
-    }
-
-    if(commandByte == MIP_CMD_RECEIVE_IR_DONGLE_CODE){
-        for(int i = 0; i < length * 2; i++)
         MiPStream.print(buffer[i]);
     }
+    MiPStream.println();
 
     if (bytesRead != length * 2)
     {

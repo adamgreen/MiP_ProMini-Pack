@@ -39,9 +39,13 @@ void loop() {
   if (!connectResult)
     return;
 
+  Serial.println(F("Looking for data."));
+  
   mip.readIRDongleCode(receiveCode);
 
-  Serial.println(F("Looking for data."));
+  if (receiveCode.dataNumbers)
+    Serial.print(F("Found ")); Serial.print(receiveCode.dataNumbers); Serial.println(F(" data numbers."));
+    
   for (int i = 0; i < receiveCode.dataNumbers ; i++)
   {
     Serial.print(i); Serial.print(F(" byte data: ")); Serial.println(receiveCode.code[i], HEX);
