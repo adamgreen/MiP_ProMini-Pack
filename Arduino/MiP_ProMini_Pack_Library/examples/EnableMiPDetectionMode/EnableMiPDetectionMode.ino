@@ -56,7 +56,7 @@ void loop() {
     if (mip.readDetectedMiP(detectedMiP)) {
       Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
 
-    } 
+    }
     delay(3333);
   }
 

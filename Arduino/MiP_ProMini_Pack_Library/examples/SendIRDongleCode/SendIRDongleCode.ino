@@ -18,9 +18,11 @@
 
 #include <mip.h>
 
-// Try different values for VALID_DATA_BYTES (0x10, 0x18, 0x20)
-#define VALID_DATA_BYTES 0x20
+// 0x78 is the max tranmission power
 #define MIP_IR_TX_POWER  0x78
+
+// Try different values for dongleCode[].
+uint8_t dongleCode[2] = { 0xAC, 0xCA };
 
 MiP  mip;
 bool connectResult;
@@ -33,18 +35,12 @@ void setup() {
     return;
   }
 
-  Serial.println(F("SendIRDongleCode.ino - Send up to four bytes to another MiP using IR."));
+  Serial.println(F("SendIRDongleCode.ino - Send a two-byte code to another MiP using IR."));
 }
 
 void loop() {
-  // Don't run if no connection was established. Useful for development when J1 is jumpered.
-  if (!connectResult)
-    return;
 
-  // Try different values for dongleCode[].
-  uint8_t dongleCode[5] = { 0x04, 0x03, 0x02, 0x01 };
+  mip.sendIRDongleCode(dongleCode, MIP_IR_TX_POWER);
 
   delay(3000);
-
-  mip.sendIRDongleCode(dongleCode, VALID_DATA_BYTES, MIP_IR_TX_POWER);
 }

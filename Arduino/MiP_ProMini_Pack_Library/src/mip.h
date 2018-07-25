@@ -414,14 +414,11 @@ public:
     void clear()
     {
         received = false;
-        for(int i = 0; i < 4; i++)
-            code[i] = 0;
-        dataNumbers = 0;
+        code[0] = code[1] = 0;
     }
 
     bool    received;
-    uint8_t code[4];
-    uint8_t dataNumbers;
+    uint8_t code[2];
 };
 
 
@@ -548,7 +545,7 @@ public:
     void   enableIRRemoteControl();
     void   disableIRRemoteControl();
     bool   isIRRemoteControlEnabled();
-    void   sendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower);
+    void   sendIRDongleCode(uint8_t sendCode[], uint8_t txPower);
     int8_t readIRDongleCode(MiPIRCode& codeEvent);
 
     void   rawSend(const uint8_t request[], size_t requestLength);
@@ -645,7 +642,7 @@ protected:
     int8_t  rawGetUserData(uint8_t address, uint8_t& userData);
 
     void    rawSetMiPDetectionMode(uint8_t id, uint8_t txPower);
-    void    rawSendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower);
+    void    rawSendIRDongleCode(uint8_t sendCode[], uint8_t transmitPower);
     void    verifiedIRRemoteControl(uint8_t desiredRemoteControlMode);
     void    rawSetIRRemoteControl(uint8_t remoteControl);
     int8_t  rawGetIRRemoteControl(uint8_t& remoteControl);

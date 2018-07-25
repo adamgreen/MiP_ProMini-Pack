@@ -2037,31 +2037,28 @@ bool MiP::isIRRemoteControlEnabled()
     return response[1] == MIP_IR_REMOTE_CONTROL_ENABLE ? true : false;
 }
 
-void MiP::sendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower)
+void MiP::sendIRDongleCode(uint8_t sendCode[], uint8_t txPower)
 {
-    // According to WowWee documentation, indicate number of valid bits in transmission.
-    MIP_ASSERT( dataNumbers == 0x10 || dataNumbers == 0x18 || dataNumbers == 0x20 );
-
-    // Check for valid transmitPower values.  Must be between 1 and 120.
-    MIP_ASSERT( 1 <= transmitPower && transmitPower <= 0x78 );
+    // Check for valid txPower values.  Must be between 1 and 120.
+    MIP_ASSERT( 1 <= txPower && txPower <= 0x78 );
 
     // Send this command blindly with no error checking since there is no easy way to determine if it has failed.
-    rawSendIRDongleCode(sendCode, dataNumbers, transmitPower);
+    rawSendIRDongleCode(sendCode, txPower);
 }
 
 // This internal protected method sends the send IR dongle code command with no error checking.
 // The error handling and recovery happens at a higher level of the driver.
-void MiP::rawSendIRDongleCode(uint8_t sendCode[], uint8_t dataNumbers, uint8_t transmitPower)
+void MiP::rawSendIRDongleCode(uint8_t sendCode[], uint8_t txPower)
 {
     uint8_t command[1+6];
 
     command[0] = MIP_CMD_SEND_IR_DONGLE_CODE;
-    command[1] = sendCode[0];
-    command[2] = sendCode[1];
-    command[3] = sendCode[2];
-    command[4] = sendCode[3];
-    command[5] = dataNumbers;
-    command[6] = transmitPower;
+    command[1] = 0x00;
+    command[2] = 0x00;
+    command[3] = sendCode[0];
+    command[4] = sendCode[1];
+    command[5] = 0x10;
+    command[6] = txPower;
 
     rawSend(command, sizeof(command));
 }
@@ -2074,18 +2071,15 @@ int8_t MiP::readIRDongleCode(MiPIRCode& codeEvent)
     if (!m_receivedIRCode.received)
     {
         m_lastError = MIP_ERROR_NO_EVENT;
-        return -1; //MIP_GESTURE_INVALID;
+        return -1;
     }
 
     codeEvent.received = true;
     codeEvent.code[0] = m_receivedIRCode.code[0];
     codeEvent.code[1] = m_receivedIRCode.code[1];
-    codeEvent.code[2] = m_receivedIRCode.code[2];
-    codeEvent.code[3] = m_receivedIRCode.code[3];
-    codeEvent.dataNumbers = m_receivedIRCode.dataNumbers;
 
     // Now that the code had been read, invalidate the last received code.
-    m_receivedIRCode.dataNumbers = 0;
+    m_receivedIRCode.clear();
 
     m_lastError = MIP_ERROR_NONE;
     return 0;
@@ -2362,9 +2356,7 @@ void MiP::processOobResponseData(uint8_t commandByte)
         length = 2;
         break;
     case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
-        highNibble = Serial.read();
-        lowNibble = Serial.read();
-        length = (parseHexDigit(highNibble) << 4) | parseHexDigit(lowNibble);
+        length = 3;
         break;
     default:
         uint8_t discardedBytes = discardUnexpectedSerialData();
@@ -2378,13 +2370,8 @@ void MiP::processOobResponseData(uint8_t commandByte)
 
     // Read in the additional bytes of the notification.  The "4" comes from maximum length
     // which is a response for MIP_CMD_RECEIVE_IR_DONGLE_CODE.
-    uint8_t buffer[4 * 2];
+    uint8_t buffer[3 * 2];
     size_t  bytesRead = Serial.readBytes(buffer, length * 2);
-    for (int i = 0 ; i < bytesRead; i++){
-        // STT: debugging. 
-        MiPStream.print(buffer[i]);
-    }
-    MiPStream.println();
 
     if (bytesRead != length * 2)
     {
@@ -2434,10 +2421,8 @@ void MiP::processOobResponseData(uint8_t commandByte)
         m_detectedMiP.detected = true;
         break;
     case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
-        m_receivedIRCode.dataNumbers = length;
-        for(int i = 0; i < m_receivedIRCode.dataNumbers; i++){
-            m_receivedIRCode.code[i] = response[i+1];
-        }
+        m_receivedIRCode.code[0] = response[2];
+        m_receivedIRCode.code[1] = response[3];
         m_receivedIRCode.received = true;
         break;
     default:
