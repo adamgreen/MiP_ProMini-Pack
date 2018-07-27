@@ -163,8 +163,8 @@ void MiP::clear()
     m_lastWeight = 0;
     m_clapEvents.clear();
     m_gestureEvents.clear();
-    m_detectedMiP.clear();
-    m_receivedIRCode.clear();
+    m_detectedMiPEvents.clear();
+    m_irCodeEvents.clear();
     m_irId = 0x00;
 }
 
@@ -1171,7 +1171,7 @@ int8_t MiP::rawReadOdometer(float& distanceInCm)
         return MIP_ERROR_BAD_RESPONSE;
     }
 
-    // Tick count is store as big-endian in response buffer.
+    // Tick count is stored as big-endian in response buffer.
     ticks = (uint32_t)response[1] << 24 | (uint32_t)response[2] << 16 | (uint32_t)response[3] << 8 | response[4];
     // Odometer has 48.5 ticks / cm.
     distanceInCm = (float)((double)ticks / 48.5);
@@ -1845,7 +1845,7 @@ void MiP::setUserData(uint8_t addressOffset, uint8_t userData)
 {
     uint8_t address = MIP_BASE_EEPROM_ADDRESS + addressOffset;
 
-    // address must be between 0x20 and 0x2F, inclusive.
+    // Address must be between 0x20 and 0x2F, inclusive.
     MIP_ASSERT( MIP_BASE_EEPROM_ADDRESS <= address && address <= MIP_LAST_EEPROM_ADDRESS );
 
     int8_t result;
@@ -1886,7 +1886,7 @@ uint8_t MiP::getUserData(uint8_t addressOffset)
 {
     uint8_t address = MIP_BASE_EEPROM_ADDRESS + addressOffset;
 
-    // address must be between 0x20 and 0x2F, inclusive.
+    // Address must be between 0x20 and 0x2F, inclusive.
     MIP_ASSERT( MIP_BASE_EEPROM_ADDRESS <= address && address <= MIP_LAST_EEPROM_ADDRESS );
 
    int8_t result;
@@ -1971,22 +1971,27 @@ bool MiP::isMiPDetectionModeEnabled()
     return m_irId > MIP_IR_DETECTION_MODE_DISABLE ? true : false;
 }
 
-int8_t MiP::readDetectedMiP(uint8_t& detectedMiP)
+uint8_t MiP::readDetectedMiP()
 {
     // Fetch bytes from the Serial receive buffer and process any event data found within.
     processAllResponseData();
 
-    if(!m_detectedMiP.detected)
+    uint8_t detectedMiPEvent = 0;
+    if(!m_detectedMiPEvents.pop(detectedMiPEvent))
     {
-        return 0;
+        m_lastError = MIP_ERROR_NO_EVENT;
+        return detectedMiPEvent;
     }
+    m_lastError = MIP_ERROR_NONE;
+    return detectedMiPEvent;
+}
 
-    detectedMiP = m_detectedMiP.id;
-
-    // Now that it's been read, invalidate the last detected MiP.
-    m_detectedMiP.clear();
-
-    return 1;
+uint8_t MiP::availableDetectedMiPEvents()
+{
+    // Fetch bytes from the Serial receive buffer and process any event data found within.
+    processAllResponseData();
+    m_lastError = MIP_ERROR_NONE;
+    return m_detectedMiPEvents.available();
 }
 
 // This internal protected method sends the set detection mode command with minimal error
@@ -1995,7 +2000,6 @@ void MiP::rawSetMiPDetectionMode(uint8_t id, uint8_t txPower)
 {
     uint8_t command[1+2];
 
-    MIP_ASSERT( MIP_IR_DETECTION_MODE_DISABLE <= id && id <= 0xFF );
     MIP_ASSERT( 0x01 <= txPower && txPower <= 0x78 );
 
     command[0] = MIP_CMD_SET_DETECTION_MODE;
@@ -2037,52 +2041,42 @@ bool MiP::isIRRemoteControlEnabled()
     return response[1] == MIP_IR_REMOTE_CONTROL_ENABLE ? true : false;
 }
 
-void MiP::sendIRDongleCode(uint8_t sendCode[], uint8_t txPower)
-{
-    // Check for valid txPower values.  Must be between 1 and 120.
-    MIP_ASSERT( 1 <= txPower && txPower <= 0x78 );
-
-    // Send this command blindly with no error checking since there is no easy way to determine if it has failed.
-    rawSendIRDongleCode(sendCode, txPower);
-}
-
-// This internal protected method sends the send IR dongle code command with no error checking.
-// The error handling and recovery happens at a higher level of the driver.
-void MiP::rawSendIRDongleCode(uint8_t sendCode[], uint8_t txPower)
+void MiP::sendIRDongleCode(uint16_t sendCode, uint8_t transmitPower)
 {
     uint8_t command[1+6];
-
     command[0] = MIP_CMD_SEND_IR_DONGLE_CODE;
     command[1] = 0x00;
     command[2] = 0x00;
-    command[3] = sendCode[0];
-    command[4] = sendCode[1];
+    command[3] = (sendCode >> 8) & 0xFF;
+    command[4] = sendCode & 0xFF;
     command[5] = 0x10;
-    command[6] = txPower;
+    command[6] = transmitPower;
 
+    // Send this command blindly with no error checking since there is no robust way to determine if it has failed.
     rawSend(command, sizeof(command));
 }
 
-int8_t MiP::readIRDongleCode(MiPIRCode& codeEvent)
+uint32_t MiP::readIRDongleCode()
 {
     // Fetch bytes from the Serial receive buffer and process any event data found within.
     processAllResponseData();
 
-    if (!m_receivedIRCode.received)
+    uint32_t irCodeEvent = 0xFFFFFFFF;
+    if (!m_irCodeEvents.pop(irCodeEvent))
     {
         m_lastError = MIP_ERROR_NO_EVENT;
-        return -1;
+        return irCodeEvent;
     }
-
-    codeEvent.received = true;
-    codeEvent.code[0] = m_receivedIRCode.code[0];
-    codeEvent.code[1] = m_receivedIRCode.code[1];
-
-    // Now that the code had been read, invalidate the last received code.
-    m_receivedIRCode.clear();
-
     m_lastError = MIP_ERROR_NONE;
-    return 0;
+    return irCodeEvent;
+}
+
+uint8_t MiP::availableIRCodeEvents()
+{
+    // Fetch bytes from the Serial receive buffer and process any event data found within.
+    processAllResponseData();
+    m_lastError = MIP_ERROR_NONE;
+    return m_irCodeEvents.available();
 }
 
 // This internal protected method verifies that IR remote control is enabled.
@@ -2335,9 +2329,7 @@ uint8_t MiP::parseHexDigit(uint8_t digit)
 void MiP::processOobResponseData(uint8_t commandByte)
 {
     size_t length = 0;
-
-    uint8_t highNibble;
-    uint8_t lowNibble;
+    size_t bytesRead;
 
     // The number of additional bytes to read depends on which notification has been found in serial buffer.
     switch (commandByte)
@@ -2356,7 +2348,26 @@ void MiP::processOobResponseData(uint8_t commandByte)
         length = 2;
         break;
     case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
-        length = 3;
+        // MIP_CMD_RECEIVE_IR_DONGLE_CODE is the only message delivered by MiP that has a
+        // variable length so we need to read the next byte which contains the length.
+        uint8_t nibbles[2];
+        bytesRead = Serial.readBytes(nibbles, sizeof(nibbles));
+        if (bytesRead != sizeof(nibbles))
+        {
+            MiPStream.println(F("MiP: Missing IR code length"));
+            return;
+        }
+        length = (parseHexDigit(nibbles[0]) << 4) | parseHexDigit(nibbles[1]);
+        if (length < 2 || length > 4)
+        {
+            uint8_t discardedBytes = discardUnexpectedSerialData();
+            MiPStream.print(F("MiP: Bad IR code length: "));
+            MiPStream.print(length, HEX);
+            MiPStream.print(F(" (discarded "));
+            MiPStream.print(discardedBytes);
+            MiPStream.println(F(" bytes)"));
+            return;
+        }
         break;
     default:
         uint8_t discardedBytes = discardUnexpectedSerialData();
@@ -2370,8 +2381,8 @@ void MiP::processOobResponseData(uint8_t commandByte)
 
     // Read in the additional bytes of the notification.  The "4" comes from maximum length
     // which is a response for MIP_CMD_RECEIVE_IR_DONGLE_CODE.
-    uint8_t buffer[3 * 2];
-    size_t  bytesRead = Serial.readBytes(buffer, length * 2);
+    uint8_t buffer[4 * 2];
+    bytesRead = Serial.readBytes(buffer, length * 2);
 
     if (bytesRead != length * 2)
     {
@@ -2386,6 +2397,9 @@ void MiP::processOobResponseData(uint8_t commandByte)
     uint8_t response[MIP_RESPONSE_MAX_LEN];
     response[0] = commandByte;
     copyHexTextToBinary(&response[1], buffer, length);
+
+    // Have 32 bits ready in case of an IR event.
+    uint32_t irCode = 0;
 
     // Process the response just received.
     switch (commandByte)
@@ -2417,13 +2431,15 @@ void MiP::processOobResponseData(uint8_t commandByte)
         m_clapEvents.push(response[1]);
         break;
     case MIP_CMD_GET_DETECTED_MIP:
-        m_detectedMiP.id = response[1];
-        m_detectedMiP.detected = true;
+        m_detectedMiPEvents.push(response[1]);
         break;
     case MIP_CMD_RECEIVE_IR_DONGLE_CODE:
-        m_receivedIRCode.code[0] = response[2];
-        m_receivedIRCode.code[1] = response[3];
-        m_receivedIRCode.received = true;
+        for(size_t i = 0; i < length; i++)
+        {
+            irCode <<= 8;
+            irCode |= response[i+1];
+        }
+        m_irCodeEvents.push(irCode);
         break;
     default:
         // Invalid notification command bytes were already handled in the previous switch so should never get here.

@@ -18,7 +18,6 @@
     isMiPDetectionModeEnabled()
     readDetectedMiP()
 */
-
 #include <mip.h>
 
 MiP mip;
@@ -29,46 +28,28 @@ MiP mip;
 
 void setup() {
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
 
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
-  if (!mip.isMiPDetectionModeEnabled())
+  mip.disableMiPDetectionMode();
+  
+  if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
+  }
 
   mip.enableMiPDetectionMode(MIP_ID_NO, MIP_IR_TX_POWER);
 
-  if (mip.isMiPDetectionModeEnabled())
+  if (mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("Now I can be discovered."));
+  }
 }
 
 void loop() {
-  delay(3000);
-
-  uint8_t detectedMiP = 0x00;
-
-  // Spend about 10 seconds broadcasting MiP's ID while looking for another MiP.
-  for (int i = 0; i < 3; i++) {
-    if (mip.readDetectedMiP(detectedMiP)) {
-      Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
-
-    }
-    delay(3333);
-  }
-
-  // MiP doesn't want to be found anymore.
-  mip.disableMiPDetectionMode();
-
-  // Verify it and keep looking for other MiPs.
-  if (mip.isMiPDetectionModeEnabled())
-    Serial.println(F("Now I can be discovered."));
-  else
-    Serial.println(F("I am not discoverable."));
-  if (mip.readDetectedMiP(detectedMiP)) {
-    Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
+  if (mip.availableDetectedMiPEvents()) {
+    Serial.print(F("I detected MiP with ID number ")); Serial.println(mip.readDetectedMiP(), HEX);
   }
 }

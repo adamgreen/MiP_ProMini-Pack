@@ -13,14 +13,12 @@
    limitations under the License.
 */
 /* Example used in following API documentation:
-    receiveIRDongleCode()
+    readIRDongleCode()
+    availableIRCodeEvents()
 */
-
 #include <mip.h>
 
 MiP       mip;
-uint8_t   dongleCode[2] = { 0xFF, 0xFF };
-MiPIRCode receiveCode;
 bool      connectResult;
 
 void setup() {
@@ -31,20 +29,23 @@ void setup() {
     return;
   }
 
-  Serial.println(F("ReceiveIRDongleCode.ino - Receive up to four bytes from another MiP using IR."));
+  Serial.println(F("ReadIRDongleCode.ino - Receive code from another MiP using IR."));
 }
 
 void loop() {
-  Serial.println(F("Looking for data."));
+  uint32_t receiveCode;
 
-  mip.readIRDongleCode(receiveCode);
+  if (mip.availableIRCodeEvents()) {
+    receiveCode = mip.readIRDongleCode();
 
-  if (receiveCode.received) {
-    Serial.print(F("First data byte:  ")); Serial.println(receiveCode.code[0], HEX);
-    Serial.print(F("Second data byte: ")); Serial.println(receiveCode.code[1], HEX);
+    Serial.print(F("Received "));
+    Serial.print(((receiveCode >> 28) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print(((receiveCode >> 16) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print(((receiveCode >> 8) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print((receiveCode & 0xFF), HEX);
+    Serial.println();
   }
-  
-  receiveCode.clear();
-
-  delay(3000);
 }

@@ -27,7 +27,7 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
   * Clap events
   * Weight updates
   * Shake events
-  * Infrared events (detecting other MiPs and receiving their IR signals)
+  * Infrared events (detecting other MiPs and receiving their IR codes)
 * If you are sending a lot of data to the Arduino IDE in between MiP function calls, you might cause these updates/events to be lost.
 * There is a LED labelled **MiP UART** towards the lower right corner of the MiP ProMini Pack. This will be lit when Serial is switched to exchange data with the MiP.
 * If you see that it is off most of the time, then you are likely to miss these updates/events.
@@ -53,8 +53,8 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * [Radar](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Radar/Radar.ino): Is there anything in front of your MiP robot? This example sends descriptive text to the Arduino IDE when it detects changes in the obstacles around it.
 * [RawSendReceive](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/RawSendReceive/RawSendReceive.ino): You found a command in WowWee's Protocol Specification that isn't supported by this library? This example shows you how to experiment with these new commands.
 * [ReadWriteEeprom](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReadWriteEeprom/ReadWriteEeprom.ino): Read and write your own data to MiP's EEPROM. This is useful for storing data across power cycles. See also [ZeroEeprom](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ZeroEeprom/ZeroEeprom.ino).
-* [ReceiveIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReceiveIRDongleCode/ReceiveIRDongleCode.ino): Receives IR signals sent from another MiP. See also [SendIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SendIRDongleCode/SendIRDongleCode.ino).
-* [SendIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SendIRDongleCode/SendIRDongleCode.ino): Sends IR signals to another MiP. See also [ReceiveIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReceiveIRDongleCode/ReceiveIRDongleCode.ino).
+* [ReadIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReadIRDongleCode/ReadIRDongleCode.ino): Reads IR signals sent from another MiP. See also [SendIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SendIRDongleCode/SendIRDongleCode.ino).
+* [SendIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SendIRDongleCode/SendIRDongleCode.ino): Sends IR signals to another MiP. See also [ReadIRDongleCode](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ReadIRDongleCode/ReadIRDongleCode.ino).
 * [SRSdemo](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SRSdemo/SRSdemo.ino): The MiP robot made an appearance at the [Seattle Robotics Society](http://www.seattlerobotics.org) meeting on April 21st, 2018. This is what he was running!
 * [Shake](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Shake/Shake.ino): Is someone shaking your poor little MiP robot? This example shows you how to detect such rudeness and report it to the Arduino IDE.
 * [SoftwareHardwareVersion](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/SoftwareHardwareVersion/SoftwareHardwareVersion.ino): This example shows you how to peek under the covers and see what hardware / software is running inside your MiP robot.
@@ -140,12 +140,14 @@ Game Modes      | [enableAppMode()](#enableappmode)
 <br>            | [isRoamModeEnabled()](#isroammodeenabled)
 EEPROM          | [setUserData()](#setUserData)
 <br>            | [getUserData()](#getUserData)
-Infrared        | [enableMiPDetectionMode()](#enableMiPDetectionMode)
-<br>            | [disableMiPDetectionMode()](#disableMiPDetectionMode)
-<br>            | [isMiPDetectionModeEnabled()](#isMiPDetectionModeEnabled)
-<br>            | [readDetectedMiP()](#readDetectedMiP)
-<br>            | [sendIRDongleCode()](#sendIRDongleCode)
-<br>            | [readIRDongleCode()](#readIRDongleCode)
+Infrared        | [enableMiPDetectionMode()](#enablemipdetectionmode)
+<br>            | [disableMiPDetectionMode()](#disablemipdetectionmode)
+<br>            | [isMiPDetectionModeEnabled()](#ismipdetectionmodeenabled)
+<br>            | [readDetectedMiP()](#readdetectedmip)
+<br>            | [availableDetectedMiPEvents()](#availabledetectedmipevents)
+<br>            | [sendIRDongleCode()](#sendirdonglecode)
+<br>            | [readIRDongleCode()](#readirdonglecode)
+<br>            | [availableIRCodeEvents()](#availableircodeevents)
 
 
 ---
@@ -4980,16 +4982,15 @@ void loop() {
 Allows MiP to be discovered by another MiP using IR.  MiP broadcasts a user-defined identification number for another MiP to read.
 
 #### Parameters
-* **id** is the user-defined identification number to send to another MiP.
-
-
+* **id** is the user-defined identification number to send to another MiP.  A user-defined value cannot be zero.
 * **txPower** is the IR transmission power.  Valid values are 1 to 120 for about 1-300cm.
+
 #### Returns
-*Nothing.
+Nothing
 
 #### Example
 ```c++
-##include <mip.h>
+#include <mip.h>
 
 MiP mip;
 
@@ -4999,47 +5000,29 @@ MiP mip;
 
 void setup() {
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
 
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
-  if (!mip.isMiPDetectionModeEnabled())
+  mip.disableMiPDetectionMode();
+  
+  if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
+  }
 
   mip.enableMiPDetectionMode(MIP_ID_NO, MIP_IR_TX_POWER);
 
-  if (mip.isMiPDetectionModeEnabled())
+  if (mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("Now I can be discovered."));
+  }
 }
 
 void loop() {
-  delay(3000);
-
-  uint8_t detectedMiP = 0x00;
-
-  // Spend about 10 seconds broadcasting MiP's ID while looking for another MiP.
-  for (int i = 0; i < 3; i++) {
-    if (mip.readDetectedMiP(detectedMiP)) {
-      Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
-
-    }
-    delay(3333);
-  }
-
-  // MiP doesn't want to be found anymore.
-  mip.disableMiPDetectionMode();
-
-  // Verify it and keep looking for other MiPs.
-  if (mip.isMiPDetectionModeEnabled())
-    Serial.println(F("Now I can be discovered."));
-  else
-    Serial.println(F("I am not discoverable."));
-  if (mip.readDetectedMiP(detectedMiP)) {
-    Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
+  if (mip.availableDetectedMiPEvents()) {
+    Serial.print(F("I detected MiP with ID number ")); Serial.println(mip.readDetectedMiP(), HEX);
   }
 }
 ```
@@ -5048,7 +5031,6 @@ void loop() {
 
 ---
 ### disableMiPDetectionMode()
-
 ```void disableMiPDetectionMode();```
 #### Description
 Prevents MiP from being discovered by another MiP using IR.
@@ -5071,47 +5053,29 @@ MiP mip;
 
 void setup() {
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
 
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
-  if (!mip.isMiPDetectionModeEnabled())
+  mip.disableMiPDetectionMode();
+  
+  if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
+  }
 
   mip.enableMiPDetectionMode(MIP_ID_NO, MIP_IR_TX_POWER);
 
-  if (mip.isMiPDetectionModeEnabled())
+  if (mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("Now I can be discovered."));
+  }
 }
 
 void loop() {
-  delay(3000);
-
-  uint8_t detectedMiP = 0x00;
-
-  // Spend about 10 seconds broadcasting MiP's ID while looking for another MiP.
-  for (int i = 0; i < 3; i++) {
-    if (mip.readDetectedMiP(detectedMiP)) {
-      Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
-
-    }
-    delay(3333);
-  }
-
-  // MiP doesn't want to be found anymore.
-  mip.disableMiPDetectionMode();
-
-  // Verify it and keep looking for other MiPs.
-  if (mip.isMiPDetectionModeEnabled())
-    Serial.println(F("Now I can be discovered."));
-  else
-    Serial.println(F("I am not discoverable."));
-  if (mip.readDetectedMiP(detectedMiP)) {
-    Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
+  if (mip.availableDetectedMiPEvents()) {
+    Serial.print(F("I detected MiP with ID number ")); Serial.println(mip.readDetectedMiP(), HEX);
   }
 }
 ```
@@ -5128,7 +5092,7 @@ Checks whether MiP is broadcasting an identification number using IR.
 None
 
 #### Returns
-* true if MiP is broadcasting its identification number.
+* **true** if MiP is broadcasting its identification number.
 
 #### Example
 ```c++
@@ -5142,47 +5106,29 @@ MiP mip;
 
 void setup() {
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
 
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
-  if (!mip.isMiPDetectionModeEnabled())
+  mip.disableMiPDetectionMode();
+  
+  if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
+  }
 
   mip.enableMiPDetectionMode(MIP_ID_NO, MIP_IR_TX_POWER);
 
-  if (mip.isMiPDetectionModeEnabled())
+  if (mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("Now I can be discovered."));
+  }
 }
 
 void loop() {
-  delay(3000);
-
-  uint8_t detectedMiP = 0x00;
-
-  // Spend about 10 seconds broadcasting MiP's ID while looking for another MiP.
-  for (int i = 0; i < 3; i++) {
-    if (mip.readDetectedMiP(detectedMiP)) {
-      Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
-
-    }
-    delay(3333);
-  }
-
-  // MiP doesn't want to be found anymore.
-  mip.disableMiPDetectionMode();
-
-  // Verify it and keep looking for other MiPs.
-  if (mip.isMiPDetectionModeEnabled())
-    Serial.println(F("Now I can be discovered."));
-  else
-    Serial.println(F("I am not discoverable."));
-  if (mip.readDetectedMiP(detectedMiP)) {
-    Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
+  if (mip.availableDetectedMiPEvents()) {
+    Serial.print(F("I detected MiP with ID number ")); Serial.println(mip.readDetectedMiP(), HEX);
   }
 }
 ```
@@ -5191,16 +5137,17 @@ void loop() {
 
 ---
 ### readDetectedMiP()
-```int8_t readDetectedMiP(uint8_t& detectedMiP)```
+```uint8_t readDetectedMiP()```
 #### Description
 Reads the identification number of a detected MiP.
 
 #### Parameters
-* ***detectedMiP*** contains the identification number of a detected MiP after calling the function.
-
+None
 #### Returns
-* ***0*** if no MiP was detected.
-* ***1*** if a MiP was detected.
+* The identification number of the detected MiP.
+
+#### Notes
+Zero is a valid identifier. Call [availableIRCodeEvents()](#availableircodeevents) before calling readDetectedMiP() to prevent interpreting an empty answer with a MiP with an identification number of zero.
 
 #### Example
 ```c++
@@ -5214,47 +5161,82 @@ MiP mip;
 
 void setup() {
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
 
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
-  if (!mip.isMiPDetectionModeEnabled())
+  mip.disableMiPDetectionMode();
+  
+  if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
+  }
 
   mip.enableMiPDetectionMode(MIP_ID_NO, MIP_IR_TX_POWER);
 
-  if (mip.isMiPDetectionModeEnabled())
+  if (mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("Now I can be discovered."));
+  }
 }
 
 void loop() {
-  delay(3000);
+  if (mip.availableDetectedMiPEvents()) {
+    Serial.print(F("I detected MiP with ID number ")); Serial.println(mip.readDetectedMiP(), HEX);
+  }
+}
+```
 
-  uint8_t detectedMiP = 0x00;
 
-  // Spend about 10 seconds broadcasting MiP's ID while looking for another MiP.
-  for (int i = 0; i < 3; i++) {
-    if (mip.readDetectedMiP(detectedMiP)) {
-      Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
 
-    }
-    delay(3333);
+---
+### availableDetectedMiPEvents()
+```uint8_t availableDetectedMiPEvents()```
+#### Description
+Provides the number of other MiPs that MiP has detected.
+
+#### Parameters
+None
+
+#### Returns
+* The number of MiPs that MiP has detected.
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP mip;
+
+// Load this sketch on a pair of MiPs facing each other and use a different MIP_ID_NO for each.
+#define MIP_ID_NO       0x10
+#define MIP_IR_TX_POWER 0x78
+
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
   }
 
-  // MiP doesn't want to be found anymore.
-  mip.disableMiPDetectionMode();
+  Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
-  // Verify it and keep looking for other MiPs.
-  if (mip.isMiPDetectionModeEnabled())
-    Serial.println(F("Now I can be discovered."));
-  else
+  mip.disableMiPDetectionMode();
+  
+  if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
-  if (mip.readDetectedMiP(detectedMiP)) {
-    Serial.print(F("I detected MiP with ID number ")); Serial.println(detectedMiP, HEX);
+  }
+
+  mip.enableMiPDetectionMode(MIP_ID_NO, MIP_IR_TX_POWER);
+
+  if (mip.isMiPDetectionModeEnabled()) {
+    Serial.println(F("Now I can be discovered."));
+  }
+}
+
+void loop() {
+  if (mip.availableDetectedMiPEvents()) {
+    Serial.print(F("I detected MiP with ID number ")); Serial.println(mip.readDetectedMiP(), HEX);
   }
 }
 ```
@@ -5263,12 +5245,12 @@ void loop() {
 
 ---
 ### sendIRDongleCode()
-```void sendIRDongleCode(uint8_t sendCode[], uint8_t txPower)```
+```void sendIRDongleCode(uint16_t sendCode, uint8_t transmitPower)```
 #### Description
-Sends a pair of bytes to another MiP using IR.
+Sends a two-byte code to another MiP using IR.
 
 #### Parameters
-* ***sendCode*** contains two bytes to send to another MiP.
+* **sendCode** contains a two-byte code to send to another MiP. 
 * **txPower** is the IR transmission power.  Valid values are 1 to 120 for about 1-300cm.
 
 #### Returns
@@ -5278,11 +5260,8 @@ Nothing
 ```c++
 #include <mip.h>
 
-// 0x78 is the max tranmission power
+// Try different values for transmission power (0x01 - 0x78)
 #define MIP_IR_TX_POWER  0x78
-
-// Try different values for dongleCode[].
-uint8_t dongleCode[2] = { 0xAC, 0xCA };
 
 MiP  mip;
 bool connectResult;
@@ -5295,37 +5274,49 @@ void setup() {
     return;
   }
 
-  Serial.println(F("SendIRDongleCode.ino - Send a two-byte code to another MiP using IR."));
+  Serial.println(F("SendIRDongleCode.ino - Send code to another MiP using IR."));
 }
 
 void loop() {
+  uint16_t dongleCode;
+
+  char formattedOutput[14];
+  
+  // Try different codes for dongleCode.
+  dongleCode = 0x45;
+  dongleCode <<= 8;
+  dongleCode |= 0x67;
+
+  sprintf(formattedOutput, "Sending 0x%04X", dongleCode);
+
+  Serial.println(formattedOutput);
 
   mip.sendIRDongleCode(dongleCode, MIP_IR_TX_POWER);
 
-  delay(3000);
+  delay(1000);
 }
 ```
 
+
+
 ---
 ### readIRDongleCode()
-```int8_t readIRDongleCode(MiPIRCode& codeEvent)```
+```uint32_t readIRDongleCode()```
 #### Description
-Reads a pair of bytes sent by another MiP using IR.
+Reads code sent by another MiP using IR.
 
 #### Parameters
-* ***codeEvent*** is the MiPIRCode object containing the received code after a call to the function.
+None
 
 #### Returns
-* ***MIP_ERROR_NO_EVENT*** if no transmitted data was found.
-* ***0*** if the data was received.
+* A 32-bit value containing the data received via IR.
+* **0** if no data was received.
 
 #### Example
 ```c++
 #include <mip.h>
 
 MiP       mip;
-uint8_t   dongleCode[2] = { 0xFF, 0xFF };
-MiPIRCode receiveCode;
 bool      connectResult;
 
 void setup() {
@@ -5336,21 +5327,75 @@ void setup() {
     return;
   }
 
-  Serial.println(F("ReceiveIRDongleCode.ino - Receive up to four bytes from another MiP using IR."));
+  Serial.println(F("ReadIRDongleCode.ino - Receive code from another MiP using IR."));
 }
 
 void loop() {
-  Serial.println(F("Looking for data."));
+  uint32_t receiveCode;
 
-  mip.readIRDongleCode(receiveCode);
+  if (mip.availableIRCodeEvents()) {
+    receiveCode = mip.readIRDongleCode();
 
-  if (receiveCode.received) {
-    Serial.print(F("First data byte:  ")); Serial.println(receiveCode.code[0], HEX);
-    Serial.print(F("Second data byte: ")); Serial.println(receiveCode.code[1], HEX);
+    Serial.print(F("Received "));
+    Serial.print(((receiveCode >> 28) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print(((receiveCode >> 16) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print(((receiveCode >> 8) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print((receiveCode & 0xFF), HEX);
+    Serial.println();
   }
-  
-  receiveCode.clear();
+}
+```
 
-  delay(3000);
+
+
+---
+### availableIRCodeEvents()
+```uint8_t availableIRCodeEvents()```
+#### Description
+Returns the number of IR code events that the library currently has sitting in its queue, ready to be read by calling [readIRCodeEvent()](#readircodeevent).
+
+#### Parameters
+None
+
+#### Returns
+* The number of available code events that MiP has detected.
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP       mip;
+bool      connectResult;
+
+void setup() {
+  connectResult = mip.begin();
+  if (!connectResult)
+  {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("ReadIRDongleCode.ino - Receive code from another MiP using IR."));
+}
+
+void loop() {
+  uint32_t receiveCode;
+
+  if (mip.availableIRCodeEvents()) {
+    receiveCode = mip.readIRDongleCode();
+
+    Serial.print(F("Received "));
+    Serial.print(((receiveCode >> 28) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print(((receiveCode >> 16) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print(((receiveCode >> 8) & 0xFF), HEX);
+    Serial.print(F(" "));
+    Serial.print((receiveCode & 0xFF), HEX);
+    Serial.println();
+  }
 }
 ```

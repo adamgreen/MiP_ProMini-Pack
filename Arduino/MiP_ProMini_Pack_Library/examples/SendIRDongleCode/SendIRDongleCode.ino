@@ -15,14 +15,10 @@
 /* Example used in following API documentation:
     sendIRDongleCode()
 */
-
 #include <mip.h>
 
-// 0x78 is the max tranmission power
+// Try different values for transmission power (0x01 - 0x78)
 #define MIP_IR_TX_POWER  0x78
-
-// Try different values for dongleCode[].
-uint8_t dongleCode[2] = { 0xAC, 0xCA };
 
 MiP  mip;
 bool connectResult;
@@ -35,12 +31,24 @@ void setup() {
     return;
   }
 
-  Serial.println(F("SendIRDongleCode.ino - Send a two-byte code to another MiP using IR."));
+  Serial.println(F("SendIRDongleCode.ino - Send code to another MiP using IR."));
 }
 
 void loop() {
+  uint16_t dongleCode;
+
+  char formattedOutput[14];
+  
+  // Try different codes for dongleCode.
+  dongleCode = 0x45;
+  dongleCode <<= 8;
+  dongleCode |= 0x67;
+
+  sprintf(formattedOutput, "Sending 0x%04X", dongleCode);
+
+  Serial.println(formattedOutput);
 
   mip.sendIRDongleCode(dongleCode, MIP_IR_TX_POWER);
 
-  delay(3000);
+  delay(1000);
 }

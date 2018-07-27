@@ -384,43 +384,6 @@ public:
     uint16_t       delay;
 };
 
-class MiPDetectedMiP
-{
-public:
-    MiPDetectedMiP()
-    {
-        clear();
-    }
-
-    void clear()
-    {
-        detected = false;
-        id = 0x00;
-    }
-
-    bool    detected;
-    uint8_t id;
-};
-
-// A container for code received from the IR dongle.
-class MiPIRCode
-{
-public:
-    MiPIRCode()
-    {
-        clear();
-    }
-
-    void clear()
-    {
-        received = false;
-        code[0] = code[1] = 0;
-    }
-
-    bool    received;
-    uint8_t code[2];
-};
-
 
 
 class MiP
@@ -538,22 +501,24 @@ public:
     void    setUserData(uint8_t addressOffset, uint8_t userData);
     uint8_t getUserData(uint8_t addressOffset);
 
-    void   enableMiPDetectionMode(uint8_t id, uint8_t txPower);
-    void   disableMiPDetectionMode();
-    bool   isMiPDetectionModeEnabled();
-    int8_t readDetectedMiP(uint8_t& detectedMiP);
-    void   enableIRRemoteControl();
-    void   disableIRRemoteControl();
-    bool   isIRRemoteControlEnabled();
-    void   sendIRDongleCode(uint8_t sendCode[], uint8_t txPower);
-    int8_t readIRDongleCode(MiPIRCode& codeEvent);
+    void     enableMiPDetectionMode(uint8_t id, uint8_t txPower);
+    void     disableMiPDetectionMode();
+    bool     isMiPDetectionModeEnabled();
+    uint8_t  readDetectedMiP();
+    uint8_t  availableDetectedMiPEvents();
+    void     enableIRRemoteControl();
+    void     disableIRRemoteControl();
+    bool     isIRRemoteControlEnabled();
+    void     sendIRDongleCode(uint16_t sendCode, uint8_t transmitPower);
+    uint32_t readIRDongleCode();
+    uint8_t  availableIRCodeEvents();
 
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
 
     // Serial is shared between the MiP and the PC on the MiP ProMini Pack.
-    // You shouldn't need to use these function directly as just calling Serial.print() or Serial.println() from your
+    // You shouldn't need to use these functions directly as just calling Serial.print() or Serial.println() from your
     // code will automatically end up calling these functions for you as needed.
     void switchSerialToMiP()
     {
@@ -642,7 +607,6 @@ protected:
     int8_t  rawGetUserData(uint8_t address, uint8_t& userData);
 
     void    rawSetMiPDetectionMode(uint8_t id, uint8_t txPower);
-    void    rawSendIRDongleCode(uint8_t sendCode[], uint8_t transmitPower);
     void    verifiedIRRemoteControl(uint8_t desiredRemoteControlMode);
     void    rawSetIRRemoteControl(uint8_t remoteControl);
     int8_t  rawGetIRRemoteControl(uint8_t& remoteControl);
@@ -680,8 +644,8 @@ protected:
     int8_t                       m_lastWeight;
     CircularQueue<uint8_t, 8>    m_clapEvents;
     CircularQueue<MiPGesture, 8> m_gestureEvents;
-    MiPDetectedMiP               m_detectedMiP;
-    MiPIRCode                    m_receivedIRCode;
+    CircularQueue<uint32_t, 8>   m_irCodeEvents;
+    CircularQueue<uint8_t, 8>    m_detectedMiPEvents;
     uint8_t                      m_irId;
 
     static MiP*                  s_pInstance;
