@@ -37,8 +37,8 @@
 #define MIP_ERROR_MAX_RETRIES   4 // Exceeded maximum number of retries to get this operation to succeed.
 
 // Maximum length of MiP request and response buffer lengths.
-#define MIP_REQUEST_MAX_LEN     (17 + 1)    // Longest request is MPI_CMD_PLAY_SOUND.
-#define MIP_RESPONSE_MAX_LEN    (5 + 1)     // Longest response is MPI_CMD_REQUEST_CHEST_LED.
+#define MIP_REQUEST_MAX_LEN     (17 + 1)    // Longest request is MIP_CMD_PLAY_SOUND.
+#define MIP_RESPONSE_MAX_LEN    (5 + 1)     // Longest response is MIP_CMD_REQUEST_CHEST_LED.
 
 enum MiPGestureRadarMode
 {
@@ -498,15 +498,27 @@ public:
     bool isTrickModeEnabled();
     bool isRoamModeEnabled();
 
-    void   setUserData(uint8_t addressOffset, uint8_t userData);
+    void    setUserData(uint8_t addressOffset, uint8_t userData);
     uint8_t getUserData(uint8_t addressOffset);
+
+    void     enableMiPDetectionMode(uint8_t id, uint8_t txPower);
+    void     disableMiPDetectionMode();
+    bool     isMiPDetectionModeEnabled();
+    uint8_t  readDetectedMiP();
+    uint8_t  availableDetectedMiPEvents();
+    void     enableIRRemoteControl();
+    void     disableIRRemoteControl();
+    bool     isIRRemoteControlEnabled();
+    void     sendIRDongleCode(uint16_t sendCode, uint8_t transmitPower);
+    uint32_t readIRDongleCode();
+    uint8_t  availableIRCodeEvents();
 
     void   rawSend(const uint8_t request[], size_t requestLength);
     int8_t rawReceive(const uint8_t request[], size_t requestLength,
                       uint8_t responseBuffer[], size_t responseBufferSize, size_t& responseLength);
 
     // Serial is shared between the MiP and the PC on the MiP ProMini Pack.
-    // You shouldn't need to use these function directly as just calling Serial.print() or Serial.println() from your
+    // You shouldn't need to use these functions directly as just calling Serial.print() or Serial.println() from your
     // code will automatically end up calling these functions for you as needed.
     void switchSerialToMiP()
     {
@@ -594,6 +606,11 @@ protected:
     void    rawSetUserData(uint8_t address, uint8_t userData);
     int8_t  rawGetUserData(uint8_t address, uint8_t& userData);
 
+    void    rawSetMiPDetectionMode(uint8_t id, uint8_t txPower);
+    void    verifiedIRRemoteControl(uint8_t desiredRemoteControlMode);
+    void    rawSetIRRemoteControl(uint8_t remoteControl);
+    int8_t  rawGetIRRemoteControl(uint8_t& remoteControl);
+
     void    transportSendRequest(const uint8_t* pRequest, size_t requestLength, int expectResponse);
     int8_t  transportGetResponse(uint8_t* pResponseBuffer, size_t responseBufferSize, size_t* pResponseLength);
     bool    processAllResponseData();
@@ -627,6 +644,9 @@ protected:
     int8_t                       m_lastWeight;
     CircularQueue<uint8_t, 8>    m_clapEvents;
     CircularQueue<MiPGesture, 8> m_gestureEvents;
+    CircularQueue<uint32_t, 8>   m_irCodeEvents;
+    CircularQueue<uint8_t, 8>    m_detectedMiPEvents;
+    uint8_t                      m_irId;
 
     static MiP*                  s_pInstance;
 };
