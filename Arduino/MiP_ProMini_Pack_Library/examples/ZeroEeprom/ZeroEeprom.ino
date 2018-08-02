@@ -25,15 +25,15 @@ char    outputString;
 void setup() {
   // First need to initialize the serial connection with the MiP.
   bool connectResult = mip.begin();
-  if (!connectResult)
-  {
+  if (!connectResult) {
     Serial.println(F("Failed connecting to MiP!"));
     return;
   }
 
   Serial.println(F("ZeroEeprom.ino - Writes zeros to each byte in EEPROM."));
 
-  for (uint8_t i = 0x00; i <= 0x0F; i++) { // Variable i is the EEPROM address offset where we will start writing zeroes.
+  // Variable i is the EEPROM address offset where we will start writing zeroes.
+  for (uint8_t i = 0x00; i <= 0x0F; i++) {
     mip.setUserData(i, 0x00);
     delay(1000);
 
@@ -43,3 +43,4 @@ void setup() {
 
 void loop() {
 }
+

@@ -19,58 +19,49 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("ContinuousDrive.ino - Use continuousDrive() function. Drive forward with right turn and then backward with left turn."));
+  Serial.println(F("ContinuousDrive.ino - Use continuousDrive() function. Drive forward with right turn and then backward with left turn."));
 }
 
 void loop()
 {
-    static enum States 
-    {
-        RIGHT_TURN,
-        LEFT_TURN,
-        DONE
-    } state = RIGHT_TURN;
-    static uint32_t startTime = millis();
-    uint32_t        currentTime = millis();
-    uint32_t        elapsedTime = currentTime - startTime;
+  static enum States {
+    RIGHT_TURN,
+    LEFT_TURN,
+    DONE
+  } state = RIGHT_TURN;
+  static uint32_t startTime = millis();
+  uint32_t        currentTime = millis();
+  uint32_t        elapsedTime = currentTime - startTime;
 
-    switch (state)
-    {
+  switch (state) {
     case RIGHT_TURN:
-        if (elapsedTime < 2000)
-        {
-          // Drive forward at half-speed and turn right at quarter rate.
-          mip.continuousDrive(16, 8);
-        }
-        else
-        {
-            startTime = currentTime;
-            state = LEFT_TURN;
-        }
-        break;
+      if (elapsedTime < 2000) {
+        // Drive forward at half-speed and turn right at quarter rate.
+        mip.continuousDrive(16, 8);
+      } else {
+        startTime = currentTime;
+        state = LEFT_TURN;
+      }
+      break;
     case LEFT_TURN:
-        if (elapsedTime < 2000)
-        {
-            // Drive backward at half-speed and turn left at quarter rate.
-            mip.continuousDrive(-16, -8);
-        }
-        else
-        {
-            Serial.println();
-            Serial.println(F("Sample done."));
-            state = DONE;
-        }
-        break;
+      if (elapsedTime < 2000) {
+        // Drive backward at half-speed and turn left at quarter rate.
+        mip.continuousDrive(-16, -8);
+      } else {
+        Serial.println();
+        Serial.println(F("Sample done."));
+        state = DONE;
+      }
+      break;
     default:
-        break;
-    }
+      break;
+  }
 }
+

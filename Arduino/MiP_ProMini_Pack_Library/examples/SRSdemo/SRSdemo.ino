@@ -55,7 +55,7 @@ void loop()
         g_mip.writeHeadLEDs(g_headLEDs);
         state = WAITING_TO_STANDUP;
         break;
-        
+
     case WAITING_TO_STANDUP:
         // Waiting for the robot to indicate that it is standing upright and balancing on its own.
         if (g_mip.isUpright())
@@ -110,7 +110,7 @@ void loop()
         g_mip.writeHeadLEDs(g_headLEDs);
         state = PLAYING_EYE_ANIMATION;
         break;
-        
+
     case PLAYING_EYE_ANIMATION:
         if (!g_mip.isUpright())
         {
@@ -118,7 +118,7 @@ void loop()
             state = RESTART;
             return;
         }
-        
+
         // Update to next animation keyframe in 250 milliseconds.
         if (millis() - keyframeStart >= 250)
         {
@@ -163,4 +163,3 @@ static void animateEyes(int8_t direction)
     }
     g_mip.writeHeadLEDs(g_headLEDs);
 }
-

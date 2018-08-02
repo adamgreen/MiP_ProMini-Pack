@@ -20,29 +20,26 @@
 
 MiP     mip;
 
-void setup()
-{
-    bool connectResult = mip.begin();
-    if (!connectResult)
-    {
-        Serial.println(F("Failed connecting to MiP!"));
-        return;
-    }
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
 
-    Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
+  Serial.println(F("Volume.ino - Use read/writeVolume(). Set volume level to 1 and read out afterwards."));
 
-    mip.writeVolume(1);
+  mip.writeVolume(1);
 
-    uint8_t volume = mip.readVolume();
+  uint8_t volume = mip.readVolume();
 
-    Serial.print(F("Volume = "));
-      Serial.println(volume);
+  Serial.print(F("Volume = "));
+    Serial.println(volume);
 
-    Serial.println();
-    Serial.println(F("Sample done."));
+  Serial.println();
+  Serial.println(F("Sample done."));
 }
 
-void loop()
-{
+void loop() {
 }
 
