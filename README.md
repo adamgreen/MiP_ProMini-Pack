@@ -1,5 +1,5 @@
 # MiP ProMini Pack - 16MHz/5V
-<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180416-02.jpg" alt="MiP with ProMini Pack on its back" width="240" height="320" border="10" />
+<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180416-02.jpg" alt="MiP with ProMini Pack on its back" width="240" height="320"/>
 
 # Attribution
 This project is based on the now retired [Sparkfun MiP ProMini-Pack](https://www.sparkfun.com/products/retired/13058).<br>
@@ -8,7 +8,7 @@ Sparkfun employee [Casey Kuhns](https://github.com/caseykuhns).
 
 
 # Project Goals
-* Produce a functional version of the MiP ProMini-Pack to correct the [MiP communication issue](https://github.com/WowWeeLabs/MiP-BLE-Protocol/issues/18) in the Sparkfun original.
+    * Produce a functional version of the MiP ProMini-Pack to correct the [MiP communication issue](https://github.com/WowWeeLabs/MiP-BLE-Protocol/issues/18) in the Sparkfun original.
 * Run the ATMEGA328 at 16MHz instead of 8MHz. This allows the AVR to properly receive 115200 bps serial output from the
   MiP.
 * Increase Vcc from 3.3V to 5V so that the ATMEGA328 can reliably run at 16MHz.
@@ -51,5 +51,5 @@ Description | Quantity | Part Number(s)
 ![Schematic](https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180427-Schematic.png)
 
 # OSHPark Renderings of PCB
-<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180427-PCB-Top.png" alt="PCB Top" width="320" height="492" border="10" />
-<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180427-PCB-Bottom.png" alt="PCB Top" width="320" height="492" border="10" />
+<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180427-PCB-Top.png" alt="PCB Top" width="320" height="492"/>
+<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180427-PCB-Bottom.png" alt="PCB Top" width="320" height="492"/>
