@@ -23,6 +23,7 @@ Sparkfun employee [Casey Kuhns](https://github.com/caseykuhns).
 * [MiP ProMini-Pack Arduino Library](Arduino/MiP_ProMini_Pack_Library#readme): The Arduino library for this MiP ProMini-Pack.<br>
 * [WowWee's Official MiP Protocol Specification](https://github.com/WowWeeLabs/MiP-BLE-Protocol): Describes the serial protocol used by the Arduino library to communicate with the MiP.<br>
 * [Sparkfun's MiP ProMini-Pack Installation Tutorial](https://learn.sparkfun.com/tutorials/hacking-the-mip---promini-pack): This retired Sparkfun tutorial is still the best place to learn about opening up your MiP and installing this MiP ProMini Pack.<br>
+* [Tiogaplanet's MiP ProtoPack](https://github.com/Tiogaplanet/MiP_ProtoPack): A prototyping plug-in board to expand the MiP ProMini-Pack.
 
 
 # Bill of Materials
