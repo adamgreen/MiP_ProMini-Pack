@@ -8,7 +8,7 @@ Sparkfun employee [Casey Kuhns](https://github.com/caseykuhns).
 
 
 # Project Goals
-    * Produce a functional version of the MiP ProMini-Pack to correct the [MiP communication issue](https://github.com/WowWeeLabs/MiP-BLE-Protocol/issues/18) in the Sparkfun original.
+* Produce a functional version of the MiP ProMini-Pack to correct the [MiP communication issue](https://github.com/WowWeeLabs/MiP-BLE-Protocol/issues/18) in the Sparkfun original.
 * Run the ATMEGA328 at 16MHz instead of 8MHz. This allows the AVR to properly receive 115200 bps serial output from the
   MiP.
 * Increase Vcc from 3.3V to 5V so that the ATMEGA328 can reliably run at 16MHz.
