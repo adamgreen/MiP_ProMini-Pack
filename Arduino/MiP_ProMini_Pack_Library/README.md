@@ -11,7 +11,7 @@ The [WowWee MiP](https://wowwee.com/mip) is a hacker friendly self-balancing rob
 * And More!
 
 The MiP ProMini Pack was [originally designed by Sparkfun](https://www.sparkfun.com/products/retired/13058) but has since been retired. [This retired Sparkfun tutorial](https://learn.sparkfun.com/tutorials/hacking-the-mip---promini-pack) is still the best place to learn about opening up your MiP and installing the MiP ProMini Pack. Once installed, this is what your MiP will look like:<br>
-<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180416-02.jpg" alt="MiP with ProMini Pack on its back" width="240" height="320" border="10" /><br>
+<img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180416-02.jpg" alt="MiP with ProMini Pack on its back" width="240" height="320"/><br>
 Once you have it mounted, attach your [FTDI cable](https://www.sparkfun.com/products/9718), [install the MiP ProMini Pack library in the Arduino IDE](https://learn.sparkfun.com/tutorials/installing-an-arduino-library), start hacking and have fun!
 
 ## Limitations
@@ -5008,7 +5008,7 @@ void setup() {
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
   mip.disableMiPDetectionMode();
-  
+
   if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
   }
@@ -5061,7 +5061,7 @@ void setup() {
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
   mip.disableMiPDetectionMode();
-  
+
   if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
   }
@@ -5114,7 +5114,7 @@ void setup() {
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
   mip.disableMiPDetectionMode();
-  
+
   if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
   }
@@ -5169,7 +5169,7 @@ void setup() {
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
   mip.disableMiPDetectionMode();
-  
+
   if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
   }
@@ -5222,7 +5222,7 @@ void setup() {
   Serial.println(F("EnableMiPDetectionMode.ino - Enable your MiP to be discovered by another using IR."));
 
   mip.disableMiPDetectionMode();
-  
+
   if (!mip.isMiPDetectionModeEnabled()) {
     Serial.println(F("I am not discoverable."));
   }
@@ -5250,7 +5250,7 @@ void loop() {
 Sends a two-byte code to another MiP using IR.
 
 #### Parameters
-* **sendCode** contains a two-byte code to send to another MiP. 
+* **sendCode** contains a two-byte code to send to another MiP.
 * **txPower** is the IR transmission power.  Valid values are 1 to 120 for about 1-300cm.
 
 #### Returns
@@ -5281,7 +5281,7 @@ void loop() {
   uint16_t dongleCode;
 
   char formattedOutput[14];
-  
+
   // Try different codes for dongleCode.
   dongleCode = 0x45;
   dongleCode <<= 8;
