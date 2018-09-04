@@ -45,7 +45,10 @@ Description | Quantity | Part Number(s)
 [SPST Tactile SMD Switch - Normally Open](https://www.digikey.com/products/en?keywords=CKN9112CT-ND) | 1 | S1
 [JST 4-position Connector - 1.5mm Through-Hole](https://www.digikey.com/products/en?keywords=455-1659-ND) | 1 | JP11
 [Male Header for FTDI 1x6 - 0.1" Through-Hole](https://www.digikey.com/products/en?keywords=HDR100IMP40M-G-V-TH-ND) | 1 | JP1
-[JST 4-wire Cable]( https://www.digikey.com/product-detail/en/jst-sales-america-inc/A04ZR04ZR28H152A/455-3026-ND/6009402) | 1 |
+[JST 4-wire Cable](https://www.digikey.com/product-detail/en/jst-sales-america-inc/A04ZR04ZR28H152A/455-3026-ND/6009402) | 1 |
+[Screw - Phillips Head (1/2", 4-40)](https://www.sparkfun.com/products/10452) | 3 |
+[Nut - (4-40)](https://www.sparkfun.com/products/10454) | 3 |
+[Screw - Phillip Head (M3-0.5 x 12mm)](https://www.sparkfun.com/products/13227) | 3 |
 
 
 # Schematic
