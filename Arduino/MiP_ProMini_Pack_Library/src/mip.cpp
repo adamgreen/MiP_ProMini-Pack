@@ -50,6 +50,9 @@
 // Last addressable address in EEPROM.
 #define MIP_LAST_EEPROM_ADDRESS 0x2F
 
+// Baud rate to use for MiP/PC communications.
+#define MIP_BAUD_RATE 115200
+
 // MiP Protocol Commands.
 // These command codes are placed in the first byte of requests sent to the MiP and responses sent back from the MiP.
 // See https://github.com/WowWeeLabs/MiP-BLE-Protocol/blob/master/MiP-Protocol.md for more information.
@@ -178,7 +181,7 @@ bool MiP::begin()
     // Call MiPStream.begin() instead of Serial.begin() directly so that it can track the begin/end state. This allows
     // it to know that it should automatically initialize the Serial stream to 115200 if the user attempts to write to
     // it before calling this MiP::begin method.
-    MiPStream.begin(115200);
+    MiPStream.begin(MIP_BAUD_RATE);
     Serial.setTimeout(MIP_RESPONSE_TIMEOUT);
 
     // Initialize the class members.
@@ -2545,7 +2548,7 @@ void MiPStream::begin(unsigned long baud, uint8_t mode)
     m_isInit = true;
 
     // Fix the baud rate / mode at 115200-8-N-1 since that is required by the MiP.
-    Serial.begin(115200, SERIAL_8N1);
+    Serial.begin(MIP_BAUD_RATE, SERIAL_8N1);
 }
 
 void MiPStream::end()
@@ -2565,7 +2568,7 @@ void MiPStream::initIfNeeded()
     // Make sure that Serial stream has been initialized by user or MiP.
     if (!m_isInit)
     {
-        begin(115200);
+        begin(MIP_BAUD_RATE);
     }
 }
 
