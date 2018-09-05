@@ -522,12 +522,30 @@ public:
     // code will automatically end up calling these functions for you as needed.
     void switchSerialToMiP()
     {
+        if (isSerialGoingToMiP())
+        {
+            return;
+        }
+
         Serial.flush();
+        if (m_mipBaudRate != 115200)
+        {
+            Serial.begin(m_mipBaudRate);
+        }
         digitalWrite(m_serialSelectPin, HIGH);
     }
     void switchSerialToPC()
     {
+        if (!isSerialGoingToMiP())
+        {
+            return;
+        }
+
         Serial.flush();
+        if (m_mipBaudRate != 115200)
+        {
+            Serial.begin(115200);
+        }
         digitalWrite(m_serialSelectPin, LOW);
     }
     bool isSerialGoingToMiP()
@@ -630,6 +648,7 @@ protected:
 
     uint32_t                     m_lastRequestTime;
     uint32_t                     m_lastContinuousDriveTime;
+    uint32_t                     m_mipBaudRate;
     uint8_t                      m_flags;
     int8_t                       m_serialSelectPin;
     uint8_t                      m_responseBuffer[MIP_RESPONSE_MAX_LEN];

@@ -21,7 +21,9 @@
 
 
 // Number of times that begin() method should try to initialize the MiP.
-#define MIP_MAX_BEGIN_RETRIES 5
+// Half way through the retry iterations, the baud rate will be dropped to see if the failures are due to the slower
+// baud rate used by newer MiP robots.
+#define MIP_MAX_BEGIN_RETRIES 10
 
 // Number of milliseconds to wait between retries in begin().
 #define MIP_BEGIN_RETRY_WAIT 500
@@ -52,6 +54,9 @@
 
 // Baud rate to use for MiP/PC communications.
 #define MIP_BAUD_RATE 115200
+
+// Slower baud rate used by newer MiP robots.
+#define MIP_SLOWER_BAUD_RATE 9600
 
 // MiP Protocol Commands.
 // These command codes are placed in the first byte of requests sent to the MiP and responses sent back from the MiP.
@@ -155,6 +160,7 @@ void MiP::clear()
 {
     m_lastRequestTime = millis();
     m_lastContinuousDriveTime = millis();
+    m_mipBaudRate = MIP_BAUD_RATE;
     m_flags = 0;
     memset(m_responseBuffer, 0, sizeof(m_responseBuffer));
     m_expectedResponseCommand = 0;
@@ -199,6 +205,14 @@ bool MiP::begin()
     int8_t retry;
     for (retry = 0 ; retry < MIP_MAX_BEGIN_RETRIES ; retry++)
     {
+        // Switch baud rate to 9600 baud, rate used by newer MiP robots, if already failed half of the retries.
+        if (retry == MIP_MAX_BEGIN_RETRIES / 2)
+        {
+            MiPStream.println(F("MiP: Switching to 9600 baud for MiP communications..."));
+            m_mipBaudRate = MIP_SLOWER_BAUD_RATE;
+            Serial.begin(MIP_SLOWER_BAUD_RATE);
+        }
+
         // Send 0xFF to the MiP via UART to enable the UART communication channel in the MiP.
         const uint8_t initMipCommand[] = { 0xFF };
         rawSend(initMipCommand, sizeof(initMipCommand));

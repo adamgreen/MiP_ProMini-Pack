@@ -34,6 +34,8 @@ What limitations does this put on your usage of ```Serial.println()``` and ```Se
 * If you find your code isn't receiving expected updates/events then double check that you aren't sending too much data to the Arduino IDE.
 * It is probably best to not attempt receiving data sent from the Arduino IDE. Calling functions like ```Serial.read()``` from your code is likely to read MiP updates and not Arduino IDE data from the Serial receive buffer.
 
+The original MiP robots communicated over the UART at 115200 baud but the newer ones now communicate at 9600 baud. This library will first start to connect with the MiP at 115200 baud in the MiP::begin() call. If this fails after 5 retries, it will switch to 9600 baud and try again (up to 5 retries). This means that the library should work with both new and old MiP robots but may take a second or so longer to connect to the newer MiP robots when it tries 115200 baud initially.
+
 ## Examples
 * [ChestLED](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/ChestLED/ChestLED.ino): Take control of the RGB LED in the chest of the MiP.
 * [Clap](https://github.com/adamgreen/MiP_ProMini-Pack/blob/master/Arduino/MiP_ProMini_Pack_Library/examples/Clap/Clap.ino): Send descriptive messages to the Arduino IDE about each clap event deteced by the MiP robot.
