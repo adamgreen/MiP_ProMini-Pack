@@ -580,6 +580,7 @@ public:
 
 protected:
     void    clear();
+    int8_t  attemptMiPConnection(uint32_t baudRate);
 
     void    verifiedSetGestureRadarMode(MiPGestureRadarMode desiredMode);
     bool    checkGestureRadarMode(MiPGestureRadarMode expectedMode);

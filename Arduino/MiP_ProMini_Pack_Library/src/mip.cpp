@@ -21,9 +21,7 @@
 
 
 // Number of times that begin() method should try to initialize the MiP.
-// Half way through the retry iterations, the baud rate will be dropped to see if the failures are due to the slower
-// baud rate used by newer MiP robots.
-#define MIP_MAX_BEGIN_RETRIES 10
+#define MIP_MAX_BEGIN_RETRIES 5
 
 // Number of milliseconds to wait between retries in begin().
 #define MIP_BEGIN_RETRY_WAIT 500
@@ -205,42 +203,61 @@ bool MiP::begin()
     int8_t retry;
     for (retry = 0 ; retry < MIP_MAX_BEGIN_RETRIES ; retry++)
     {
-        // Switch baud rate to 9600 baud, rate used by newer MiP robots, if already failed half of the retries.
-        if (retry == MIP_MAX_BEGIN_RETRIES / 2)
-        {
-            MiPStream.println(F("MiP: Switching to 9600 baud for MiP communications..."));
-            m_mipBaudRate = MIP_SLOWER_BAUD_RATE;
-            Serial.begin(MIP_SLOWER_BAUD_RATE);
-        }
+        int8_t result = -1;
 
-        // Send 0xFF to the MiP via UART to enable the UART communication channel in the MiP.
-        const uint8_t initMipCommand[] = { 0xFF };
-        rawSend(initMipCommand, sizeof(initMipCommand));
-
-        // The MiP UART documentation indicates that this delay is required after sending 0xFF.
-        delay(30);
-        // Flush any outstanding junk data in receive buffer.
-        discardUnexpectedSerialData();
-
-        // Attempt to get the MiP's latest status to see if the connection was successful or not.
-        int result = rawGetStatus(m_lastStatus);
+        // Try to connect at 115200 baud, the rate used by older MiP robots.
+        result = attemptMiPConnection(MIP_BAUD_RATE);
         if (result == MIP_ERROR_NONE)
         {
-            // Connection must be successful since this request was successful.
-            break;
+            // Connection succeeded at 115200.
+            return true;
         }
 
-        // Sleep a bit before making the next attempt.
-        delay(MIP_BEGIN_RETRY_WAIT);
-    }
-    if (retry == MIP_MAX_BEGIN_RETRIES)
-    {
-        m_flags &= ~MRI_FLAG_INITIALIZED;
-        end();
-        return false;
+        // Try to connect at 9600 baud, the rate used by newer MiP robots.
+        result = attemptMiPConnection(MIP_SLOWER_BAUD_RATE);
+        if (result == MIP_ERROR_NONE)
+        {
+            // Connection succeeded at 9600.
+            return true;
+        }
     }
 
-    return true;
+    // Get here if connection to the MiP never succeeds.
+    m_flags &= ~MRI_FLAG_INITIALIZED;
+    end();
+    return false;
+}
+
+int8_t MiP::attemptMiPConnection(uint32_t baudRate)
+{
+    // Set baud rate to specified rate.
+    m_mipBaudRate = baudRate;
+    Serial.begin(baudRate);
+
+    // Send 0xFF to the MiP via UART to enable the UART communication channel in the MiP.
+    const uint8_t initMipCommand[] = { 0xFF };
+    rawSend(initMipCommand, sizeof(initMipCommand));
+
+    // The MiP UART documentation indicates that this delay is required after sending 0xFF.
+    delay(30);
+    // Flush any outstanding junk data in receive buffer.
+    discardUnexpectedSerialData();
+
+    // Attempt to get the MiP's latest status to see if the connection was successful or not.
+    int8_t result = rawGetStatus(m_lastStatus);
+    if (result == MIP_ERROR_NONE)
+    {
+        // Let the user know which baud rate the connection to the MiP was made.
+        MiPStream.print(F("MiP: Connected at "));
+            MiPStream.print(baudRate);
+            MiPStream.println(F(" baud."));
+    }
+    else
+    {
+        // Sleep a bit before returning to code which will retry connection at alternate baud rate.
+        delay(MIP_BEGIN_RETRY_WAIT);
+    }
+    return result;
 }
 
 void MiP::end()
