@@ -611,6 +611,26 @@ void MiP::readChestLED(MiPChestLED& chestLED)
     m_lastError = result;
 }
 
+void MiP::unverifiedWriteChestLED(uint8_t red, uint8_t green, uint8_t blue)
+{
+    rawSetChestLED(red, green, blue);
+}
+
+void MiP::unverifiedWriteChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime)
+{
+    // on/off time are in units of 20 msecs.
+    MIP_ASSERT( onTime / 20 <= 255 && offTime / 20 <= 255 );
+    onTime = (onTime + 10) / 20;
+    offTime = (offTime + 10) / 20;
+
+    rawFlashChestLED(red, green, blue, onTime, offTime);
+}
+
+void MiP::unverifiedWriteChestLED(const MiPChestLED& chestLED)
+{
+    unverifiedWriteChestLED(chestLED.red, chestLED.green, chestLED.blue, chestLED.onTime, chestLED.offTime);
+}
+
 // This internal protected method sends the set chest LED command with no error checking. The error handling /
 // recovery happens at a higher level of the driver.
 void MiP::rawSetChestLED(uint8_t red, uint8_t green, uint8_t blue)
@@ -736,6 +756,16 @@ void MiP::readHeadLEDs(MiPHeadLEDs& headLEDs)
     }
 
     m_lastError = result;
+}
+
+void MiP::unverifiedWriteHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4)
+{
+    rawSetHeadLEDs(led1, led2, led3, led4);
+}
+
+void MiP::unverifiedWriteHeadLEDs(const MiPHeadLEDs& headLEDs)
+{
+    unverifiedWriteHeadLEDs(headLEDs.led1, headLEDs.led2, headLEDs.led3, headLEDs.led4);
 }
 
 // This internal protected method sends the set head LEDs command with no error checking. The error handling /

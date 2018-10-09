@@ -432,10 +432,15 @@ public:
     void writeChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
     void writeChestLED(const MiPChestLED& chestLED);
     void readChestLED(MiPChestLED& chestLED);
+    void unverifiedWriteChestLED(uint8_t red, uint8_t green, uint8_t blue);
+    void unverifiedWriteChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime);
+    void unverifiedWriteChestLED(const MiPChestLED& chestLED);
 
     void writeHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
     void writeHeadLEDs(const MiPHeadLEDs& headLEDs);
     void readHeadLEDs(MiPHeadLEDs& headLEDs);
+    void unverifiedWriteHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4);
+    void unverifiedWriteHeadLEDs(const MiPHeadLEDs& headLEDs);
 
     void continuousDrive(int8_t velocity, int8_t turnRate);
     void distanceDrive(MiPDriveDirection driveDirection, uint8_t cm, MiPTurnDirection turnDirection, uint16_t degrees);

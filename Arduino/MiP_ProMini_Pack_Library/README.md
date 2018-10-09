@@ -88,8 +88,10 @@ Gesture         | [enableGestureMode()](#enablegesturemode)
 <br>            | [readGestureEvent()](#readgestureevent)
 Chest LED       | [writeChestLED()](#writechestled)
 <br>            | [readChestLED()](#readchestled)
+<br>            | [unverifiedWriteChestLED()](#unverifiedwritechestled)
 Head LEDs       | [writeHeadLEDs()](#writeheadleds)
 <br>            | [readHeadLEDs()](#readheadleds)
+<br>            | [unverifiedWriteHeadLEDs()](#unverifiedwriteheadleds)
 Motion          | [continuousDrive()](#continuousdrive)
 <br>            | [distanceDrive()](#distancedrive)
 <br>            | [turnLeft()](#turnleft)
@@ -999,7 +1001,7 @@ Returns a gesture detection event from the library's queue. They will be returne
 None
 
 #### Returns
-* **MIP_GESTURE_INVALID** if the gesture detection event queue is empty. [availableGestureEvents()](availablegestureevents) would return 0 in this scenario.
+* **MIP_GESTURE_INVALID** if the gesture detection event queue is empty. [availableGestureEvents()](#availablegestureevents) would return 0 in this scenario.
 
 | Other Valid Return Values       |
 | ------------------------------- |
@@ -1153,6 +1155,31 @@ void setup() {
   printCurrentChestLEDSetting();
   delay(1000);
 
+  // Attempt to run through the same sequence of chest LED changes using the
+  // unverifiedWriteChestLED() functions which don't always get accepted by the MiP.
+  Serial.println(F("Trying to set chest LED to magenta."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0xfe;
+  mip.unverifiedWriteChestLED(red, green, blue);
+  delay(1000);
+
+  Serial.println(F("Trying to set chest LED to blink red."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0x05;
+  mip.unverifiedWriteChestLED(red, green, blue, onTime, offTime);
+  delay(4000);
+
+  Serial.println(F("Trying to set chest LED back to green."));
+  chestLED.red = 0x00;
+  chestLED.green = 0xff;
+  chestLED.blue = 0x00;
+  chestLED.onTime = 0;
+  chestLED.offTime = 0;
+  mip.unverifiedWriteChestLED(chestLED);
+  delay(1000);
+
   Serial.println();
   Serial.println(F("Sample done."));
 }
@@ -1249,6 +1276,163 @@ void setup() {
   printCurrentChestLEDSetting();
   delay(1000);
 
+  // Attempt to run through the same sequence of chest LED changes using the
+  // unverifiedWriteChestLED() functions which don't always get accepted by the MiP.
+  Serial.println(F("Trying to set chest LED to magenta."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0xfe;
+  mip.unverifiedWriteChestLED(red, green, blue);
+  delay(1000);
+
+  Serial.println(F("Trying to set chest LED to blink red."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0x05;
+  mip.unverifiedWriteChestLED(red, green, blue, onTime, offTime);
+  delay(4000);
+
+  Serial.println(F("Trying to set chest LED back to green."));
+  chestLED.red = 0x00;
+  chestLED.green = 0xff;
+  chestLED.blue = 0x00;
+  chestLED.onTime = 0;
+  chestLED.offTime = 0;
+  mip.unverifiedWriteChestLED(chestLED);
+  delay(1000);
+
+  Serial.println();
+  Serial.println(F("Sample done."));
+}
+
+void loop() {
+}
+
+static void printCurrentChestLEDSetting() {
+  MiPChestLED chestLED;
+  mip.readChestLED(chestLED);
+
+  Serial.println(F("Current Chest LED Setting"));
+  Serial.print(F("    red: "));
+    Serial.println(chestLED.red);
+  Serial.print(F("    green: "));
+    Serial.println(chestLED.green);
+  Serial.print(F("    blue: "));
+    Serial.println(chestLED.blue);
+  Serial.print(F("    on time: "));
+    Serial.print(chestLED.onTime);
+    Serial.println(F(" milliseconds"));
+  Serial.print(F("    off time: "));
+    Serial.print(chestLED.offTime);
+    Serial.println(F(" milliseconds"));
+  Serial.println();
+}
+```
+
+
+---
+### unverifiedWriteChestLED()
+```void unverifiedWriteChestLED(uint8_t red, uint8_t green, uint8_t blue)```<br>
+```void unverifiedWriteChestLED(uint8_t red, uint8_t green, uint8_t blue, uint16_t onTime, uint16_t offTime)```<br>
+```void unverifiedWriteChestLED(const MiPChestLED& chestLED)```
+#### Description
+Sets the colour and flashing period of the RGB LED in the MiP robot's chest. These functions operate similarily to the [writeChestLED()](#writechestled) functions except that these ones are faster since they don't bother to verify that the MiP actually sets the LED state as requested. Typically you would want to use the writeChestLED() functions but these unverified ones can be useful when you are calling them several times per second so that a missed LED state update won't be noticed by the user.
+
+#### Parameters
+* **red** is the intensity of the red colour channel (0 - 255).
+* **green** is the intensity of the green colour channel (0 - 255).
+* **blue** is the intensity of the blue colour channel (0 - 255). The MiP robot actually clears the lower 2 bits of the blue colour channel to treat it as a 6-bit value.
+* **onTime** is the time in milliseconds that the LED should remain on with the specified colour. This parameter can be set to a value between 0 and 5100 milliseconds.
+* **offTime** is the time in milliseconds that the LED should remain off before turning on again with the specified colour. This parameter can be set to a value between 0 and 5100 milliseconds.
+* **chestLED** is an object which contains red, green, blue, onTime, and offTime fields for setting the LED colour and flashing period.
+```c++
+class MiPChestLED
+{
+    // ...
+    uint16_t onTime;
+    uint16_t offTime;
+    uint8_t  red;
+    uint8_t  green;
+    uint8_t  blue;
+};
+```
+
+#### Returns
+Nothing
+
+#### Notes
+* The MiP only supports a granularity of 20 milliseconds for the onTime and offTime parameters.
+* The ```void writeChestLED(uint8_t red, uint8_t green, uint8_t blue)``` version can only set the LED to a solid colour with no flashing.
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP     mip;
+
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("ChestLED.ino - Set Chest LED to different colors.\n"));
+
+  Serial.println(F("Set chest LED to magenta."));
+  uint8_t red = 0xff;
+  uint8_t green = 0x01;
+  uint8_t blue = 0xfe;
+  mip.writeChestLED(red, green, blue);
+  printCurrentChestLEDSetting();
+  delay(1000);
+
+  Serial.println(F("Set chest LED to blink red."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0x05;
+  const uint16_t onTime = 990;
+  const uint16_t offTime = 989;
+  mip.writeChestLED(red, green, blue, onTime, offTime);
+  printCurrentChestLEDSetting();
+  delay(4000);
+
+  Serial.println(F("Set chest LED back to green."));
+  MiPChestLED chestLED;
+  chestLED.red = 0x00;
+  chestLED.green = 0xff;
+  chestLED.blue = 0x00;
+  chestLED.onTime = 0;
+  chestLED.offTime = 0;
+  mip.writeChestLED(chestLED);
+  printCurrentChestLEDSetting();
+  delay(1000);
+
+  // Attempt to run through the same sequence of chest LED changes using the
+  // unverifiedWriteChestLED() functions which don't always get accepted by the MiP.
+  Serial.println(F("Trying to set chest LED to magenta."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0xfe;
+  mip.unverifiedWriteChestLED(red, green, blue);
+  delay(1000);
+
+  Serial.println(F("Trying to set chest LED to blink red."));
+  red = 0xff;
+  green = 0x01;
+  blue = 0x05;
+  mip.unverifiedWriteChestLED(red, green, blue, onTime, offTime);
+  delay(4000);
+
+  Serial.println(F("Trying to set chest LED back to green."));
+  chestLED.red = 0x00;
+  chestLED.green = 0xff;
+  chestLED.blue = 0x00;
+  chestLED.onTime = 0;
+  chestLED.offTime = 0;
+  mip.unverifiedWriteChestLED(chestLED);
+  delay(1000);
+
   Serial.println();
   Serial.println(F("Sample done."));
 }
@@ -1343,6 +1527,17 @@ void setup() {
   Serial.println(F("Turning all eye LEDs back on now."));
   headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
   mip.writeHeadLEDs(headLEDs);
+  delay(1000);
+
+  // Attempt to run through the same sequence of head LED changes using the
+  // unverifiedWriteHeadLEDs() functions which don't always get accepted by the MiP.
+  Serial.println(F("Trying to set each head LED to a different state."));
+  mip.unverifiedWriteHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+  delay(4000);
+
+  Serial.println(F("Trying to set all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.unverifiedWriteHeadLEDs(headLEDs);
 
   Serial.println();
   Serial.println(F("Sample done."));
@@ -1433,6 +1628,123 @@ void setup() {
   Serial.println(F("Turning all eye LEDs back on now."));
   headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
   mip.writeHeadLEDs(headLEDs);
+  delay(1000);
+
+  // Attempt to run through the same sequence of head LED changes using the
+  // unverifiedWriteHeadLEDs() functions which don't always get accepted by the MiP.
+  Serial.println(F("Trying to set each head LED to a different state."));
+  mip.unverifiedWriteHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+  delay(4000);
+
+  Serial.println(F("Trying to set all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.unverifiedWriteHeadLEDs(headLEDs);
+
+  Serial.println();
+  Serial.println(F("Sample done."));
+}
+
+static void printLEDString(MiPHeadLED led) {
+  switch (led) {
+    case MIP_HEAD_LED_OFF:
+      Serial.println(F("Off"));
+      break;
+    case MIP_HEAD_LED_ON:
+      Serial.println(F("On"));
+      break;
+    case MIP_HEAD_LED_BLINK_SLOW:
+      Serial.println(F("Blink Slow"));
+      break;
+    case MIP_HEAD_LED_BLINK_FAST:
+      Serial.println(F("Blink Fast"));
+      break;
+    default:
+      Serial.println();
+      break;
+  }
+}
+
+void loop() {
+}
+```
+
+
+---
+### unverifiedWriteHeadLEDs()
+```void unverifiedWriteHeadLEDs(MiPHeadLED led1, MiPHeadLED led2, MiPHeadLED led3, MiPHeadLED led4)```<br>
+```void unverifiedWriteHeadLEDs(const MiPHeadLEDs& headLEDs)```<br>
+#### Description
+Sets the state of the four eye LEDs on the MiP robot's head. These functions operate similarily to the [writeHeadLEDs()](#writeheadleds) functions except that these ones are faster since they don't bother to verify that the MiP actually sets the LED state as requested. Typically you would want to use the writeHeadLEDs() functions but these unverified ones can be useful when you are calling them several times per second so that a missed LED state update won't be noticed by the user.
+
+#### Parameters
+* **led1** sets the state of led1 on the MiP robot's head. Valid states are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* **led2** sets the state of led2 on the MiP robot's head. Valid states are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* **led3** sets the state of led3 on the MiP robot's head. Valid states are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* **led4** sets the state of led4 on the MiP robot's head. Valid states are **MIP_HEAD_LED_OFF**, **MIP_HEAD_LED_ON**, **MIP_HEAD_LED_BLINK_SLOW**, **MIP_HEAD_LED_BLINK_FAST**.
+* **headLEDs** is an object which contains led1, led2, led3, and led4 fields for setting the state of all 4 LEDs.
+```c++
+class MiPHeadLEDs
+{
+public:
+    // ...
+    MiPHeadLED led1;
+    MiPHeadLED led2;
+    MiPHeadLED led3;
+    MiPHeadLED led4;
+};
+```
+
+#### Returns
+Nothing
+
+#### Notes
+* The 4 head LEDs are numbered from left to right, with led1 being the leftmost and led4 being the rightmost.
+
+#### Example
+```c++
+#include <mip.h>
+
+MiP     mip;
+
+void setup() {
+  bool connectResult = mip.begin();
+  if (!connectResult) {
+    Serial.println(F("Failed connecting to MiP!"));
+    return;
+  }
+
+  Serial.println(F("HeadLEDs.ino - Use head LED functions. Should set each head LED to different state."));
+  mip.writeHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+
+  MiPHeadLEDs headLEDs;
+  mip.readHeadLEDs(headLEDs);
+  Serial.println(F("Head LEDs"));
+  Serial.print(F("    led1: "));
+    printLEDString(headLEDs.led1);
+  Serial.print(F("    led2: "));
+    printLEDString(headLEDs.led2);
+  Serial.print(F("    led3: "));
+    printLEDString(headLEDs.led3);
+  Serial.print(F("    led4: "));
+    printLEDString(headLEDs.led4);
+
+  delay(4000);
+
+  // Turn all the LEDs back on now.
+  Serial.println(F("Turning all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.writeHeadLEDs(headLEDs);
+  delay(1000);
+
+  // Attempt to run through the same sequence of head LED changes using the
+  // unverifiedWriteHeadLEDs() functions which don't always get accepted by the MiP.
+  Serial.println(F("Trying to set each head LED to a different state."));
+  mip.unverifiedWriteHeadLEDs(MIP_HEAD_LED_OFF, MIP_HEAD_LED_ON, MIP_HEAD_LED_BLINK_SLOW, MIP_HEAD_LED_BLINK_FAST);
+  delay(4000);
+
+  Serial.println(F("Trying to set all eye LEDs back on now."));
+  headLEDs.led1 = headLEDs.led2 = headLEDs.led3 = headLEDs.led4 = MIP_HEAD_LED_ON;
+  mip.unverifiedWriteHeadLEDs(headLEDs);
 
   Serial.println();
   Serial.println(F("Sample done."));
