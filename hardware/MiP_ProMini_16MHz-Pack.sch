@@ -6035,6 +6035,21 @@ QFN is non-stock</description>
 <text x="-1.524" y="1.27" size="0.4064" layer="25">&gt;Name</text>
 <text x="-1.524" y="-1.651" size="0.4064" layer="27">&gt;Value</text>
 </package>
+<package name="RESONATOR-SMD-CUSTOM2">
+<description>Custom package layout for muRATA CSTNE16M0V530000R0. I elongated pads to make soldering easy.</description>
+<wire x1="1.87111875" y1="0.65" x2="1.87111875" y2="-0.65" width="0.2032" layer="21"/>
+<wire x1="-1.878740625" y1="-0.65" x2="-1.878740625" y2="0.65" width="0.2032" layer="21"/>
+<smd name="1" x="-1.2" y="0" dx="0.4" dy="2.6" layer="1"/>
+<smd name="2" x="0" y="0" dx="0.4" dy="2.6" layer="1"/>
+<smd name="3" x="1.2" y="0" dx="0.4" dy="2.6" layer="1"/>
+<text x="-1.056" y="1.52" size="0.4064" layer="25">&gt;Name</text>
+<text x="-1.0325" y="-1.9275" size="0.4064" layer="27">&gt;Value</text>
+<rectangle x1="-1.6" y1="-0.65" x2="1.6" y2="0.65" layer="29"/>
+<rectangle x1="-1.6" y1="-0.65" x2="-1.5" y2="0.65" layer="41"/>
+<rectangle x1="-0.9" y1="-0.65" x2="-0.3" y2="0.65" layer="41"/>
+<rectangle x1="0.3" y1="-0.65" x2="0.9" y2="0.65" layer="41"/>
+<rectangle x1="1.5" y1="-0.65" x2="1.6" y2="0.65" layer="41"/>
+</package>
 </packages>
 <symbols>
 <symbol name="SWITCH-MOMENTARY-2">
@@ -6290,6 +6305,16 @@ Used, eg, on the Arduino Pro/ Pro Mini boards.&lt;br&gt;
 </technologies>
 </device>
 <device name="MURATA_16MHZ" package="RESONATOR-SMD-CUSTOM">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+<connect gate="G$1" pin="3" pad="3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="MURATA_16MHZ_2" package="RESONATOR-SMD-CUSTOM2">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -12080,7 +12105,7 @@ Source: AVX .. aphvc.pdf</description>
 <part name="P+3" library="SparkFun-Aesthetics" deviceset="5V" device="" value="5V"/>
 <part name="S1" library="adam_custom" deviceset="SWITCH-MOMENTARY-NO" device="SMD" value="Reset"/>
 <part name="JP3" library="SparkFun" deviceset="M02" device="PTH"/>
-<part name="Q1" library="adam_custom" deviceset="RESONATOR" device="MURATA_16MHZ" value="16MHZ"/>
+<part name="Q1" library="adam_custom" deviceset="RESONATOR" device="MURATA_16MHZ_2" value="16MHZ"/>
 <part name="FRAME1" library="SparkFun-Aesthetics" deviceset="FRAME-LETTER" device=""/>
 <part name="GND1" library="SparkFun" deviceset="GND" device=""/>
 <part name="GND6" library="SparkFun" deviceset="GND" device=""/>
@@ -12157,7 +12182,7 @@ Source: AVX .. aphvc.pdf</description>
 <wire x1="223.52" y1="140.208" x2="223.52" y2="175.26" width="0.2032" layer="97" style="shortdash"/>
 <text x="243.84" y="141.478" size="1.778" layer="97" rot="R90">Optional Pullups for I2C lines</text>
 <text x="166.37" y="11.43" size="2.54" layer="94">Adam Green (http://github.com/adamgreen)</text>
-<text x="238.76" y="7.62" size="2.54" layer="94">v3</text>
+<text x="238.76" y="7.62" size="2.54" layer="94">v4</text>
 <text x="86.36" y="154.94" size="1.778" layer="97">Note: Cut jumper to move
 SEL to another pin</text>
 <text x="6.35" y="115.57" size="1.778" layer="97" rot="R90" align="bottom-center">MiP UART</text>

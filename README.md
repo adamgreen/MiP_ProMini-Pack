@@ -31,7 +31,7 @@ Description | Quantity | Part Number(s)
 ------------|----------|---------------
 [TS3USB221A USB SWITCH DUAL - 10QFN](https://www.digikey.com/products/en?keywords=296-24019-1-ND) | 1 | U3
 [ATMEGA328P - 32TQFP](https://www.digikey.com/products/en?keywords=ATMEGA328P-AURCT-ND) | 1 | U1
-[16MHz Ceramic Resonator - 15pF ±0.2% SMD](https://www.digikey.com/products/en?keywords=490-1198-1-ND) | 1 | Q1
+[16MHz Ceramic Resonator - 15pF ±0.2% SMD](https://www.digikey.com/products/en?keywords=490-17948-1-ND) | 1 | Q1
 [MIC5205 Linear Regulator - 5.0V 150mA SOT23-5](https://www.digikey.com/products/en?keywords=576-1261-1-ND) | 1 | U2
 [MIC5205 Linear Regulator - 3.3V 150mA SOT23-5](https://www.digikey.com/products/en?keywords=576-1259-1-ND) | 1 | U4
 [10kΩ Resistor - 0805](https://www.adafruit.com/product/441) | 3 | R2, R4, R5
