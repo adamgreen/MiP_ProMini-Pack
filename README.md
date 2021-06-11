@@ -1,6 +1,9 @@
 # MiP ProMini Pack - 16MHz/5V
 <img src="https://raw.githubusercontent.com/adamgreen/MiP_ProMini-Pack/master/images/20180416-02.jpg" alt="MiP with ProMini Pack on its back" width="240" height="320"/>
 
+# Archived - June 10th, 2021
+This project is no longer under active development. Both @Tiogaplanet and I have moved onto other projects.
+
 # Attribution
 This project is based on the now retired [Sparkfun MiP ProMini-Pack](https://www.sparkfun.com/products/retired/13058).<br>
 The original Eagle files can be found on [GitHub](https://github.com/sparkfun/MiP_ProMini-Pack). They were created by
